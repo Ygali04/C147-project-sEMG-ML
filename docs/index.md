@@ -38,3 +38,15 @@ uv sync --group dev
 make test
 make docs-serve
 ```
+
+## Docs
+Prettified docs using MkDocs.
+
+To to add documentation, simply edit or add markdown files in the ./docs folder.
+Once your done, run:
+```bash
+make docs-deploy
+```
+which will commit your changes, push them, and then update the site html.
+Those html changes will instantly be broadcasted to the github IO page:
+`<https://Ygali04.github.io/C147-project-sEMG-ML/>`

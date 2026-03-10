@@ -1,0 +1,67 @@
+# EMG2QWERTY — UCLA ECE C147/C247 Final Project
+#
+# Suggested source layout:
+#
+#   src/
+#     emg2qwerty/
+#       data/          # Dataset loading, HDF5 parsing, preprocessing
+#       models/        # Model definitions (TDS, RNN, Transformer, etc.)
+#       train.py       # Training loop
+#       evaluate.py    # CER evaluation
+#       utils.py       # Shared utilities
+#   tests/
+#     test_data.py
+#     test_models.py
+#   notebooks/         # EDA, result visualization (nbstripout will clean these)
+#   config/            # Hydra/YAML experiment configs
+#   docs/
+
+[project]
+name = "emg2qwerty"
+version = "0.1.0"
+description = "Predicting keystrokes from surface EMG signals using deep learning (ECE C147/C247)"
+requires-python = ">=3.11"
+dependencies = [
+    "torch>=2.2",
+    "torchaudio>=2.2",
+    "numpy>=1.26",
+    "scipy>=1.12",
+    "h5py>=3.10",
+    "pydantic>=2.6",
+    "tqdm>=4.66",
+    "matplotlib>=3.8",
+    "editdistance>=0.6",
+    "pyyaml>=6.0",
+    "hydra-core>=1.3",
+]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.4",
+    "pytest>=8.0",
+    "pytest-cov>=5.0",
+    "pytest-xdist>=3.5",
+    "pre-commit>=3.6",
+    "ipywidgets>=8.1",
+    "jupyterlab>=4.1",
+    "nbstripout>=0.7",
+]
+docs = [
+    "mkdocs>=1.5",
+    "mkdocs-material>=9.5",
+    "pymdown-extensions>=10.7",
+    "mkdocs-awesome-nav>=2.9",
+]
+
+[tool.pytest.ini_options]
+pythonpath = "src"
+testpaths = ["tests"]
+addopts = ["--import-mode=importlib"]
+
+[tool.ruff]
+exclude = ["notebooks/", "site/", "*.ipynb"]
+line-length = 120
+
+[build-system]
+requires = ["setuptools>=69.0", "wheel"]
+build-backend = "setuptools.build_meta"

@@ -1374,33 +1374,37 @@
 predicted keystrokes — and how every component in the codebase connects.</p>
 <hr />
 <h2 id="system-overview">System Overview<a class="headerlink" href="#system-overview" title="Permanent link">&para;</a></h2>
-<pre class="mermaid"><code>flowchart LR
-    subgraph Data Acquisition
-        MetaS3["Meta S3&lt;br/&gt;(308 GB tar.gz)"]
-        Downloader["EMGDownloader&lt;br/&gt;(stream-filter)"]
-        B2["Backblaze B2"]
-        Local["Local data/"]
+<pre class="mermaid"><code>flowchart TB
+    subgraph acq["📦 Data Acquisition"]
+        direction TB
+        MetaS3["☁️ Meta S3\n308 GB tar.gz"]
+        Downloader["⬇️ EMGDownloader\nstream-filter"]
+        B2["🗄️ Backblaze B2"]
+        Local["💾 Local data/"]
+
+        MetaS3 --&gt;|"HTTPS tar.gz stream"| Downloader
+        Downloader --&gt; B2
+        Downloader --&gt; Local
+        B2 --&gt;|"rclone sync"| Local
     end
 
-    subgraph Training Loop
-        Dataset["WindowedEMGDataset"]
-        Transforms["Transforms&lt;br/&gt;(LogSpec + SpecAug)"]
-        Model["TDSConvEncoder"]
-        CTC["CTC Loss"]
-        Decoder["Greedy / Beam&lt;br/&gt;Decoder"]
-        Metric["CER Metric"]
+    subgraph train["🔁 Training Loop"]
+        direction TB
+        Dataset["🪟 WindowedEMGDataset"]
+        Transforms["🔀 Transforms\nLogSpec + SpecAug"]
+        Model["🧠 TDSConvEncoder"]
+        CTC["📉 CTC Loss"]
+        Decoder["🔤 Greedy / Beam Decoder"]
+        Metric["📊 CER Metric"]
+
+        Dataset --&gt; Transforms
+        Transforms --&gt; Model
+        Model --&gt; CTC
+        Model --&gt; Decoder
+        Decoder --&gt; Metric
     end
 
-    MetaS3 --&gt;|"HTTPS tar.gz stream"| Downloader
-    Downloader --&gt; B2
-    Downloader --&gt; Local
-    B2 --&gt;|"rclone sync"| Local
-    Local --&gt; Dataset
-    Dataset --&gt; Transforms
-    Transforms --&gt; Model
-    Model --&gt; CTC
-    Model --&gt; Decoder
-    Decoder --&gt; Metric</code></pre>
+    acq --&gt;|"stream to training"| train</code></pre>
 <hr />
 <h2 id="sections">Sections<a class="headerlink" href="#sections" title="Permanent link">&para;</a></h2>
 <table>

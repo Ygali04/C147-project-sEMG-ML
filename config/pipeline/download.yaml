@@ -1,0 +1,16 @@
+# Hydra config for the data-download pipeline.
+# Usage: referenced programmatically by scripts/download_data.py.
+
+source:
+  bucket: fb-baml-public
+  prefix: emg2qwerty
+  region: us-east-1
+  anonymous: true
+
+registry_key: emg2qwerty_registry.json
+
+# Override via CLI: --mode baseline | test | all
+mode: baseline
+n_test_users: 10
+seed: 1501
+dry_run: false

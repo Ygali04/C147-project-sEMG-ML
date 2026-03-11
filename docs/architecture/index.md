@@ -8,33 +8,37 @@ predicted keystrokes — and how every component in the codebase connects.
 ## System Overview
 
 ```mermaid
-flowchart LR
-    subgraph Data Acquisition
-        MetaS3["Meta S3<br/>(308 GB tar.gz)"]
-        Downloader["EMGDownloader<br/>(stream-filter)"]
-        B2["Backblaze B2"]
-        Local["Local data/"]
+flowchart TB
+    subgraph acq["📦 Data Acquisition"]
+        direction TB
+        MetaS3["☁️ Meta S3\n308 GB tar.gz"]
+        Downloader["⬇️ EMGDownloader\nstream-filter"]
+        B2["🗄️ Backblaze B2"]
+        Local["💾 Local data/"]
+
+        MetaS3 -->|"HTTPS tar.gz stream"| Downloader
+        Downloader --> B2
+        Downloader --> Local
+        B2 -->|"rclone sync"| Local
     end
 
-    subgraph Training Loop
-        Dataset["WindowedEMGDataset"]
-        Transforms["Transforms<br/>(LogSpec + SpecAug)"]
-        Model["TDSConvEncoder"]
-        CTC["CTC Loss"]
-        Decoder["Greedy / Beam<br/>Decoder"]
-        Metric["CER Metric"]
+    subgraph train["🔁 Training Loop"]
+        direction TB
+        Dataset["🪟 WindowedEMGDataset"]
+        Transforms["🔀 Transforms\nLogSpec + SpecAug"]
+        Model["🧠 TDSConvEncoder"]
+        CTC["📉 CTC Loss"]
+        Decoder["🔤 Greedy / Beam Decoder"]
+        Metric["📊 CER Metric"]
+
+        Dataset --> Transforms
+        Transforms --> Model
+        Model --> CTC
+        Model --> Decoder
+        Decoder --> Metric
     end
 
-    MetaS3 -->|"HTTPS tar.gz stream"| Downloader
-    Downloader --> B2
-    Downloader --> Local
-    B2 -->|"rclone sync"| Local
-    Local --> Dataset
-    Dataset --> Transforms
-    Transforms --> Model
-    Model --> CTC
-    Model --> Decoder
-    Decoder --> Metric
+    acq -->|"stream to training"| train
 ```
 
 ---

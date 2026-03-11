@@ -1,5 +1,6 @@
 nav:
   - Home: index.md
   - Getting Started: getting-started
+  - Pipeline: pipeline
   - Models: models
   - Experiments: experiments

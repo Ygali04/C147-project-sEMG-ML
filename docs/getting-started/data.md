@@ -28,7 +28,24 @@ emg2qwerty/
 
 ## Download
 
-Download the dataset from UCLA Box:
+### Automated Pipeline (recommended)
+
+Use the [data pipeline](../pipeline/index.md) to stream HDF5 files directly into Backblaze B2:
+
+```bash
+# Set up credentials
+cp .env.example .env
+# Edit .env with your B2 key ID and application key
+
+# Download baseline data
+make download-baseline
+```
+
+See [Pipeline → Download](../pipeline/download.md) for full details and all download modes.
+
+### Manual Download
+
+Alternatively, download from UCLA Box:
 
 > **[UCLA Box — emg2qwerty dataset](https://ucla.box.com/s/3xc4nwpfjfpo6ydjs94t0v2kuq37d5eg)**
 

@@ -11,7 +11,7 @@
       
       
       
-        <link rel="prev" href="../../getting-started/setup/">
+        <link rel="prev" href="../../pipeline/training/">
       
       
         <link rel="next" href="../rnn/">
@@ -260,6 +260,45 @@
   
   
   
+  
+    <li class="md-tabs__item">
+      <a href="../../architecture/" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../../pipeline/" class="md-tabs__link">
+          
+  
+  
+  Pipeline
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
     
   
   
@@ -487,6 +526,174 @@
       
   
   
+  
+  
+    <li class="md-nav__item">
+      <a href="../../architecture/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipeline
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pipeline
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipeline/download/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../pipeline/training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Batched Training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
     
   
   
@@ -506,10 +713,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_3" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" checked>
         
           
-          <label class="md-nav__link" for="__nav_3" id="__nav_3_label" tabindex="">
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="">
             
   
   
@@ -527,8 +734,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_3_label" aria-expanded="true">
-          <label class="md-nav__title" for="__nav_3">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="true">
+          <label class="md-nav__title" for="__nav_5">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -619,12 +826,12 @@
   <a href="#key-modules-srcemg2qwertymodulespy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key modules (src/emg2qwerty/modules.py)
+        Key Modules (src/emg2qwerty/modules.py)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Key modules (src/emg2qwerty/modules.py)">
+    <nav class="md-nav" aria-label="Key Modules (src/emg2qwerty/modules.py)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -643,6 +850,17 @@
     <span class="md-ellipsis">
       
         RotationInvariantMLP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multibandrotationinvariantmlp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MultiBandRotationInvariantMLP
       
     </span>
   </a>
@@ -703,6 +921,45 @@
     <span class="md-ellipsis">
       
         Decoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#greedy-decoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Greedy Decoder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#beam-search-decoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beam-Search Decoder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training
       
     </span>
   </a>
@@ -799,10 +1056,10 @@
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
             
   
   
@@ -820,8 +1077,8 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
-          <label class="md-nav__title" for="__nav_4">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
             <span class="md-nav__icon md-icon"></span>
             
   
@@ -907,12 +1164,12 @@
   <a href="#key-modules-srcemg2qwertymodulespy" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Key modules (src/emg2qwerty/modules.py)
+        Key Modules (src/emg2qwerty/modules.py)
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Key modules (src/emg2qwerty/modules.py)">
+    <nav class="md-nav" aria-label="Key Modules (src/emg2qwerty/modules.py)">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
@@ -931,6 +1188,17 @@
     <span class="md-ellipsis">
       
         RotationInvariantMLP
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#multibandrotationinvariantmlp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        MultiBandRotationInvariantMLP
       
     </span>
   </a>
@@ -995,6 +1263,45 @@
     </span>
   </a>
   
+    <nav class="md-nav" aria-label="Decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#greedy-decoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Greedy Decoder
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#beam-search-decoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Beam-Search Decoder
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training
+      
+    </span>
+  </a>
+  
 </li>
       
     </ul>
@@ -1025,29 +1332,32 @@ Convolutions, Hannun et al. (2019)</a></p>
 <h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
 <p>The baseline <code>TDSConvCTCModule</code> (defined in <code>src/emg2qwerty/lightning.py</code>) is a
 stack of Time-Depth Separable convolutional blocks followed by a linear CTC head.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Input: (T, N, bands=2, C=16, freq)            # LogSpectrogram of left+right EMG
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Input: (T, N, bands=2, C=16, freq=33)       # LogSpectrogram of left+right EMG
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  ↓
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>SpectrogramNorm                                # BatchNorm2d per band×channel
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>SpectrogramNorm                              # BatchNorm2d per band×channel (32 maps)
 <a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  ↓
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>MultiBandRotationInvariantMLP                  # MLP with electrode-rotation pooling
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  → (T, N, bands=2, mlp_features[-1])
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>MultiBandRotationInvariantMLP                # MLP with electrode-rotation pooling
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  → (T, N, bands=2, mlp_features=384)
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  ↓
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>Flatten → (T, N, num_features)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>Flatten → (T, N, 768)
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>  ↓
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>TDSConvEncoder                                 # Stack of TDSConv2dBlock + FC blocks
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>TDSConvEncoder                               # 4× (TDSConv2dBlock + FCBlock)
 <a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>  ↓
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>Linear(num_features, num_classes)
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>Linear(768, num_classes=80)
 <a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>  ↓
 <a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>LogSoftmax → CTC Loss
 </code></pre></div>
-<h2 id="key-modules-srcemg2qwertymodulespy">Key modules (<code>src/emg2qwerty/modules.py</code>)<a class="headerlink" href="#key-modules-srcemg2qwertymodulespy" title="Permanent link">&para;</a></h2>
+<h2 id="key-modules-srcemg2qwertymodulespy">Key Modules (<code>src/emg2qwerty/modules.py</code>)<a class="headerlink" href="#key-modules-srcemg2qwertymodulespy" title="Permanent link">&para;</a></h2>
 <h3 id="spectrogramnorm"><code>SpectrogramNorm</code><a class="headerlink" href="#spectrogramnorm" title="Permanent link">&para;</a></h3>
 <p>Applies <code>nn.BatchNorm2d</code> independently over each of the
 <code>num_bands × electrode_channels</code> = 2 × 16 = 32 channels.</p>
 <h3 id="rotationinvariantmlp"><code>RotationInvariantMLP</code><a class="headerlink" href="#rotationinvariantmlp" title="Permanent link">&para;</a></h3>
 <p>Shifts electrode channels by each offset in <code>(-1, 0, 1)</code> (band rotation
 augmentation), runs an MLP on each shifted version, then mean-pools. This
-makes the model robust to electrode placement variation.</p>
+makes the model robust to electrode placement variation across sessions.</p>
+<h3 id="multibandrotationinvariantmlp"><code>MultiBandRotationInvariantMLP</code><a class="headerlink" href="#multibandrotationinvariantmlp" title="Permanent link">&para;</a></h3>
+<p>Applies <code>RotationInvariantMLP</code> independently to the left-wrist and right-wrist
+bands, then concatenates the outputs.</p>
 <h3 id="tdsconv2dblock"><code>TDSConv2dBlock</code><a class="headerlink" href="#tdsconv2dblock" title="Permanent link">&para;</a></h3>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>Conv2d(channels, channels, kernel=(1, kernel_width))   # temporal conv per channel
 <a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  → ReLU
@@ -1066,10 +1376,15 @@ entry in <code>block_channels</code>.</p>
 <p>The baseline hyperparameters live in <code>config/model/tds_conv_ctc.yaml</code>:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="nt">module</span><span class="p">:</span>
 <a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emg2qwerty.lightning.TDSConvCTCModule</span>
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">in_features</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">33</span><span class="w">        </span><span class="c1"># n_fft // 2 + 1 frequency bins</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">  </span><span class="nt">in_features</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">528</span><span class="w">          </span><span class="c1"># freq × channels = (n_fft//2 + 1) × 16</span>
 <a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">  </span><span class="nt">mlp_features</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">384</span><span class="p p-Indicator">]</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nt">block_channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">]</span>
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nt">kernel_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">  </span><span class="nt">block_channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a><span class="w">  </span><span class="nt">kernel_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span><span class="w">           </span><span class="c1"># Total temporal receptive field = 125 samples</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a><span class="nt">datamodule</span><span class="p">:</span>
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a><span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emg2qwerty.lightning.WindowedEMGDataModule</span>
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a><span class="w">  </span><span class="nt">window_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span><span class="w">        </span><span class="c1"># 4 sec windows at 2 kHz</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">  </span><span class="nt">padding</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1800</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">200</span><span class="p p-Indicator">]</span><span class="w">       </span><span class="c1"># 900 ms past + 100 ms future context</span>
 </code></pre></div>
 <h2 id="decoding">Decoding<a class="headerlink" href="#decoding" title="Permanent link">&para;</a></h2>
 <p>Two decoders are available (<code>src/emg2qwerty/decoder.py</code>):</p>
@@ -1078,6 +1393,7 @@ entry in <code>block_channels</code>.</p>
 <tr>
 <th>Decoder</th>
 <th>Config</th>
+<th>Dependencies</th>
 <th>Notes</th>
 </tr>
 </thead>
@@ -1085,15 +1401,79 @@ entry in <code>block_channels</code>.</p>
 <tr>
 <td><code>CTCGreedyDecoder</code></td>
 <td><code>decoder=ctc_greedy</code></td>
-<td>Fast, no dependencies</td>
+<td>None</td>
+<td>Fast, default</td>
 </tr>
 <tr>
 <td><code>CTCBeamDecoder</code></td>
 <td><code>decoder=ctc_beam</code></td>
-<td>Requires kenlm, uses 6-gram char LM</td>
+<td><a href="https://github.com/kpu/kenlm">KenLM</a></td>
+<td>6-gram char LM, beam_size=50</td>
 </tr>
 </tbody>
 </table>
+<h3 id="greedy-decoder">Greedy Decoder<a class="headerlink" href="#greedy-decoder" title="Permanent link">&para;</a></h3>
+<p>Performs argmax at each timestep, collapses consecutive duplicates, and removes
+blank tokens. This is the default decoder and requires no additional dependencies.</p>
+<h3 id="beam-search-decoder">Beam-Search Decoder<a class="headerlink" href="#beam-search-decoder" title="Permanent link">&para;</a></h3>
+<p>Uses a 6-gram character-level language model built from WikiText-103 to rescore
+beam hypotheses. The LM biases predictions toward likely character sequences,
+reducing substitution and insertion errors.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>beam_size</code></td>
+<td>50</td>
+<td>Number of beams</td>
+</tr>
+<tr>
+<td><code>max_labels_per_timestep</code></td>
+<td>10</td>
+<td>Labels expanded per step</td>
+</tr>
+<tr>
+<td><code>lm_weight</code></td>
+<td>2.0</td>
+<td>LM score weight</td>
+</tr>
+<tr>
+<td><code>insertion_bonus</code></td>
+<td>2.0</td>
+<td>Bonus for character insertions</td>
+</tr>
+</tbody>
+</table>
+<p>To use the beam decoder:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Install kenlm (see Getting Started → Setup → KenLM)</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>pip<span class="w"> </span>install<span class="w"> </span>https://github.com/kpu/kenlm/archive/master.zip
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="c1"># Build the 6-gram character LM from WikiText-103</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>./scripts/lm/build_char_lm.sh<span class="w"> </span><span class="m">6</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="c1"># Train / evaluate with beam decoding</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">decoder</span><span class="o">=</span>ctc_beam<span class="w"> </span>...
+</code></pre></div>
+<h2 id="training">Training<a class="headerlink" href="#training" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Single-user personalized model on baseline user</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">  </span><span class="nv">user</span><span class="o">=</span>single_user<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="w">  </span>trainer.accelerator<span class="o">=</span>gpu<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a><span class="w">  </span>trainer.devices<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="c1"># With custom hyperparameters</span>
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a><span class="w">  </span><span class="nv">user</span><span class="o">=</span>single_user<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="w">  </span><span class="nv">batch_size</span><span class="o">=</span><span class="m">64</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a><span class="w">  </span>trainer.max_epochs<span class="o">=</span><span class="m">200</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a><span class="w">  </span>optimizer.lr<span class="o">=</span>5e-4
+</code></pre></div>
 
 
 
@@ -1153,6 +1533,8 @@ entry in <code>block_channels</code>.</p>
     
     
       <script src="../../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
       
     
   </body>

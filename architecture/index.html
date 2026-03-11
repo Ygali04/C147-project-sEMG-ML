@@ -1,0 +1,2540 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="Predicting keystrokes from EMG signals using deep learning">
+      
+      
+      
+      
+        <link rel="prev" href="../getting-started/setup/">
+      
+      
+        <link rel="next" href="../pipeline/">
+      
+      
+        
+      
+      
+      <link rel="icon" href="../assets/images/favicon.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.4">
+    
+    
+      
+        <title>Architecture - EMG2QWERTY — ECE C147/C247 Final Project</title>
+      
+    
+    
+      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      
+        
+        <link rel="stylesheet" href="../assets/stylesheets/palette.ab4e12ef.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+    <script>__md_scope=new URL("..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#architecture" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+<header class="md-header" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href=".." title="EMG2QWERTY — ECE C147/C247 Final Project" class="md-header__button md-logo" aria-label="EMG2QWERTY — ECE C147/C247 Final Project" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            EMG2QWERTY — ECE C147/C247 Final Project
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Architecture
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="" data-md-color-scheme="slate" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+        <div class="md-search__suggest" data-md-component="search-suggest"></div>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/Ygali04/C147-project-sEMG-ML" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+            
+<nav class="md-tabs" aria-label="Tabs" data-md-component="tabs">
+  <div class="md-grid">
+    <ul class="md-tabs__list">
+      
+        
+  
+  
+  
+  
+    <li class="md-tabs__item">
+      <a href=".." class="md-tabs__link">
+        
+  
+  
+    
+  
+  Home
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../getting-started/data/" class="md-tabs__link">
+          
+  
+  
+  Getting Started
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+    
+  
+  
+    <li class="md-tabs__item md-tabs__item--active">
+      <a href="./" class="md-tabs__link">
+        
+  
+  
+    
+  
+  Architecture
+
+      </a>
+    </li>
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../pipeline/" class="md-tabs__link">
+          
+  
+  
+  Pipeline
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../models/baseline/" class="md-tabs__link">
+          
+  
+  
+  Models
+
+        </a>
+      </li>
+    
+  
+
+      
+        
+  
+  
+  
+  
+    
+    
+      <li class="md-tabs__item">
+        <a href="../experiments/results/" class="md-tabs__link">
+          
+  
+  
+  Experiments
+
+        </a>
+      </li>
+    
+  
+
+      
+    </ul>
+  </div>
+</nav>
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+  
+
+
+<nav class="md-nav md-nav--primary md-nav--lifted" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href=".." title="EMG2QWERTY — ECE C147/C247 Final Project" class="md-nav__button md-logo" aria-label="EMG2QWERTY — ECE C147/C247 Final Project" data-md-component="logo">
+      
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
+
+    </a>
+    EMG2QWERTY — ECE C147/C247 Final Project
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/Ygali04/C147-project-sEMG-ML" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    GitHub
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href=".." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
+        
+          
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_2">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Getting Started
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/data/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Dataset
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../getting-started/setup/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Setup
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+    
+  
+  
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Architecture
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hdf5-session-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HDF5 Session Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#emgsessiondata-datapy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EMGSessionData (data.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windowedemgdataset-datapy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WindowedEMGDataset (data.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windowedemgdatamodule-lightningpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WindowedEMGDataModule (lightning.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transform-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transform Pipeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transform Pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#training-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training Transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation-test-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation / Test Transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Model Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tds-cnn-baseline-modulespy-lightningpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TDS-CNN Baseline (modules.py, lightning.py)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TDS-CNN Baseline (modules.py, lightning.py)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sub-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sub-Modules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hyperparameters-configmodeltds_conv_ctcyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hyperparameters (config/model/tds_conv_ctc.yaml)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training Loop
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Loop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hydra-configuration-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hydra Configuration System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entry-point-trainpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entry Point (train.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-training-parameters-configbaseyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Training Parameters (config/base.yaml)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimizer-lr-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimizer &amp; LR Schedule
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ctcgreedydecoder-decoderpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CTCGreedyDecoder (decoder.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ctcbeamdecoder-decoderpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CTCBeamDecoder (decoder.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-the-character-language-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building the Character Language Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics-metricspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics (metrics.py)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Pipeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Classes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deduplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deduplication
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hydra-config-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hydra Config Groups
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#override-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Override Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-all-unit-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run All Unit Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-integration-tests-requires-b2-credentials-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run Integration Tests (requires B2 credentials + network)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Pipeline
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Pipeline
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Data Pipeline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline/download/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Download Script
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../pipeline/training/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Batched Training
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_5" >
+        
+          
+          <label class="md-nav__link" for="__nav_5" id="__nav_5_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Models
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_5_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_5">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Models
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/baseline/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    TDS-CNN Baseline
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/rnn/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    RNN / LSTM / GRU
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../models/transformer/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_6" >
+        
+          
+          <label class="md-nav__link" for="__nav_6" id="__nav_6_label" tabindex="0">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Experiments
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_6_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_6">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    Experiments
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../experiments/results/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Experiment Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#system-overview" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        System Overview
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-layer" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Layer
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Layer">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hdf5-session-files" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        HDF5 Session Files
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#emgsessiondata-datapy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        EMGSessionData (data.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windowedemgdataset-datapy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WindowedEMGDataset (data.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#windowedemgdatamodule-lightningpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        WindowedEMGDataModule (lightning.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#transform-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transform Pipeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transform Pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#training-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training Transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#validation-test-transforms" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Validation / Test Transforms
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#model-architecture" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model Architecture
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Model Architecture">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tds-cnn-baseline-modulespy-lightningpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TDS-CNN Baseline (modules.py, lightning.py)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="TDS-CNN Baseline (modules.py, lightning.py)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#sub-modules" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Sub-Modules
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hyperparameters-configmodeltds_conv_ctcyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hyperparameters (config/model/tds_conv_ctc.yaml)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-loop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training Loop
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Loop">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hydra-configuration-system" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hydra Configuration System
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#entry-point-trainpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Entry Point (train.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-training-parameters-configbaseyaml" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Training Parameters (config/base.yaml)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#optimizer-lr-schedule" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optimizer &amp; LR Schedule
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#decoding" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Decoding
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Decoding">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ctcgreedydecoder-decoderpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CTCGreedyDecoder (decoder.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#ctcbeamdecoder-decoderpy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CTCBeamDecoder (decoder.py)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#building-the-character-language-model" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Building the Character Language Model
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#metrics-metricspy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Metrics (metrics.py)
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#data-pipeline" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Data Pipeline
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Data Pipeline">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#architecture_1" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-classes" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Classes
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deduplication" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deduplication
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration-reference" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration Reference
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Configuration Reference">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#hydra-config-groups" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hydra Config Groups
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#override-examples" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Override Examples
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#testing" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Testing
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Testing">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#run-all-unit-tests" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run All Unit Tests
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#run-integration-tests-requires-b2-credentials-network" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Run Integration Tests (requires B2 credentials + network)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#test-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Test Structure
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+<h1 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h1>
+<p>This page describes the full system architecture — from raw EMG signals to
+predicted keystrokes — and how every component in the codebase connects.</p>
+<hr />
+<h2 id="system-overview">System Overview<a class="headerlink" href="#system-overview" title="Permanent link">&para;</a></h2>
+<pre class="mermaid"><code>flowchart LR
+    subgraph Data Acquisition
+        MetaS3["Meta S3&lt;br/&gt;(308 GB tar.gz)"]
+        Downloader["EMGDownloader&lt;br/&gt;(stream-filter)"]
+        B2["Backblaze B2"]
+        Local["Local data/"]
+    end
+
+    subgraph Training Loop
+        Dataset["WindowedEMGDataset"]
+        Transforms["Transforms&lt;br/&gt;(LogSpec + SpecAug)"]
+        Model["TDSConvEncoder"]
+        CTC["CTC Loss"]
+        Decoder["Greedy / Beam&lt;br/&gt;Decoder"]
+        Metric["CER Metric"]
+    end
+
+    MetaS3 --&gt;|"HTTPS tar.gz stream"| Downloader
+    Downloader --&gt; B2
+    Downloader --&gt; Local
+    B2 --&gt;|"rclone sync"| Local
+    Local --&gt; Dataset
+    Dataset --&gt; Transforms
+    Transforms --&gt; Model
+    Model --&gt; CTC
+    Model --&gt; Decoder
+    Decoder --&gt; Metric</code></pre>
+<hr />
+<h2 id="data-layer">Data Layer<a class="headerlink" href="#data-layer" title="Permanent link">&para;</a></h2>
+<h3 id="hdf5-session-files">HDF5 Session Files<a class="headerlink" href="#hdf5-session-files" title="Permanent link">&para;</a></h3>
+<p>Each recording session is a single HDF5 file (~150–400 MB) structured as:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>emg2qwerty/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  timeseries       # Compound dataset with fields:
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    emg_left       # (T, 16) — left wrist, 16 electrodes, 2 kHz
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    emg_right      # (T, 16) — right wrist, 16 electrodes, 2 kHz
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    time           # (T,) — timestamps in seconds
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  attrs:
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    session_name   # Unique session identifier
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    user           # User ID (e.g. 89335547)
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    condition      # &quot;on_keyboard&quot;
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>    duration_mins  # Session length in minutes
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    keystrokes     # JSON array: [{key, start, end}, ...]
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>    prompts        # JSON array: [{payload: {text}, start, end}, ...]
+</code></pre></div>
+<h3 id="emgsessiondata-datapy"><code>EMGSessionData</code> (<code>data.py</code>)<a class="headerlink" href="#emgsessiondata-datapy" title="Permanent link">&para;</a></h3>
+<p>Context-manager wrapper around a single HDF5 file. Provides:</p>
+<ul>
+<li>Lazy loading of EMG timeseries and keystrokes</li>
+<li><code>ground_truth()</code> — returns keystroke labels as a <code>LabelData</code> named tuple</li>
+<li>Indexing <code>session[start:end]</code> returns a structured NumPy array</li>
+</ul>
+<h3 id="windowedemgdataset-datapy"><code>WindowedEMGDataset</code> (<code>data.py</code>)<a class="headerlink" href="#windowedemgdataset-datapy" title="Permanent link">&para;</a></h3>
+<p>A <code>torch.utils.data.Dataset</code> that:</p>
+<ol>
+<li>Loads an HDF5 session via <code>EMGSessionData</code></li>
+<li>Segments the continuous EMG stream into fixed-length windows
+   (<code>window_length=8000</code> samples = 4 seconds at 2 kHz)</li>
+<li>Adds configurable padding for past/future context (<code>[1800, 200]</code> →
+   900 ms past, 100 ms future)</li>
+<li>Returns <code>(emg_window, labels, input_lengths, label_lengths)</code> tuples</li>
+</ol>
+<h3 id="windowedemgdatamodule-lightningpy"><code>WindowedEMGDataModule</code> (<code>lightning.py</code>)<a class="headerlink" href="#windowedemgdatamodule-lightningpy" title="Permanent link">&para;</a></h3>
+<p>PyTorch Lightning <code>LightningDataModule</code> that:</p>
+<ul>
+<li>Accepts train/val/test session lists (from Hydra config)</li>
+<li>Instantiates <code>WindowedEMGDataset</code> for each split</li>
+<li>Applies per-split transforms (augmentation for train, none for val/test)</li>
+<li>Creates <code>DataLoader</code> instances with collation</li>
+</ul>
+<hr />
+<h2 id="transform-pipeline">Transform Pipeline<a class="headerlink" href="#transform-pipeline" title="Permanent link">&para;</a></h2>
+<p>Transforms are defined in <code>config/transforms/log_spectrogram.yaml</code> and
+implemented in <code>src/emg2qwerty/transforms.py</code>.</p>
+<h3 id="training-transforms">Training Transforms<a class="headerlink" href="#training-transforms" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>ToTensor                    # Convert numpy arrays to torch tensors
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  ↓
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>RandomBandRotation          # Shift electrode channels by (-1, 0, +1)
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>  ↓
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>TemporalAlignmentJitter     # Random ±60 ms temporal offset
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>  ↓
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>LogSpectrogram              # STFT: n_fft=64, hop=16 → (T&#39;, 33) at 125 Hz
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>  ↓
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>SpecAugment                 # Mask 3 time bands + 2 freq bands
+</code></pre></div>
+<h3 id="validation-test-transforms">Validation / Test Transforms<a class="headerlink" href="#validation-test-transforms" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>ToTensor → LogSpectrogram   # No augmentation
+</code></pre></div>
+<h3 id="key-parameters">Key Parameters<a class="headerlink" href="#key-parameters" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>n_fft</code></td>
+<td>64</td>
+<td>STFT window size (32 ms at 2 kHz)</td>
+</tr>
+<tr>
+<td><code>hop_length</code></td>
+<td>16</td>
+<td>STFT hop (8 ms) → output rate = 125 Hz</td>
+</tr>
+<tr>
+<td><code>n_time_masks</code></td>
+<td>3</td>
+<td>SpecAugment: number of time masks</td>
+</tr>
+<tr>
+<td><code>time_mask_param</code></td>
+<td>25</td>
+<td>Max width per time mask (200 ms at 125 Hz)</td>
+</tr>
+<tr>
+<td><code>n_freq_masks</code></td>
+<td>2</td>
+<td>SpecAugment: number of frequency masks</td>
+</tr>
+<tr>
+<td><code>freq_mask_param</code></td>
+<td>4</td>
+<td>Max width per frequency mask</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="model-architecture">Model Architecture<a class="headerlink" href="#model-architecture" title="Permanent link">&para;</a></h2>
+<h3 id="tds-cnn-baseline-modulespy-lightningpy">TDS-CNN Baseline (<code>modules.py</code>, <code>lightning.py</code>)<a class="headerlink" href="#tds-cnn-baseline-modulespy-lightningpy" title="Permanent link">&para;</a></h3>
+<p>The default model is a Time-Depth Separable CNN, following
+<a href="https://arxiv.org/abs/1904.02619">Hannun et al. (2019)</a>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>Input: (T, N, bands=2, C=16, freq=33)       # LogSpectrogram of L+R EMG
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  ↓
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>SpectrogramNorm                              # BatchNorm2d per band×channel
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>  ↓
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>MultiBandRotationInvariantMLP                # MLP + electrode-rotation pooling
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>  → (T, N, bands=2, mlp_features=384)
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>  ↓
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>Flatten → (T, N, 768)
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>  ↓
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>TDSConvEncoder                               # 4× (TDSConv2dBlock + FCBlock)
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a>  ↓
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a>Linear(768, num_classes=80)
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>  ↓
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a>LogSoftmax → CTC Loss
+</code></pre></div>
+<h4 id="sub-modules">Sub-Modules<a class="headerlink" href="#sub-modules" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Module</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>SpectrogramNorm</code></td>
+<td><code>BatchNorm2d</code> over <code>bands × channels</code> = 32 feature maps</td>
+</tr>
+<tr>
+<td><code>RotationInvariantMLP</code></td>
+<td>Shifts electrodes by each offset <code>(-1, 0, 1)</code>, runs MLP, mean-pools — robust to electrode placement</td>
+</tr>
+<tr>
+<td><code>MultiBandRotationInvariantMLP</code></td>
+<td>Applies <code>RotationInvariantMLP</code> independently to left and right wrist bands</td>
+</tr>
+<tr>
+<td><code>TDSConv2dBlock</code></td>
+<td><code>Conv2d(C, C, (1, K))</code> → ReLU → skip connection → LayerNorm</td>
+</tr>
+<tr>
+<td><code>TDSFullyConnectedBlock</code></td>
+<td><code>Linear → ReLU → Linear</code> → skip → LayerNorm</td>
+</tr>
+<tr>
+<td><code>TDSConvEncoder</code></td>
+<td>Alternating stack of conv + FC blocks</td>
+</tr>
+</tbody>
+</table>
+<h4 id="hyperparameters-configmodeltds_conv_ctcyaml">Hyperparameters (<code>config/model/tds_conv_ctc.yaml</code>)<a class="headerlink" href="#hyperparameters-configmodeltds_conv_ctcyaml" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="nt">module</span><span class="p">:</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emg2qwerty.lightning.TDSConvCTCModule</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="w">  </span><span class="nt">in_features</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">528</span><span class="w">          </span><span class="c1"># freq × channels</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="w">  </span><span class="nt">mlp_features</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">384</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="w">  </span><span class="nt">block_channels</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">24</span><span class="p p-Indicator">]</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="w">  </span><span class="nt">kernel_width</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span><span class="w">           </span><span class="c1"># Temporal receptive field</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nt">datamodule</span><span class="p">:</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="w">  </span><span class="nt">_target_</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">emg2qwerty.lightning.WindowedEMGDataModule</span>
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a><span class="w">  </span><span class="nt">window_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span><span class="w">        </span><span class="c1"># 4 sec at 2 kHz</span>
+<a id="__codelineno-4-11" name="__codelineno-4-11" href="#__codelineno-4-11"></a><span class="w">  </span><span class="nt">padding</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1800</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">200</span><span class="p p-Indicator">]</span><span class="w">       </span><span class="c1"># 900 ms past + 100 ms future</span>
+</code></pre></div>
+<hr />
+<h2 id="training-loop">Training Loop<a class="headerlink" href="#training-loop" title="Permanent link">&para;</a></h2>
+<h3 id="hydra-configuration-system">Hydra Configuration System<a class="headerlink" href="#hydra-configuration-system" title="Permanent link">&para;</a></h3>
+<p>All training parameters are managed through Hydra YAML configs under <code>config/</code>:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a>config/
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>  base.yaml                              # Top-level defaults + trainer settings
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>  model/tds_conv_ctc.yaml                # Model architecture
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a>  optimizer/adam.yaml                     # Adam: lr=1e-3
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>  lr_scheduler/
+<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>    linear_warmup_cosine_annealing.yaml  # 10-epoch warmup, cosine decay
+<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a>    cosine_annealing.yaml
+<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a>    reduce_on_plateau.yaml
+<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>    step.yaml
+<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a>  decoder/
+<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    ctc_greedy.yaml                      # Default: no LM
+<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    ctc_beam.yaml                        # KenLM beam search
+<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>  transforms/log_spectrogram.yaml        # STFT + augmentation
+<a id="__codelineno-5-14" name="__codelineno-5-14" href="#__codelineno-5-14"></a>  user/
+<a id="__codelineno-5-15" name="__codelineno-5-15" href="#__codelineno-5-15"></a>    single_user.yaml                     # Baseline user (89335547)
+<a id="__codelineno-5-16" name="__codelineno-5-16" href="#__codelineno-5-16"></a>    generic.yaml                         # Multi-user training
+<a id="__codelineno-5-17" name="__codelineno-5-17" href="#__codelineno-5-17"></a>  cluster/
+<a id="__codelineno-5-18" name="__codelineno-5-18" href="#__codelineno-5-18"></a>    local.yaml                           # Single-machine training
+<a id="__codelineno-5-19" name="__codelineno-5-19" href="#__codelineno-5-19"></a>    slurm.yaml                           # SLURM cluster
+</code></pre></div>
+<h3 id="entry-point-trainpy">Entry Point (<code>train.py</code>)<a class="headerlink" href="#entry-point-trainpy" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="o">[</span>HYDRA_OVERRIDES...<span class="o">]</span>
+</code></pre></div>
+<p>This:</p>
+<ol>
+<li>Loads the composed Hydra config</li>
+<li>Instantiates the <code>WindowedEMGDataModule</code> and <code>TDSConvCTCModule</code></li>
+<li>Creates a <code>pl.Trainer</code> with configured callbacks (LR monitor, checkpointing)</li>
+<li>Calls <code>trainer.fit()</code> if <code>train=True</code>, then <code>trainer.test()</code></li>
+</ol>
+<h3 id="key-training-parameters-configbaseyaml">Key Training Parameters (<code>config/base.yaml</code>)<a class="headerlink" href="#key-training-parameters-configbaseyaml" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>seed</code></td>
+<td>1501</td>
+<td>Random seed for reproducibility</td>
+</tr>
+<tr>
+<td><code>batch_size</code></td>
+<td>32</td>
+<td>Mini-batch size</td>
+</tr>
+<tr>
+<td><code>num_workers</code></td>
+<td>4</td>
+<td>DataLoader worker processes</td>
+</tr>
+<tr>
+<td><code>trainer.max_epochs</code></td>
+<td>150</td>
+<td>Training epochs</td>
+</tr>
+<tr>
+<td><code>trainer.accelerator</code></td>
+<td><code>gpu</code></td>
+<td>Device type</td>
+</tr>
+<tr>
+<td><code>monitor_metric</code></td>
+<td><code>val/CER</code></td>
+<td>Checkpoint selection metric</td>
+</tr>
+<tr>
+<td><code>dataset.root</code></td>
+<td><code>data</code></td>
+<td>HDF5 file root directory</td>
+</tr>
+</tbody>
+</table>
+<h3 id="optimizer-lr-schedule">Optimizer &amp; LR Schedule<a class="headerlink" href="#optimizer-lr-schedule" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Optimizer</strong>: Adam with <code>lr=1e-3</code></li>
+<li><strong>LR Schedule</strong>: Linear warmup (10 epochs, from <code>1e-8</code>) → cosine annealing to <code>1e-6</code></li>
+</ul>
+<hr />
+<h2 id="decoding">Decoding<a class="headerlink" href="#decoding" title="Permanent link">&para;</a></h2>
+<h3 id="ctcgreedydecoder-decoderpy"><code>CTCGreedyDecoder</code> (<code>decoder.py</code>)<a class="headerlink" href="#ctcgreedydecoder-decoderpy" title="Permanent link">&para;</a></h3>
+<p>The default decoder. Performs argmax at each timestep, then collapses
+consecutive duplicates and removes blanks. No external dependencies required.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">decoder</span><span class="o">=</span>ctc_greedy<span class="w"> </span>...
+</code></pre></div>
+<h3 id="ctcbeamdecoder-decoderpy"><code>CTCBeamDecoder</code> (<code>decoder.py</code>)<a class="headerlink" href="#ctcbeamdecoder-decoderpy" title="Permanent link">&para;</a></h3>
+<p>Beam search with optional n-gram language model (KenLM) rescoring.</p>
+<table>
+<thead>
+<tr>
+<th>Parameter</th>
+<th>Default</th>
+<th>Description</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>beam_size</code></td>
+<td>50</td>
+<td>Number of beams</td>
+</tr>
+<tr>
+<td><code>max_labels_per_timestep</code></td>
+<td>10</td>
+<td>Labels expanded per step</td>
+</tr>
+<tr>
+<td><code>lm_path</code></td>
+<td><code>models/lm/wikitext-103-6gram-charlm.bin</code></td>
+<td>KenLM binary</td>
+</tr>
+<tr>
+<td><code>lm_weight</code></td>
+<td>2.0</td>
+<td>LM score weight</td>
+</tr>
+<tr>
+<td><code>insertion_bonus</code></td>
+<td>2.0</td>
+<td>Bonus for inserting characters</td>
+</tr>
+<tr>
+<td><code>delete_key</code></td>
+<td><code>Key.backspace</code></td>
+<td>Character mapped to deletion</td>
+</tr>
+</tbody>
+</table>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">decoder</span><span class="o">=</span>ctc_beam<span class="w"> </span>...
+</code></pre></div>
+<div class="admonition note">
+<p class="admonition-title">KenLM required</p>
+<p>The beam-search decoder requires <a href="https://github.com/kpu/kenlm">KenLM</a> to
+be installed. See <a href="../getting-started/setup/#kenlm-beam-search-decoder">Setup → KenLM</a>
+for installation instructions.</p>
+</div>
+<h3 id="building-the-character-language-model">Building the Character Language Model<a class="headerlink" href="#building-the-character-language-model" title="Permanent link">&para;</a></h3>
+<p>The 6-gram character LM is built from WikiText-103:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="c1"># Build kenlm C++ tools first:</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="c1"># https://github.com/kpu/kenlm#compiling</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="c1"># Then build the 6-gram char LM:</span>
+<a id="__codelineno-9-5" name="__codelineno-9-5" href="#__codelineno-9-5"></a>./scripts/lm/build_char_lm.sh<span class="w"> </span><span class="m">6</span>
+</code></pre></div>
+<p>This produces:</p>
+<ul>
+<li><code>models/lm/wikitext-103-6gram-charlm.arpa</code> — human-readable ARPA format</li>
+<li><code>models/lm/wikitext-103-6gram-charlm.bin</code> — fast binary format (used at inference)</li>
+</ul>
+<hr />
+<h2 id="metrics-metricspy">Metrics (<code>metrics.py</code>)<a class="headerlink" href="#metrics-metricspy" title="Permanent link">&para;</a></h2>
+<p>The primary evaluation metric is <strong>Character Error Rate (CER)</strong>:</p>
+<div class="arithmatex">\[\text{CER} = \frac{\text{edit\_distance}(\text{prediction}, \text{reference})}{\text{len}(\text{reference})}\]</div>
+<p>The <code>CharacterErrorRates</code> module also reports decomposed error types:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CER</strong></td>
+<td>Overall character error rate</td>
+</tr>
+<tr>
+<td><strong>IER</strong></td>
+<td>Insertion error rate</td>
+</tr>
+<tr>
+<td><strong>DER</strong></td>
+<td>Deletion error rate</td>
+</tr>
+<tr>
+<td><strong>SER</strong></td>
+<td>Substitution error rate</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="data-pipeline">Data Pipeline<a class="headerlink" href="#data-pipeline" title="Permanent link">&para;</a></h2>
+<p>The data pipeline handles acquisition of HDF5 files from Meta's public S3
+archive and storage in Backblaze B2 for reproducible access.</p>
+<h3 id="architecture_1">Architecture<a class="headerlink" href="#architecture_1" title="Permanent link">&para;</a></h3>
+<pre class="mermaid"><code>flowchart TD
+    CLI["scripts/download_data.py&lt;br/&gt;(Click CLI)"]
+    Resolve["resolve_sessions()"]
+    Registry["FileRegistry&lt;br/&gt;(JSON in B2)"]
+    Stream["tarfile.open(mode='r|gz')"]
+    MetaHTTPS["Meta S3 tar.gz&lt;br/&gt;(308 GB, HTTPS)"]
+    LocalDisk["data/emg2qwerty/&amp;lt;user&amp;gt;/&amp;lt;session&amp;gt;.hdf5"]
+    B2Upload["B2 PUT via boto3"]
+
+    CLI --&gt; Resolve
+    Resolve --&gt;|"baseline / test / all"| Registry
+    Registry --&gt;|"filter pending"| Stream
+    Stream --&gt;|"HTTPS GET"| MetaHTTPS
+    Stream --&gt;|"extract matching"| LocalDisk
+    Stream --&gt;|"upload"| B2Upload
+    B2Upload --&gt;|"update"| Registry</code></pre>
+<h3 id="key-classes">Key Classes<a class="headerlink" href="#key-classes" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Class</th>
+<th>File</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>B2Config</code></td>
+<td><code>pipeline/config.py</code></td>
+<td>Pydantic model for B2 credentials (from env vars)</td>
+</tr>
+<tr>
+<td><code>SourceS3Config</code></td>
+<td><code>pipeline/config.py</code></td>
+<td>Tar.gz URL + archive prefix</td>
+</tr>
+<tr>
+<td><code>DownloadConfig</code></td>
+<td><code>pipeline/config.py</code></td>
+<td>Mode, seed, data root, dry-run flag</td>
+</tr>
+<tr>
+<td><code>FileRegistry</code></td>
+<td><code>pipeline/registry.py</code></td>
+<td>JSON-backed dedup manifest stored in B2</td>
+</tr>
+<tr>
+<td><code>FileRecord</code></td>
+<td><code>pipeline/registry.py</code></td>
+<td>Frozen dataclass for each uploaded file</td>
+</tr>
+<tr>
+<td><code>EMGDownloader</code></td>
+<td><code>pipeline/downloader.py</code></td>
+<td>Orchestrates tar.gz streaming + extraction</td>
+</tr>
+<tr>
+<td><code>BatchTrainer</code></td>
+<td><code>pipeline/trainer.py</code></td>
+<td>Multi-profile training orchestration</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deduplication">Deduplication<a class="headerlink" href="#deduplication" title="Permanent link">&para;</a></h3>
+<p>The <code>FileRegistry</code> stores a JSON manifest as an object in the B2 bucket
+(<code>emg2qwerty_registry.json</code>). Before streaming the tar.gz, the downloader
+checks both:</p>
+<ol>
+<li>The B2 registry (has this file been uploaded before?)</li>
+<li>The local filesystem (does the file already exist in <code>data/</code>?)</li>
+</ol>
+<p>Only files missing from <strong>both</strong> are extracted and uploaded.</p>
+<hr />
+<h2 id="configuration-reference">Configuration Reference<a class="headerlink" href="#configuration-reference" title="Permanent link">&para;</a></h2>
+<h3 id="hydra-config-groups">Hydra Config Groups<a class="headerlink" href="#hydra-config-groups" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Options</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>user</code></td>
+<td><code>single_user</code>, <code>generic</code></td>
+<td><code>single_user</code></td>
+</tr>
+<tr>
+<td><code>model</code></td>
+<td><code>tds_conv_ctc</code></td>
+<td><code>tds_conv_ctc</code></td>
+</tr>
+<tr>
+<td><code>optimizer</code></td>
+<td><code>adam</code></td>
+<td><code>adam</code></td>
+</tr>
+<tr>
+<td><code>lr_scheduler</code></td>
+<td><code>linear_warmup_cosine_annealing</code>, <code>cosine_annealing</code>, <code>reduce_on_plateau</code>, <code>step</code></td>
+<td><code>linear_warmup_cosine_annealing</code></td>
+</tr>
+<tr>
+<td><code>decoder</code></td>
+<td><code>ctc_greedy</code>, <code>ctc_beam</code></td>
+<td><code>ctc_greedy</code></td>
+</tr>
+<tr>
+<td><code>transforms</code></td>
+<td><code>log_spectrogram</code></td>
+<td><code>log_spectrogram</code></td>
+</tr>
+<tr>
+<td><code>cluster</code></td>
+<td><code>local</code>, <code>slurm</code></td>
+<td><code>local</code></td>
+</tr>
+</tbody>
+</table>
+<h3 id="override-examples">Override Examples<a class="headerlink" href="#override-examples" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="c1"># Change optimizer + LR schedule</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">optimizer</span><span class="o">=</span>adam<span class="w"> </span><span class="nv">lr_scheduler</span><span class="o">=</span>cosine_annealing
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a>
+<a id="__codelineno-10-4" name="__codelineno-10-4" href="#__codelineno-10-4"></a><span class="c1"># Use beam decoder</span>
+<a id="__codelineno-10-5" name="__codelineno-10-5" href="#__codelineno-10-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">decoder</span><span class="o">=</span>ctc_beam
+<a id="__codelineno-10-6" name="__codelineno-10-6" href="#__codelineno-10-6"></a>
+<a id="__codelineno-10-7" name="__codelineno-10-7" href="#__codelineno-10-7"></a><span class="c1"># Train on generic (multi-user) split</span>
+<a id="__codelineno-10-8" name="__codelineno-10-8" href="#__codelineno-10-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">user</span><span class="o">=</span>generic
+<a id="__codelineno-10-9" name="__codelineno-10-9" href="#__codelineno-10-9"></a>
+<a id="__codelineno-10-10" name="__codelineno-10-10" href="#__codelineno-10-10"></a><span class="c1"># Evaluation only, from checkpoint</span>
+<a id="__codelineno-10-11" name="__codelineno-10-11" href="#__codelineno-10-11"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-10-12" name="__codelineno-10-12" href="#__codelineno-10-12"></a><span class="w">  </span><span class="nv">train</span><span class="o">=</span>False<span class="w"> </span><span class="nv">checkpoint</span><span class="o">=</span>logs/best.ckpt<span class="w"> </span><span class="nv">decoder</span><span class="o">=</span>ctc_greedy
+<a id="__codelineno-10-13" name="__codelineno-10-13" href="#__codelineno-10-13"></a>
+<a id="__codelineno-10-14" name="__codelineno-10-14" href="#__codelineno-10-14"></a><span class="c1"># Adjust batch size + workers</span>
+<a id="__codelineno-10-15" name="__codelineno-10-15" href="#__codelineno-10-15"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">batch_size</span><span class="o">=</span><span class="m">64</span><span class="w"> </span><span class="nv">num_workers</span><span class="o">=</span><span class="m">8</span>
+</code></pre></div>
+<hr />
+<h2 id="testing">Testing<a class="headerlink" href="#testing" title="Permanent link">&para;</a></h2>
+<h3 id="run-all-unit-tests">Run All Unit Tests<a class="headerlink" href="#run-all-unit-tests" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a>make<span class="w"> </span><span class="nb">test</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="c1"># or equivalently:</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-p<span class="w"> </span>no:cacheprovider<span class="w"> </span>-m<span class="w"> </span><span class="s2">&quot;not slow and not integration&quot;</span><span class="w"> </span>-n<span class="w"> </span>auto
+</code></pre></div>
+<h3 id="run-integration-tests-requires-b2-credentials-network">Run Integration Tests (requires B2 credentials + network)<a class="headerlink" href="#run-integration-tests-requires-b2-credentials-network" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pytest<span class="w"> </span>-m<span class="w"> </span>integration<span class="w"> </span>-v<span class="w"> </span>-s
+</code></pre></div>
+<h3 id="test-structure">Test Structure<a class="headerlink" href="#test-structure" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>File</th>
+<th>Covers</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>test_charset.py</code></td>
+<td>Key ↔ label ↔ unicode mapping roundtrips</td>
+</tr>
+<tr>
+<td><code>test_data.py</code></td>
+<td>Label data creation from keystroke strings</td>
+</tr>
+<tr>
+<td><code>test_decoder.py</code></td>
+<td>Greedy + beam decoders, kenlm LM scoring</td>
+</tr>
+<tr>
+<td><code>test_pipeline_config.py</code></td>
+<td>Pydantic config validation (B2, download, training)</td>
+</tr>
+<tr>
+<td><code>test_pipeline_registry.py</code></td>
+<td>FileRegistry CRUD, save/load roundtrip (moto-mocked S3)</td>
+</tr>
+<tr>
+<td><code>test_pipeline_downloader.py</code></td>
+<td>EMGDownloader session resolution, dry-run, dedup</td>
+</tr>
+<tr>
+<td><code>test_train_batched.py</code></td>
+<td>BatchTrainer profile resolution, Hydra overrides</td>
+</tr>
+<tr>
+<td><code>test_integration_baseline.py</code></td>
+<td>End-to-end: B2 connectivity, tar.gz stream, HDF5 validation</td>
+</tr>
+</tbody>
+</table>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+          <button type="button" class="md-top md-icon" data-md-component="top" hidden>
+  
+  <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M13 20h-2V8l-5.5 5.5-1.42-1.42L12 4.16l7.92 7.92-1.42 1.42L13 8z"/></svg>
+  Back to top
+</button>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": ["navigation.tabs", "navigation.top", "search.suggest", "search.highlight", "content.code.copy", "content.code.annotate"], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>

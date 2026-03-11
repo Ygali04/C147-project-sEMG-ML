@@ -11,10 +11,10 @@
       
       
       
-        <link rel="prev" href="../..">
+        <link rel="prev" href="../download/">
       
       
-        <link rel="next" href="../setup/">
+        <link rel="next" href="../../models/baseline/">
       
       
         
@@ -25,7 +25,7 @@
     
     
       
-        <title>Dataset - EMG2QWERTY — ECE C147/C247 Final Project</title>
+        <title>Batched Training - EMG2QWERTY — ECE C147/C247 Final Project</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#dataset" class="md-skip">
+        <a href="#batched-training" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Dataset
+              Batched Training
             
           </span>
         </div>
@@ -240,13 +240,11 @@
   
   
   
-    
-  
   
     
     
-      <li class="md-tabs__item md-tabs__item--active">
-        <a href="./" class="md-tabs__link">
+      <li class="md-tabs__item">
+        <a href="../../getting-started/data/" class="md-tabs__link">
           
   
   
@@ -281,11 +279,13 @@
   
   
   
+    
+  
   
     
     
-      <li class="md-tabs__item">
-        <a href="../../pipeline/" class="md-tabs__link">
+      <li class="md-tabs__item md-tabs__item--active">
+        <a href="../" class="md-tabs__link">
           
   
   
@@ -413,29 +413,24 @@
       
   
   
-    
   
   
-  
     
     
     
     
       
-        
-        
-      
       
     
     
-    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" checked>
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_2" >
         
           
-          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="">
+          <label class="md-nav__link" for="__nav_2" id="__nav_2_label" tabindex="0">
             
   
   
@@ -453,7 +448,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="true">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_2_label" aria-expanded="false">
           <label class="md-nav__title" for="__nav_2">
             <span class="md-nav__icon md-icon"></span>
             
@@ -468,37 +463,10 @@
                 
   
   
-    
   
   
-  
-    <li class="md-nav__item md-nav__item--active">
-      
-      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
-      
-      
-        
-      
-      
-        <label class="md-nav__link md-nav__link--active" for="__toc">
-          
-  
-  
-  <span class="md-ellipsis">
-    
-  
-    Dataset
-  
-
-    
-  </span>
-  
-  
-
-          <span class="md-nav__icon md-icon"></span>
-        </label>
-      
-      <a href="./" class="md-nav__link md-nav__link--active">
+    <li class="md-nav__item">
+      <a href="../../getting-started/data/" class="md-nav__link">
         
   
   
@@ -514,126 +482,6 @@
   
 
       </a>
-      
-        
-
-<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
-  
-  
-  
-    
-  
-  
-    <label class="md-nav__title" for="__toc">
-      <span class="md-nav__icon md-icon"></span>
-      Table of contents
-    </label>
-    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
-      
-        <li class="md-nav__item">
-  <a href="#emg2qwerty-hdf5-dataset" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        emg2qwerty HDF5 Dataset
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#download" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Download
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Download">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#automated-pipeline-recommended" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Automated Pipeline (recommended)
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#manual-download" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Manual Download
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#subject" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Subject
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#train-val-test-split" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Train / Val / Test Split
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#loading-data-in-python" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Loading Data in Python
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Loading Data in Python">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-the-datamodule" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using the DataModule
-      
-    </span>
-  </a>
-  
-</li>
-        
-      </ul>
-    </nav>
-  
-</li>
-      
-    </ul>
-  
-</nav>
-      
     </li>
   
 
@@ -646,7 +494,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../setup/" class="md-nav__link">
+      <a href="../../getting-started/setup/" class="md-nav__link">
         
   
   
@@ -705,24 +553,29 @@
       
   
   
+    
   
   
+  
     
     
     
     
-      
-      
-    
-    
-    <li class="md-nav__item md-nav__item--nested">
       
         
         
-        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+      
+      
+    
+    
+    <li class="md-nav__item md-nav__item--active md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" checked>
         
           
-          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="0">
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
             
   
   
@@ -740,7 +593,7 @@
             <span class="md-nav__icon md-icon"></span>
           </label>
         
-        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="true">
           <label class="md-nav__title" for="__nav_4">
             <span class="md-nav__icon md-icon"></span>
             
@@ -758,7 +611,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pipeline/" class="md-nav__link">
+      <a href="../" class="md-nav__link">
         
   
   
@@ -786,7 +639,7 @@
   
   
     <li class="md-nav__item">
-      <a href="../../pipeline/download/" class="md-nav__link">
+      <a href="../download/" class="md-nav__link">
         
   
   
@@ -811,10 +664,37 @@
                 
   
   
+    
   
   
-    <li class="md-nav__item">
-      <a href="../../pipeline/training/" class="md-nav__link">
+  
+    <li class="md-nav__item md-nav__item--active">
+      
+      <input class="md-nav__toggle md-toggle" type="checkbox" id="__toc">
+      
+      
+        
+      
+      
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Batched Training
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
+      <a href="./" class="md-nav__link md-nav__link--active">
         
   
   
@@ -830,6 +710,142 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#how-it-works" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How It Works
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="How It Works">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#1-registry-scan" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        1. Registry Scan
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#2-profile-filtering" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        2. Profile Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-data-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Data Sync
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#configuration" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Configuration
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#checkpoint-management" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Checkpoint Management
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#output-structure" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Output Structure
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+      
     </li>
   
 
@@ -1095,10 +1111,10 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#emg2qwerty-hdf5-dataset" class="md-nav__link">
+  <a href="#usage" class="md-nav__link">
     <span class="md-ellipsis">
       
-        emg2qwerty HDF5 Dataset
+        Usage
       
     </span>
   </a>
@@ -1106,22 +1122,22 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#download" class="md-nav__link">
+  <a href="#how-it-works" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Download
+        How It Works
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Download">
+    <nav class="md-nav" aria-label="How It Works">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#automated-pipeline-recommended" class="md-nav__link">
+  <a href="#1-registry-scan" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Automated Pipeline (recommended)
+        1. Registry Scan
       
     </span>
   </a>
@@ -1129,10 +1145,32 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#manual-download" class="md-nav__link">
+  <a href="#2-profile-filtering" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Manual Download
+        2. Profile Filtering
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#3-data-sync" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        3. Data Sync
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#4-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        4. Training
       
     </span>
   </a>
@@ -1145,10 +1183,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#subject" class="md-nav__link">
+  <a href="#configuration" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Subject
+        Configuration
       
     </span>
   </a>
@@ -1156,10 +1194,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#train-val-test-split" class="md-nav__link">
+  <a href="#checkpoint-management" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Train / Val / Test Split
+        Checkpoint Management
       
     </span>
   </a>
@@ -1167,30 +1205,24 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#loading-data-in-python" class="md-nav__link">
+  <a href="#output-structure" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Loading Data in Python
-      
-    </span>
-  </a>
-  
-    <nav class="md-nav" aria-label="Loading Data in Python">
-      <ul class="md-nav__list">
-        
-          <li class="md-nav__item">
-  <a href="#using-the-datamodule" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Using the DataModule
+        Output Structure
       
     </span>
   </a>
   
 </li>
-        
-      </ul>
-    </nav>
+      
+        <li class="md-nav__item">
+  <a href="#monitoring" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Monitoring
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1214,104 +1246,133 @@
   
 
 
-<h1 id="dataset">Dataset<a class="headerlink" href="#dataset" title="Permanent link">&para;</a></h1>
-<h2 id="emg2qwerty-hdf5-dataset">emg2qwerty HDF5 Dataset<a class="headerlink" href="#emg2qwerty-hdf5-dataset" title="Permanent link">&para;</a></h2>
-<p>The project uses the <strong>emg2qwerty</strong> dataset — surface EMG recordings from wrist
-electrodes captured while subjects typed on a QWERTY keyboard.</p>
-<p><strong>Dataset stats:</strong></p>
+<h1 id="batched-training">Batched Training<a class="headerlink" href="#batched-training" title="Permanent link">&para;</a></h1>
+<p>The training script (<code>scripts/train_batched.py</code>) orchestrates model training
+across multiple user profiles stored in Backblaze B2.</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Train on baseline profile (user 89335547)</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Train on 10 random profiles from the registry</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--test
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Train on ALL profiles in the registry</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--all
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Resume from a checkpoint</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--checkpoint<span class="w"> </span>logs/2026-03-11/best.ckpt
+</code></pre></div>
+<p>Or use the Makefile shortcuts:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>train-baseline
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>make<span class="w"> </span>train-test
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>make<span class="w"> </span>train-all
+</code></pre></div>
+<h2 id="how-it-works">How It Works<a class="headerlink" href="#how-it-works" title="Permanent link">&para;</a></h2>
+<h3 id="1-registry-scan">1. Registry Scan<a class="headerlink" href="#1-registry-scan" title="Permanent link">&para;</a></h3>
+<p>The <code>BatchTrainer</code> reads the B2 file registry (<code>emg2qwerty_registry.json</code>)
+to discover which user profiles and sessions are available.</p>
+<h3 id="2-profile-filtering">2. Profile Filtering<a class="headerlink" href="#2-profile-filtering" title="Permanent link">&para;</a></h3>
+<p>Based on the <code>--mode</code> flag:</p>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>Strategy</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>--baseline</code></td>
+<td>Only user <code>89335547</code></td>
+</tr>
+<tr>
+<td><code>--test</code></td>
+<td>First <code>n_test_users</code> users from the registry</td>
+</tr>
+<tr>
+<td><code>--all</code></td>
+<td>Every user in the registry</td>
+</tr>
+</tbody>
+</table>
+<h3 id="3-data-sync">3. Data Sync<a class="headerlink" href="#3-data-sync" title="Permanent link">&para;</a></h3>
+<p>For each profile, HDF5 files are downloaded from B2 to the local <code>data/</code>
+directory using <code>rclone sync</code>. Files already present locally are skipped.</p>
+<h3 id="4-training">4. Training<a class="headerlink" href="#4-training" title="Permanent link">&para;</a></h3>
+<p>The existing Hydra-based training entry-point (<code>emg2qwerty.train</code>) is invoked
+with appropriate overrides for each user profile, using <code>OmegaConf.merge</code>
+and <code>OmegaConf.from_dotlist</code> to compose the final config.</p>
+<h2 id="configuration">Configuration<a class="headerlink" href="#configuration" title="Permanent link">&para;</a></h2>
+<p>Training hyperparameters are controlled by the existing Hydra config system:</p>
+<table>
+<thead>
+<tr>
+<th>Config</th>
+<th>Purpose</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>config/base.yaml</code></td>
+<td>Batch size, epochs, seed, logging</td>
+</tr>
+<tr>
+<td><code>config/model/tds_conv_ctc.yaml</code></td>
+<td>TDS-CNN architecture</td>
+</tr>
+<tr>
+<td><code>config/optimizer/adam.yaml</code></td>
+<td>Adam optimizer (lr=1e-3)</td>
+</tr>
+<tr>
+<td><code>config/lr_scheduler/*.yaml</code></td>
+<td>LR schedule options</td>
+</tr>
+<tr>
+<td><code>config/decoder/*.yaml</code></td>
+<td>Greedy vs beam decoder</td>
+</tr>
+<tr>
+<td><code>config/user/*.yaml</code></td>
+<td>Single-user vs generic splits</td>
+</tr>
+</tbody>
+</table>
+<p>The batched trainer passes user-specific overrides to Hydra automatically:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># These are injected per-profile:</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">dataset.root</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/&lt;user_id&gt;</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">single_user</span><span class="w">       </span><span class="c1"># or the appropriate user config</span>
+</code></pre></div>
+<h2 id="checkpoint-management">Checkpoint Management<a class="headerlink" href="#checkpoint-management" title="Permanent link">&para;</a></h2>
 <ul>
-<li>1,135 session files spanning <strong>108 users</strong> and <strong>346 hours</strong> of recording</li>
-<li>Format: HDF5 (<code>.hdf5</code>), one file per session</li>
-<li>EMG: 2 kHz, 16 channels per wrist (left + right)</li>
-<li>Labels: keylogger-recorded keystroke timestamps</li>
-<li>Total size: ~308 GB (compressed tar.gz archive)</li>
+<li>Checkpoints are saved to <code>logs/&lt;date&gt;/&lt;time&gt;/checkpoints/</code></li>
+<li>Use <code>--checkpoint</code> to resume training from a saved checkpoint</li>
+<li>The <code>ModelCheckpoint</code> callback saves:<ul>
+<li>Best model by validation CER</li>
+<li>Last epoch checkpoint</li>
 </ul>
-<p>Each HDF5 file is structured under the <code>emg2qwerty</code> group:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>emg2qwerty/
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  timeseries      # Compound dataset: emg_left (T,16), emg_right (T,16), time (T,)
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  attrs:
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    session_name  # Unique session ID
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    user          # User ID (e.g. 89335547)
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    condition     # &quot;on_keyboard&quot;
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    duration_mins # Session length
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    keystrokes    # JSON: [{key, start, end}, ...]
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    prompts       # JSON: [{payload: {text}, start, end}, ...]
+</li>
+</ul>
+<h2 id="output-structure">Output Structure<a class="headerlink" href="#output-structure" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>logs/
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  2026-03-11/
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    14-30-00/
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>      checkpoints/
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        epoch=42-step=1234.ckpt
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        last.ckpt
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>      hydra_configs/
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        base.yaml
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        overrides.yaml
 </code></pre></div>
-<h2 id="download">Download<a class="headerlink" href="#download" title="Permanent link">&para;</a></h2>
-<h3 id="automated-pipeline-recommended">Automated Pipeline (recommended)<a class="headerlink" href="#automated-pipeline-recommended" title="Permanent link">&para;</a></h3>
-<p>Use the <a href="../../pipeline/">data pipeline</a> to stream HDF5 files from Meta's
-public S3 archive and store them in Backblaze B2:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># 1. Set up credentials</span>
-<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>cp<span class="w"> </span>.env.example<span class="w"> </span>.env
-<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="c1"># Edit .env with your B2 key ID and application key</span>
-<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>
-<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="c1"># 2. Download baseline data (single user, 18 sessions)</span>
-<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/download_data.py<span class="w"> </span>--baseline
-<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>
-<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="c1"># 3. Or download 10 random users for evaluation</span>
-<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/download_data.py<span class="w"> </span>--test
-<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a>
-<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a><span class="c1"># 4. Or use Makefile shortcuts</span>
-<a id="__codelineno-1-12" name="__codelineno-1-12" href="#__codelineno-1-12"></a>make<span class="w"> </span>download-baseline
-</code></pre></div>
-<p>See <a href="../../pipeline/download/">Pipeline → Download</a> for full details and all
-download modes.</p>
-<div class="admonition info">
-<p class="admonition-title">Streaming architecture</p>
-<p>The Meta dataset is distributed as a single 308 GB gzip-compressed tar
-archive. Our downloader streams through it, extracting only the files
-for your selected users, and uploads them to Backblaze B2 for future access.</p>
-</div>
-<h3 id="manual-download">Manual Download<a class="headerlink" href="#manual-download" title="Permanent link">&para;</a></h3>
-<p>Alternatively, download from UCLA Box:</p>
-<blockquote>
-<p><strong><a href="https://ucla.box.com/s/3xc4nwpfjfpo6ydjs94t0v2kuq37d5eg">UCLA Box — emg2qwerty dataset</a></strong></p>
-</blockquote>
-<p>Place the downloaded <code>.hdf5</code> files under <code>data/</code> at the project root:</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>C147-project-sEMG-ML/
-<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  data/
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>    &lt;user_id&gt;/
-<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>      &lt;session_id&gt;.hdf5
-<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>      ...
-<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>    metadata.csv
-</code></pre></div>
-<p>The <code>data/</code> directory is git-ignored.</p>
-<h2 id="subject">Subject<a class="headerlink" href="#subject" title="Permanent link">&para;</a></h2>
-<p>We primarily work with <strong>subject #89335547</strong> (18 sessions across 2 days).</p>
-<h2 id="train-val-test-split">Train / Val / Test Split<a class="headerlink" href="#train-val-test-split" title="Permanent link">&para;</a></h2>
-<p>Splits are defined in <code>config/user/single_user.yaml</code>.
-Each entry lists a <code>session</code> ID; the loader resolves these to
-<code>&lt;dataset.root&gt;/&lt;session&gt;.hdf5</code> paths.</p>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Print dataset statistics</span>
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/print_dataset_stats.py
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="c1"># Re-generate splits</span>
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/generate_splits.py
-</code></pre></div>
-<h2 id="loading-data-in-python">Loading Data in Python<a class="headerlink" href="#loading-data-in-python" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">emg2qwerty.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">EMGSessionData</span>
-<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>
-<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="k">with</span> <span class="n">EMGSessionData</span><span class="p">(</span><span class="s2">&quot;data/89335547/session.hdf5&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
-<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>           <span class="c1"># EMGSessionData: (N samples, K keystrokes, T mins)</span>
-<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>    <span class="n">window</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2000</span><span class="p">]</span> <span class="c1"># Structured numpy array: emg_left, emg_right, time</span>
-<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>    <span class="n">labels</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">ground_truth</span><span class="p">()</span>
-<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>       <span class="c1"># e.g. &quot;the quick brown&quot;</span>
-</code></pre></div>
-<h3 id="using-the-datamodule">Using the DataModule<a class="headerlink" href="#using-the-datamodule" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">hydra</span><span class="w"> </span><span class="kn">import</span> <span class="n">compose</span><span class="p">,</span> <span class="n">initialize</span>
-<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="kn">from</span><span class="w"> </span><span class="nn">emg2qwerty.lightning</span><span class="w"> </span><span class="kn">import</span> <span class="n">WindowedEMGDataModule</span>
-<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
-<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="k">with</span> <span class="n">initialize</span><span class="p">(</span><span class="n">config_path</span><span class="o">=</span><span class="s2">&quot;../config&quot;</span><span class="p">):</span>
-<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>    <span class="n">cfg</span> <span class="o">=</span> <span class="n">compose</span><span class="p">(</span><span class="n">config_name</span><span class="o">=</span><span class="s2">&quot;base&quot;</span><span class="p">,</span> <span class="n">overrides</span><span class="o">=</span><span class="p">[</span><span class="s2">&quot;user=single_user&quot;</span><span class="p">])</span>
-<a id="__codelineno-5-6" name="__codelineno-5-6" href="#__codelineno-5-6"></a>
-<a id="__codelineno-5-7" name="__codelineno-5-7" href="#__codelineno-5-7"></a><span class="n">dm</span> <span class="o">=</span> <span class="n">WindowedEMGDataModule</span><span class="p">(</span><span class="n">cfg</span><span class="p">)</span>
-<a id="__codelineno-5-8" name="__codelineno-5-8" href="#__codelineno-5-8"></a><span class="n">dm</span><span class="o">.</span><span class="n">setup</span><span class="p">(</span><span class="s2">&quot;fit&quot;</span><span class="p">)</span>
-<a id="__codelineno-5-9" name="__codelineno-5-9" href="#__codelineno-5-9"></a>
-<a id="__codelineno-5-10" name="__codelineno-5-10" href="#__codelineno-5-10"></a><span class="k">for</span> <span class="n">batch</span> <span class="ow">in</span> <span class="n">dm</span><span class="o">.</span><span class="n">train_dataloader</span><span class="p">():</span>
-<a id="__codelineno-5-11" name="__codelineno-5-11" href="#__codelineno-5-11"></a>    <span class="n">emg</span><span class="p">,</span> <span class="n">labels</span><span class="p">,</span> <span class="n">input_lengths</span><span class="p">,</span> <span class="n">label_lengths</span> <span class="o">=</span> <span class="n">batch</span>
-<a id="__codelineno-5-12" name="__codelineno-5-12" href="#__codelineno-5-12"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">emg</span><span class="o">.</span><span class="n">shape</span><span class="p">)</span>  <span class="c1"># (batch_size, window_length, freq_bins)</span>
-<a id="__codelineno-5-13" name="__codelineno-5-13" href="#__codelineno-5-13"></a>    <span class="k">break</span>
-</code></pre></div>
+<h2 id="monitoring">Monitoring<a class="headerlink" href="#monitoring" title="Permanent link">&para;</a></h2>
+<p>Training progress is logged to the console with:</p>
+<ul>
+<li>Per-epoch train loss, validation CER</li>
+<li>Learning rate schedule</li>
+<li>Checkpoint save events</li>
+</ul>
+<p>For experiment tracking, PyTorch Lightning supports multiple loggers
+(TensorBoard, W&amp;B, etc.) configured through Hydra.</p>
 
 
 

@@ -1,29 +1,78 @@
 # TDS-CNN Baseline
 
-## Time-Depth Separable Convolutions
+> Reference: [Sequence-to-Sequence Speech Recognition with Time-Depth Separable
+> Convolutions, Hannun et al. (2019)](https://arxiv.org/abs/1904.02619)
 
-The baseline architecture uses **Time-Depth Separable (TDS)** convolutional
-blocks, following the approach from the emg2qwerty paper.
+## Architecture
 
-### Key ideas
-
-- **Depthwise temporal convolution**: convolves along the time axis independently
-  per channel, capturing local temporal patterns in the EMG signal.
-- **Pointwise (1×1) convolution**: mixes information across channels after the
-  temporal convolution.
-- **Residual connections** and **layer normalization** stabilize training.
-
-### Architecture summary
+The baseline `TDSConvCTCModule` (defined in `src/emg2qwerty/lightning.py`) is a
+stack of Time-Depth Separable convolutional blocks followed by a linear CTC head.
 
 ```
-Input (C channels × T time steps)
-  → [TDS Block] × N
-  → Linear projection → num_classes (26 letters + blank)
-  → CTC loss
+Input: (T, N, bands=2, C=16, freq)            # LogSpectrogram of left+right EMG
+  ↓
+SpectrogramNorm                                # BatchNorm2d per band×channel
+  ↓
+MultiBandRotationInvariantMLP                  # MLP with electrode-rotation pooling
+  → (T, N, bands=2, mlp_features[-1])
+  ↓
+Flatten → (T, N, num_features)
+  ↓
+TDSConvEncoder                                 # Stack of TDSConv2dBlock + FC blocks
+  ↓
+Linear(num_features, num_classes)
+  ↓
+LogSoftmax → CTC Loss
 ```
 
-### Notes
+## Key modules (`src/emg2qwerty/modules.py`)
 
-- This is the reference model we compare all other architectures against.
-- Hyperparameters (kernel size, number of blocks, channel width) are configured
-  via Hydra configs in `config/`.
+### `SpectrogramNorm`
+Applies `nn.BatchNorm2d` independently over each of the
+`num_bands × electrode_channels` = 2 × 16 = 32 channels.
+
+### `RotationInvariantMLP`
+Shifts electrode channels by each offset in `(-1, 0, 1)` (band rotation
+augmentation), runs an MLP on each shifted version, then mean-pools. This
+makes the model robust to electrode placement variation.
+
+### `TDSConv2dBlock`
+```
+Conv2d(channels, channels, kernel=(1, kernel_width))   # temporal conv per channel
+  → ReLU
+  → skip connection (last T_out frames of input)
+  → LayerNorm
+```
+
+### `TDSFullyConnectedBlock`
+```
+Linear(num_features, num_features) → ReLU → Linear
+  → skip connection
+  → LayerNorm
+```
+
+### `TDSConvEncoder`
+Stacks alternating `TDSConv2dBlock` + `TDSFullyConnectedBlock` for each
+entry in `block_channels`.
+
+## Config
+
+The baseline hyperparameters live in `config/model/tds_conv_ctc.yaml`:
+
+```yaml
+module:
+  _target_: emg2qwerty.lightning.TDSConvCTCModule
+  in_features: 33        # n_fft // 2 + 1 frequency bins
+  mlp_features: [384]
+  block_channels: [24, 24, 24, 24, 24, 24, 24, 24]
+  kernel_width: 32
+```
+
+## Decoding
+
+Two decoders are available (`src/emg2qwerty/decoder.py`):
+
+| Decoder | Config | Notes |
+|---|---|---|
+| `CTCGreedyDecoder` | `decoder=ctc_greedy` | Fast, no dependencies |
+| `CTCBeamDecoder` | `decoder=ctc_beam` | Requires kenlm, uses 6-gram char LM |

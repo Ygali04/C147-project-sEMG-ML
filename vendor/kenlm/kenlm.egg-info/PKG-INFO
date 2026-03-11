@@ -1,0 +1,8 @@
+Metadata-Version: 2.4
+Name: kenlm
+Version: 0.2.0
+License-File: LICENSE
+License-File: COPYING
+License-File: COPYING.3
+License-File: COPYING.LESSER.3
+Dynamic: license-file

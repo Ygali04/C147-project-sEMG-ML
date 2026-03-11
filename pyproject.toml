@@ -50,6 +50,7 @@ dependencies = [
     "requests>=2.31",
     "click>=8.1",
     "pandas>=2.1",
+    "kenlm",
 ]
 
 [dependency-groups]
@@ -81,7 +82,7 @@ markers = [
 ]
 
 [tool.ruff]
-exclude = ["notebooks/", "site/", "*.ipynb"]
+exclude = ["notebooks/", "site/", "vendor/", "*.ipynb"]
 line-length = 120
 
 [tool.setuptools.package-dir]
@@ -89,6 +90,9 @@ line-length = 120
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.uv.sources]
+kenlm = { path = "vendor/kenlm" }
 
 [build-system]
 requires = ["setuptools>=69.0", "wheel"]

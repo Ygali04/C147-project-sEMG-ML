@@ -1,6 +1,7 @@
 .PHONY: format lint test all docs-serve docs-build docs-deploy clean \
        download-baseline download-test download-all \
-       train-baseline train-test train-all rclone-setup
+       train-baseline train-test train-all rclone-setup \
+       kenlm-setup
 
 format:
 	uv run ruff format .

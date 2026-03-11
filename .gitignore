@@ -205,6 +205,12 @@ logs/
 .cursorignore
 .cursorindexingignore
 
+# Vendored kenlm — build artifacts (source is checked in)
+vendor/kenlm/build/
+vendor/kenlm/*.so
+vendor/kenlm/*.dylib
+vendor/kenlm/*.egg-info/
+
 # Marimo
 marimo/_static/
 marimo/_lsp/

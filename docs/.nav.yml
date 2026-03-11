@@ -1,7 +1,7 @@
 nav:
   - Home: index.md
   - Getting Started: getting-started
-  - Architecture: architecture.md
+  - Architecture: architecture
   - Pipeline: pipeline
   - Models: models
   - Experiments: experiments

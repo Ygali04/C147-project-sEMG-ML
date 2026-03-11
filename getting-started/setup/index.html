@@ -563,6 +563,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#running-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running training
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-kenlm-beam-search-decoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional: kenlm (beam-search decoder)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -875,6 +897,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#running-training" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Running training
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#optional-kenlm-beam-search-decoder" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Optional: kenlm (beam-search decoder)
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -900,19 +944,20 @@
 <ul>
 <li>Python ≥ 3.11</li>
 <li><a href="https://docs.astral.sh/uv/">uv</a> package manager</li>
+<li>A CUDA-capable GPU (for training; CPU works for small tests)</li>
 </ul>
 <h2 id="install-dependencies">Install dependencies<a class="headerlink" href="#install-dependencies" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Core + dev dependencies</span>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Core + dev tools (ruff, pytest, jupyterlab, pre-commit, etc.)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># If you also want docs tooling</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Also install docs tooling</span>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev<span class="w"> </span>--group<span class="w"> </span>docs
 </code></pre></div>
 <h2 id="pre-commit-hooks">Pre-commit hooks<a class="headerlink" href="#pre-commit-hooks" title="Permanent link">&para;</a></h2>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>uv<span class="w"> </span>run<span class="w"> </span>pre-commit<span class="w"> </span>install
 </code></pre></div>
-<p>This will run formatting (ruff), linting, and notebook output stripping on
-every commit.</p>
+<p>This automatically runs formatting (ruff), linting, and notebook output
+stripping before every <code>git commit</code>.</p>
 <h2 id="common-commands">Common commands<a class="headerlink" href="#common-commands" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
@@ -928,26 +973,53 @@ every commit.</p>
 </tr>
 <tr>
 <td><code>make lint</code></td>
-<td>Lint with ruff</td>
+<td>Lint with ruff (no auto-fix)</td>
 </tr>
 <tr>
 <td><code>make test</code></td>
-<td>Run tests (parallel, skips slow tests)</td>
+<td>Run tests in parallel, skip <code>@slow</code> tests</td>
 </tr>
 <tr>
 <td><code>make all</code></td>
-<td>Format → lint → test</td>
+<td>format → lint → test</td>
 </tr>
 <tr>
 <td><code>make docs-serve</code></td>
-<td>Live-preview docs at <code>localhost:8000</code></td>
+<td>Live-preview docs at <code>http://localhost:8000</code></td>
+</tr>
+<tr>
+<td><code>make docs-deploy</code></td>
+<td>Build and publish docs to GitHub Pages</td>
 </tr>
 <tr>
 <td><code>make clean</code></td>
-<td>Remove caches and build artifacts</td>
+<td>Remove <code>__pycache__</code>, <code>.pytest_cache</code>, <code>dist/</code>, <code>site/</code></td>
 </tr>
 </tbody>
 </table>
+<h2 id="running-training">Running training<a class="headerlink" href="#running-training" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Single-user personalized model (recommended for development)</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">  </span><span class="nv">user</span><span class="o">=</span>single_user<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">  </span>trainer.accelerator<span class="o">=</span>gpu<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="w">  </span>trainer.devices<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a><span class="c1"># Generic (multi-user) model</span>
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a><span class="w">  </span><span class="nv">user</span><span class="o">=</span>generic<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a><span class="w">  </span>trainer.accelerator<span class="o">=</span>gpu<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a><span class="w">  </span>trainer.devices<span class="o">=</span><span class="m">8</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a><span class="w">  </span>--multirun
+</code></pre></div>
+<p>Config overrides are passed directly on the CLI via Hydra.
+See <code>config/base.yaml</code> and the <code>config/</code> subdirectories for all options.</p>
+<h2 id="optional-kenlm-beam-search-decoder">Optional: kenlm (beam-search decoder)<a class="headerlink" href="#optional-kenlm-beam-search-decoder" title="Permanent link">&para;</a></h2>
+<p>The <code>CTCBeamDecoder</code> requires
+<a href="https://github.com/kpu/kenlm">KenLM</a> compiled from source. If you only
+need greedy decoding (the default), you can skip this.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># Build kenlm from source, then:</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>pip<span class="w"> </span>install<span class="w"> </span>https://github.com/kpu/kenlm/archive/master.zip
+</code></pre></div>
 
 
 

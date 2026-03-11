@@ -661,22 +661,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#self-attention-for-emg-sequences" class="md-nav__link">
+  <a href="#planned-approach" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Self-attention for EMG sequences
+        Planned approach
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Self-attention for EMG sequences">
+    <nav class="md-nav" aria-label="Planned approach">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#planned-experiments" class="md-nav__link">
+  <a href="#planned-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned experiments
+        Planned models
       
     </span>
   </a>
@@ -684,10 +684,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#expected-trade-offs" class="md-nav__link">
+  <a href="#minimal-example-skeleton" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Expected trade-offs
+        Minimal example skeleton
       
     </span>
   </a>
@@ -696,6 +696,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#expected-trade-offs-vs-tds-cnn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected trade-offs vs TDS-CNN
+      
+    </span>
+  </a>
   
 </li>
       
@@ -827,22 +838,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#self-attention-for-emg-sequences" class="md-nav__link">
+  <a href="#planned-approach" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Self-attention for EMG sequences
+        Planned approach
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Self-attention for EMG sequences">
+    <nav class="md-nav" aria-label="Planned approach">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#planned-experiments" class="md-nav__link">
+  <a href="#planned-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned experiments
+        Planned models
       
     </span>
   </a>
@@ -850,10 +861,10 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#expected-trade-offs" class="md-nav__link">
+  <a href="#minimal-example-skeleton" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Expected trade-offs
+        Minimal example skeleton
       
     </span>
   </a>
@@ -862,6 +873,17 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#expected-trade-offs-vs-tds-cnn" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Expected trade-offs vs TDS-CNN
+      
+    </span>
+  </a>
   
 </li>
       
@@ -886,20 +908,85 @@
 
 
 <h1 id="transformer">Transformer<a class="headerlink" href="#transformer" title="Permanent link">&para;</a></h1>
-<h2 id="self-attention-for-emg-sequences">Self-attention for EMG sequences<a class="headerlink" href="#self-attention-for-emg-sequences" title="Permanent link">&para;</a></h2>
-<p><em>This page will be updated as we implement and evaluate Transformer models.</em></p>
-<h3 id="planned-experiments">Planned experiments<a class="headerlink" href="#planned-experiments" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Encoder-only Transformer with positional encoding over EMG frames</li>
-<li>Comparison of learned vs. sinusoidal positional embeddings</li>
-<li>CNN front-end → Transformer encoder (hybrid)</li>
-</ul>
-<h3 id="expected-trade-offs">Expected trade-offs<a class="headerlink" href="#expected-trade-offs" title="Permanent link">&para;</a></h3>
-<ul>
-<li>Parallelizable (faster training than RNNs)</li>
-<li>May need more data or regularization to avoid overfitting on small datasets</li>
-<li>Attention maps could provide interpretability into which time steps matter</li>
-</ul>
+<blockquote>
+<p><strong>Status:</strong> In progress — this page will be updated as models are implemented.</p>
+</blockquote>
+<h2 id="planned-approach">Planned approach<a class="headerlink" href="#planned-approach" title="Permanent link">&para;</a></h2>
+<p>Transformer encoders are added as new <code>pl.LightningModule</code> subclasses in
+<code>src/emg2qwerty/lightning.py</code>, sharing the same CTC training loop as the baseline.</p>
+<h3 id="planned-models">Planned models<a class="headerlink" href="#planned-models" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Key idea</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Encoder-only Transformer</td>
+<td>Self-attention over EMG spectrogram frames</td>
+</tr>
+<tr>
+<td>CNN + Transformer</td>
+<td>TDS/Conv front-end → Transformer encoder</td>
+</tr>
+</tbody>
+</table>
+<h3 id="minimal-example-skeleton">Minimal example skeleton<a class="headerlink" href="#minimal-example-skeleton" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">TransformerCTCModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_features</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">input_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="n">encoder_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">TransformerEncoderLayer</span><span class="p">(</span>
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>            <span class="n">d_model</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span> <span class="n">nhead</span><span class="o">=</span><span class="n">nhead</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="p">)</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">TransformerEncoder</span><span class="p">(</span><span class="n">encoder_layer</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">)</span>
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">charset</span><span class="p">()</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="c1"># inputs: (T, N, bands=2, C=16, freq) after SpectrogramNorm + MLP</span>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_proj</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>          <span class="c1"># (T, N, d_model)</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>              <span class="c1"># (T, N, d_model)</span>
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+</code></pre></div>
+<h2 id="expected-trade-offs-vs-tds-cnn">Expected trade-offs vs TDS-CNN<a class="headerlink" href="#expected-trade-offs-vs-tds-cnn" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th>TDS-CNN</th>
+<th>Transformer</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Parallelism</td>
+<td>✅ Parallel</td>
+<td>✅ Fully parallel</td>
+</tr>
+<tr>
+<td>Long-range context</td>
+<td>⚠️ Limited</td>
+<td>✅ Global attention</td>
+</tr>
+<tr>
+<td>Training speed</td>
+<td>Fast</td>
+<td>Moderate (O(T²) attention)</td>
+</tr>
+<tr>
+<td>Data hunger</td>
+<td>Low</td>
+<td>Higher</td>
+</tr>
+<tr>
+<td>Interpretability</td>
+<td>Low</td>
+<td>✅ Attention maps</td>
+</tr>
+</tbody>
+</table>
 
 
 

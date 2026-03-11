@@ -535,6 +535,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#loading-data-in-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading data in Python
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -875,6 +886,17 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#loading-data-in-python" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loading data in Python
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -899,24 +921,58 @@
 <h2 id="emg2qwerty-hdf5-dataset">emg2qwerty HDF5 dataset<a class="headerlink" href="#emg2qwerty-hdf5-dataset" title="Permanent link">&para;</a></h2>
 <p>The project uses the <strong>emg2qwerty</strong> dataset — surface EMG recordings from wrist
 electrodes captured while subjects typed on a QWERTY keyboard.</p>
-<p>Each session is stored as an <strong>HDF5</strong> (<code>.hdf5</code>) file containing:</p>
+<p><strong>Dataset stats:</strong></p>
 <ul>
-<li><code>emg</code>: multi-channel sEMG signal array (electrodes × time steps)</li>
-<li><code>labels</code>: ground-truth keystroke sequence</li>
+<li>1,135 session files spanning <strong>108 users</strong> and <strong>346 hours</strong> of recording</li>
+<li>Format: HDF5 (<code>.hdf5</code>), one file per session</li>
+<li>EMG: 2 kHz, 16 channels per wrist (left + right)</li>
+<li>Labels: keylogger-recorded keystroke timestamps</li>
 </ul>
+<p>Each HDF5 file is structured under the <code>emg2qwerty</code> group:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>emg2qwerty/
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  timeseries      # Compound dataset: emg_left (T,16), emg_right (T,16), time (T,)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  attrs:
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>    session_name  # Unique session ID
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    user          # User ID (e.g. 89335547)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>    condition     # &quot;on_keyboard&quot;
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>    duration_mins # Session length
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>    keystrokes    # JSON: [{key, start, end}, ...]
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>    prompts       # JSON: [{payload: {text}, start, end}, ...]
+</code></pre></div>
 <h2 id="download">Download<a class="headerlink" href="#download" title="Permanent link">&para;</a></h2>
 <p>Download the dataset from UCLA Box:</p>
 <blockquote>
 <p><strong><a href="https://ucla.box.com/s/3xc4nwpfjfpo6ydjs94t0v2kuq37d5eg">UCLA Box — emg2qwerty dataset</a></strong></p>
 </blockquote>
-<p>Place the downloaded <code>.hdf5</code> files under a <code>data/</code> directory at the project root
-(this path is git-ignored).</p>
+<p>Place the downloaded <code>.hdf5</code> files under <code>data/</code> at the project root:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>C147-project-sEMG-ML/
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>  data/
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>    &lt;session_id&gt;.hdf5
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>    ...
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>    metadata.csv
+</code></pre></div>
+<p>The <code>data/</code> directory is git-ignored.</p>
 <h2 id="subject">Subject<a class="headerlink" href="#subject" title="Permanent link">&para;</a></h2>
-<p>We primarily work with <strong>subject #89335547</strong>. The dataset includes multiple
-recording sessions for this subject.</p>
+<p>We primarily work with <strong>subject #89335547</strong>.</p>
 <h2 id="train-val-test-split">Train / Val / Test split<a class="headerlink" href="#train-val-test-split" title="Permanent link">&para;</a></h2>
-<p>The train/validation/test split is defined in the YAML config files under
-<code>config/</code>. See the Hydra experiment configs for the exact file lists per split.</p>
+<p>Splits are defined in <code>config/user/single_user.yaml</code>.
+Each entry lists a <code>session</code> ID; the loader resolves these to
+<code>&lt;dataset.root&gt;/&lt;session&gt;.hdf5</code> paths.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># Print dataset statistics</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/print_dataset_stats.py
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="c1"># Re-generate splits</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/generate_splits.py
+</code></pre></div>
+<h2 id="loading-data-in-python">Loading data in Python<a class="headerlink" href="#loading-data-in-python" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kn">from</span><span class="w"> </span><span class="nn">emg2qwerty.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">EMGSessionData</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="k">with</span> <span class="n">EMGSessionData</span><span class="p">(</span><span class="s2">&quot;data/89335547_session1.hdf5&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">session</span><span class="p">:</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">session</span><span class="p">)</span>           <span class="c1"># EMGSessionData: (N samples, K keystrokes, T mins)</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>    <span class="n">window</span> <span class="o">=</span> <span class="n">session</span><span class="p">[</span><span class="mi">0</span><span class="p">:</span><span class="mi">2000</span><span class="p">]</span> <span class="c1"># Structured numpy array: emg_left, emg_right, time</span>
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>    <span class="n">labels</span> <span class="o">=</span> <span class="n">session</span><span class="o">.</span><span class="n">ground_truth</span><span class="p">()</span>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>    <span class="nb">print</span><span class="p">(</span><span class="n">labels</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>       <span class="c1"># e.g. &quot;the quick brown&quot;</span>
+</code></pre></div>
 
 
 

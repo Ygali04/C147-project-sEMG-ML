@@ -419,10 +419,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#approach" class="md-nav__link">
+  <a href="#pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Approach
+        Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loss-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loss &amp; Metric
       
     </span>
   </a>
@@ -452,10 +463,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#docs" class="md-nav__link">
+  <a href="#source-layout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Docs
+        Source layout
       
     </span>
   </a>
@@ -847,10 +858,21 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#approach" class="md-nav__link">
+  <a href="#pipeline" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Approach
+        Pipeline
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#loss-metric" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Loss &amp; Metric
       
     </span>
   </a>
@@ -880,10 +902,10 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#docs" class="md-nav__link">
+  <a href="#source-layout" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Docs
+        Source layout
       
     </span>
   </a>
@@ -912,63 +934,108 @@
 
 <h1 id="emg2qwerty">EMG2QWERTY<a class="headerlink" href="#emg2qwerty" title="Permanent link">&para;</a></h1>
 <p><strong>Predicting Keystrokes from Electromyography (EMG) Signals</strong></p>
-<p>UCLA ECE C147/C247 Final Project</p>
+<p>UCLA ECE C147/C247 Final Project — Winter 2026</p>
 <hr />
 <h2 id="overview">Overview<a class="headerlink" href="#overview" title="Permanent link">&para;</a></h2>
-<p>This project explores decoding QWERTY keystrokes from surface electromyography
-(sEMG) signals recorded at the wrist. We use the
-<a href="https://github.com/facebookresearch/emg2qwerty">emg2qwerty</a> dataset, which
-provides multi-electrode sEMG recordings paired with ground-truth keystroke
-labels.</p>
-<h2 id="approach">Approach<a class="headerlink" href="#approach" title="Permanent link">&para;</a></h2>
+<p>This project decodes QWERTY keystrokes from surface electromyography (sEMG)
+signals recorded at the wrist. We build on the
+<a href="https://arxiv.org/abs/2410.20081">emg2qwerty dataset and baseline</a> from Meta,
+extending it with new model architectures and experiments.</p>
+<p>Each session is an HDF5 file containing:</p>
 <ul>
-<li><strong>Loss function:</strong> CTC (Connectionist Temporal Classification) loss, which
-  handles the alignment between variable-length EMG windows and keystroke
-  sequences without requiring frame-level labels.</li>
-<li><strong>Metric:</strong> Character Error Rate (CER) — the edit distance between predicted
-  and ground-truth keystroke sequences, normalized by the reference length.</li>
+<li><strong>Left + right wrist EMG</strong> — 16 electrode channels per wrist, 2 kHz sampling rate</li>
+<li><strong>Keystroke ground-truth</strong> — keylogger-recorded key-press timestamps per character</li>
 </ul>
+<h2 id="pipeline">Pipeline<a class="headerlink" href="#pipeline" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>HDF5 session files
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  → WindowedEMGDataset (data.py)
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  → LogSpectrogram transform (transforms.py)
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>  → Model encoder (modules.py / lightning.py)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  → CTC Loss (nn.CTCLoss)
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  → Greedy / Beam decoder (decoder.py)
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  → CER metric (metrics.py)
+</code></pre></div>
+<h2 id="loss-metric">Loss &amp; Metric<a class="headerlink" href="#loss-metric" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th></th>
+<th></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Loss</strong></td>
+<td>CTC (Connectionist Temporal Classification) — handles alignment without frame-level labels</td>
+</tr>
+<tr>
+<td><strong>Metric</strong></td>
+<td>CER (Character Error Rate) = edit distance / reference length</td>
+</tr>
+</tbody>
+</table>
 <h2 id="architectures">Architectures<a class="headerlink" href="#architectures" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Architecture</th>
+<th>Status</th>
 <th>Description</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><strong>TDS-CNN</strong></td>
-<td>Time-Depth Separable convolutions (baseline from the paper)</td>
+<td>✅ Baseline</td>
+<td>Time-Depth Separable CNN (Meta baseline)</td>
 </tr>
 <tr>
 <td><strong>RNN / LSTM / GRU</strong></td>
-<td>Recurrent models for sequential EMG decoding</td>
+<td>🔬 In progress</td>
+<td>Recurrent sequential decoder</td>
 </tr>
 <tr>
 <td><strong>Transformer</strong></td>
-<td>Self-attention-based encoder for EMG sequences</td>
+<td>🔬 In progress</td>
+<td>Self-attention over EMG frames</td>
 </tr>
 <tr>
 <td><strong>Hybrid</strong></td>
-<td>Combinations (e.g., CNN feature extractor + Transformer encoder)</td>
+<td>🔬 Planned</td>
+<td>CNN front-end + Transformer/RNN encoder</td>
 </tr>
 </tbody>
 </table>
 <h2 id="quick-start">Quick start<a class="headerlink" href="#quick-start" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>make<span class="w"> </span><span class="nb">test</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>make<span class="w"> </span>docs-serve
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="c1"># Install all dependencies</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>uv<span class="w"> </span>sync<span class="w"> </span>--group<span class="w"> </span>dev
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="c1"># Run tests (charset + decoder)</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>make<span class="w"> </span><span class="nb">test</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="c1"># Train the baseline (requires GPU + data)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">user</span><span class="o">=</span>single_user<span class="w"> </span>trainer.accelerator<span class="o">=</span>gpu
+<a id="__codelineno-1-9" name="__codelineno-1-9" href="#__codelineno-1-9"></a>
+<a id="__codelineno-1-10" name="__codelineno-1-10" href="#__codelineno-1-10"></a><span class="c1"># Serve docs locally</span>
+<a id="__codelineno-1-11" name="__codelineno-1-11" href="#__codelineno-1-11"></a>make<span class="w"> </span>docs-serve
 </code></pre></div>
-<h2 id="docs">Docs<a class="headerlink" href="#docs" title="Permanent link">&para;</a></h2>
-<p>Prettified docs using MkDocs.</p>
-<p>To to add documentation, simply edit or add markdown files in the ./docs folder.
-Once your done, run:
-<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>docs-deploy
+<h2 id="source-layout">Source layout<a class="headerlink" href="#source-layout" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>src/emg2qwerty/
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>  __init__.py
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>  charset.py     # Key ↔ label ↔ unicode mappings
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>  data.py        # EMGSessionData + WindowedEMGDataset
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>  decoder.py     # CTCGreedyDecoder + CTCBeamDecoder
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>  lightning.py   # LightningDataModule + TDSConvCTCModule
+<a id="__codelineno-2-7" name="__codelineno-2-7" href="#__codelineno-2-7"></a>  metrics.py     # CharacterErrorRates (CER / IER / DER / SER)
+<a id="__codelineno-2-8" name="__codelineno-2-8" href="#__codelineno-2-8"></a>  modules.py     # TDSConvEncoder + RotationInvariantMLP + SpectrogramNorm
+<a id="__codelineno-2-9" name="__codelineno-2-9" href="#__codelineno-2-9"></a>  train.py       # Hydra entry-point (train + eval loop)
+<a id="__codelineno-2-10" name="__codelineno-2-10" href="#__codelineno-2-10"></a>  transforms.py  # LogSpectrogram, SpecAugment, RandomBandRotation, ...
+<a id="__codelineno-2-11" name="__codelineno-2-11" href="#__codelineno-2-11"></a>  utils.py       # Optimizer/scheduler instantiation, checkpoint helpers
+<a id="__codelineno-2-12" name="__codelineno-2-12" href="#__codelineno-2-12"></a>config/          # Hydra YAML configs (model, optimizer, LR scheduler, ...)
+<a id="__codelineno-2-13" name="__codelineno-2-13" href="#__codelineno-2-13"></a>scripts/         # Dataset utilities (generate_splits, print_stats, ...)
+<a id="__codelineno-2-14" name="__codelineno-2-14" href="#__codelineno-2-14"></a>tests/           # pytest tests for charset, decoder, data
+<a id="__codelineno-2-15" name="__codelineno-2-15" href="#__codelineno-2-15"></a>notebooks/       # EDA and result visualization
 </code></pre></div>
-which will commit your changes, push them, and then update the site html.
-Those html changes will instantly be broadcasted to the github IO page:
-<code>&lt;https://Ygali04.github.io/C147-project-sEMG-ML/&gt;</code></p>
 
 
 

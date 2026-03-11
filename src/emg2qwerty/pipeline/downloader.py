@@ -9,30 +9,89 @@ sessions we need.
 
 Download modes (``--baseline``, ``--test``, ``--all``) select different
 subsets of the ~1 135 session files.
+
+User-ID parsing
+---------------
+The tar contains two filename conventions:
+
+* **Old format** (2020 pilot data)::
+
+      emg2qwerty-data-2021-08/2020-08-13-1597357485-keystrokes-71409769.hdf5
+                                                                  ^^^^^^^^
+                                                                  user-id
+
+* **New format** (2021 DCA study)::
+
+      emg2qwerty-data-2021-08/2021-06-03-1622765527-keystrokes-dca-study@1-<uuid>.hdf5
+                                                                             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+                                                                             user UUID (used as user-id)
+
+* **Pilot** (no user suffix)::
+
+      emg2qwerty-data-2021-08/2020-08-13-1597354281-keystrokes.hdf5
+      → stored under user-id ``pilot``
+
+Because a separate ``metadata.csv`` is not publicly accessible outside the
+tar, user identity is recovered entirely from the filename.
 """
 
 from __future__ import annotations
 
 import logging
+import re
 import tarfile
 from pathlib import Path
-from typing import TYPE_CHECKING
+from typing import Callable
 
 import boto3
 import numpy as np
-import requests
 import yaml
+
+import requests
 
 from emg2qwerty.pipeline.config import DownloadConfig, DownloadMode
 from emg2qwerty.pipeline.registry import FileRecord, FileRegistry, make_record
-
-if TYPE_CHECKING:
-    pass
 
 log = logging.getLogger(__name__)
 
 # Baseline user hard-coded from config/user/single_user.yaml
 _BASELINE_USER = "89335547"
+
+# Regex patterns for extracting user-id from HDF5 filenames
+# Group "user" captures the identifier
+_RE_OLD = re.compile(r"keystrokes-(?P<user>\d{6,12})\.hdf5$")
+_RE_NEW = re.compile(
+    r"keystrokes-dca-study@\d+-(?P<user>[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})\.hdf5$"
+)
+
+
+def parse_user_from_name(name: str) -> str:
+    """Extract a user identifier from a tar member filename.
+
+    Parameters
+    ----------
+    name:
+        Bare filename (without the tar prefix directory), e.g.
+        ``2021-06-03-1622765527-keystrokes-dca-study@1-<uuid>.hdf5``.
+
+    Returns
+    -------
+    str
+        The user identifier, or ``"pilot"`` for sessions with no user suffix.
+    """
+    m = _RE_NEW.search(name) or _RE_OLD.search(name)
+    if m:
+        return m.group("user")
+    if name.endswith(".hdf5"):
+        return "pilot"
+    return "unknown"
+
+
+def parse_session_from_name(name: str) -> str:
+    """Strip ``.hdf5`` from a bare filename to get the session name."""
+    if name.endswith(".hdf5"):
+        return name[: -len(".hdf5")]
+    return name
 
 
 class EMGDownloader:
@@ -80,59 +139,26 @@ class EMGDownloader:
         return self._registry
 
     # ------------------------------------------------------------------
-    # Session resolution
+    # Session resolution for BASELINE mode
     # ------------------------------------------------------------------
 
-    def _load_baseline_sessions(self) -> list[tuple[str, str]]:
-        """Read baseline sessions directly from ``config/user/single_user.yaml``."""
+    def _load_baseline_sessions(self) -> set[str]:
+        """Read baseline session names from ``config/user/single_user.yaml``.
+
+        Returns a set of bare session names (no ``.hdf5``) to match against
+        tar member filenames.
+        """
         config_path = Path("config/user/single_user.yaml")
         if not config_path.exists():
             raise FileNotFoundError(f"Baseline config not found at {config_path}. Run from the project root directory.")
         with open(config_path) as f:
             data = yaml.safe_load(f)
 
-        sessions: list[tuple[str, str]] = []
+        sessions: set[str] = set()
         for split in ("train", "val", "test"):
             for entry in data.get("dataset", {}).get(split, []) or []:
-                sessions.append((str(entry["user"]), entry["session"]))
+                sessions.add(str(entry["session"]))
         return sessions
-
-    def resolve_sessions(self) -> list[tuple[str, str]]:
-        """Return ``(user, session)`` pairs for the configured download mode.
-
-        * **BASELINE** — the 18 sessions of user ``89335547`` from
-          ``config/user/single_user.yaml``.
-        * **TEST** — ``n_test_users`` randomly sampled users (all their
-          sessions).  Requires ``metadata.csv`` in ``data_root``.
-        * **ALL** — every user/session pair in ``metadata.csv``.
-        """
-        mode = self.config.mode
-
-        if mode == DownloadMode.BASELINE:
-            return self._load_baseline_sessions()
-
-        # TEST and ALL need metadata.csv (must be pre-downloaded or available)
-        import pandas as pd
-
-        meta_path = self.config.data_root / "metadata.csv"
-        if not meta_path.exists():
-            raise FileNotFoundError(
-                f"metadata.csv not found at {meta_path}. Download it manually or run --baseline first."
-            )
-        metadata = pd.read_csv(meta_path)
-
-        if mode == DownloadMode.ALL:
-            return list(zip(metadata["user"].astype(str), metadata["session"].astype(str)))
-
-        if mode == DownloadMode.TEST:
-            rng = np.random.RandomState(self.config.seed)
-            unique_users = metadata["user"].unique()
-            n = min(self.config.n_test_users, len(unique_users))
-            sampled_users = set(rng.choice(unique_users, size=n, replace=False))
-            subset = metadata[metadata["user"].isin(sampled_users)]
-            return list(zip(subset["user"].astype(str), subset["session"].astype(str)))
-
-        raise ValueError(f"Unknown download mode: {mode}")  # pragma: no cover
 
     # ------------------------------------------------------------------
     # Key helpers
@@ -148,34 +174,84 @@ class EMGDownloader:
         return self.config.data_root / "emg2qwerty" / user / f"{session}.hdf5"
 
     # ------------------------------------------------------------------
-    # Tar member → session name matching
+    # Member filter factories
     # ------------------------------------------------------------------
 
-    def _match_member(self, member_name: str, wanted: set[str]) -> tuple[str, str] | None:
-        """Try to match a tar member name against our wanted session set.
+    def _make_filter(self) -> Callable[[str], tuple[str, str] | None]:
+        """Return a callable that maps a bare member name → (user, session) or None.
 
-        Returns ``(user, session)`` if found, else ``None``.
-        The tar contains entries like::
-
-            emg2qwerty-data-2021-08/<session>.hdf5
-
-        And we want to match against session names like::
-
-            2021-06-03-1622765527-keystrokes-dca-study@1-<uuid>
+        The filter encapsulates all download-mode logic so the streaming loop
+        stays simple.
         """
-        # Strip the top-level tar directory and .hdf5 extension
-        name = member_name
-        prefix = self.config.source.tar_prefix + "/"
-        if name.startswith(prefix):
-            name = name[len(prefix) :]
-        if name.endswith(".hdf5"):
-            name = name[: -len(".hdf5")]
+        mode = self.config.mode
 
-        if name in wanted:
-            # Find the corresponding (user, session) from our resolved list
-            # The session name is the key in `wanted`
-            return None  # caller handles lookup
-        return None
+        if mode == DownloadMode.BASELINE:
+            wanted: set[str] = self._load_baseline_sessions()
+            log.info("BASELINE mode — targeting %d sessions for user %s", len(wanted), _BASELINE_USER)
+
+            def _baseline_filter(name: str) -> tuple[str, str] | None:
+                session = parse_session_from_name(name)
+                if session in wanted:
+                    return (_BASELINE_USER, session)
+                return None
+
+            return _baseline_filter
+
+        if mode == DownloadMode.ALL:
+            log.info("ALL mode — extracting every session in the archive")
+
+            def _all_filter(name: str) -> tuple[str, str] | None:
+                if not name.endswith(".hdf5"):
+                    return None
+                user = parse_user_from_name(name)
+                session = parse_session_from_name(name)
+                return (user, session)
+
+            return _all_filter
+
+        if mode == DownloadMode.TEST:
+            rng = np.random.RandomState(self.config.seed)
+            n_users = self.config.n_test_users
+            # We'll dynamically select users as we stream; users seen first
+            # are accepted up to n_users total.
+            # Use a stable random decision: assign each new user a random
+            # priority; keep the n_users with the lowest priority.
+            #
+            # Implementation: reservoir sampling over users as they appear.
+            accepted_users: set[str] = set()
+            reservoir: list[tuple[float, str]] = []  # (priority, user)
+
+            def _test_filter(name: str) -> tuple[str, str] | None:
+                if not name.endswith(".hdf5"):
+                    return None
+                user = parse_user_from_name(name)
+                session = parse_session_from_name(name)
+
+                if user in accepted_users:
+                    return (user, session)
+
+                # New user — reservoir sample
+                if len(accepted_users) < n_users:
+                    accepted_users.add(user)
+                    reservoir.append((rng.random(), user))
+                    return (user, session)
+
+                # Reservoir is full — compare priority
+                priority = rng.random()
+                max_entry = max(reservoir, key=lambda x: x[0])
+                if priority < max_entry[0]:
+                    # Evict the highest-priority (worst) user
+                    reservoir.remove(max_entry)
+                    accepted_users.discard(max_entry[1])
+                    reservoir.append((priority, user))
+                    accepted_users.add(user)
+                    return (user, session)
+
+                return None  # User not selected
+
+            return _test_filter
+
+        raise ValueError(f"Unknown download mode: {mode}")  # pragma: no cover
 
     # ------------------------------------------------------------------
     # Streaming extraction
@@ -184,8 +260,8 @@ class EMGDownloader:
     def run(self) -> list[FileRecord]:
         """Execute the full download pipeline:
 
-        1. Resolve the list of sessions for the chosen mode.
-        2. Load the B2 registry and filter out already-downloaded files.
+        1. Build a member-filter for the chosen mode (BASELINE/TEST/ALL).
+        2. Load the B2 registry.
         3. Stream the tar.gz, extracting matching files locally + to B2.
         4. Update and save the registry.
 
@@ -193,53 +269,27 @@ class EMGDownloader:
         """
         log.info("Download mode: %s", self.config.mode.value)
 
-        # 1. Resolve sessions
-        sessions = self.resolve_sessions()
-        log.info("Resolved %d sessions", len(sessions))
+        # 1. Build filter
+        member_filter = self._make_filter()
 
-        # Build lookup: session_name -> (user, session)
-        session_lookup: dict[str, tuple[str, str]] = {}
-        for user, session in sessions:
-            session_lookup[session] = (user, session)
-
-        # 2. Filter via registry — skip files already in B2 AND on local disk
+        # 2. Load registry
         registry = self._get_registry()
-        pending_sessions: dict[str, tuple[str, str]] = {}
-        for session_name, (user, session) in session_lookup.items():
-            b2_key = self._b2_key(user, session)
-            local_path = self._local_path(user, session)
-            if registry.contains(b2_key) and local_path.exists():
-                continue
-            pending_sessions[session_name] = (user, session)
 
-        log.info(
-            "%d sessions already complete, %d pending",
-            len(sessions) - len(pending_sessions),
-            len(pending_sessions),
-        )
-
-        if not pending_sessions:
-            log.info("All sessions already downloaded. Nothing to do.")
-            return []
-
-        if self.config.dry_run:
-            log.info("[DRY RUN] Would download %d files — exiting.", len(pending_sessions))
-            for session_name in sorted(pending_sessions):
-                user, session = pending_sessions[session_name]
-                log.info("  %s → %s", session_name, self._local_path(user, session))
-            return []
-
-        # 3. Stream the tar.gz
         tar_url = self.config.source.tar_gz_url
         tar_prefix = self.config.source.tar_prefix + "/"
         log.info("Streaming tar.gz from %s ...", tar_url)
-        log.info("Looking for %d session(s) — this may take a while for large archives.", len(pending_sessions))
+        log.info("Connect timeout = 60 s; no read timeout (stream may run for many hours).")
 
-        response = requests.get(tar_url, stream=True, timeout=60)
+        if self.config.dry_run:
+            log.info("[DRY RUN] Scanning archive — will not download or upload anything.")
+
+        # Connect timeout = 60s; no read timeout (stream runs for many hours)
+        response = requests.get(tar_url, stream=True, timeout=(60, None))
         response.raise_for_status()
 
         uploaded: list[FileRecord] = []
         found_count = 0
+        skipped_registry = 0
 
         try:
             with tarfile.open(fileobj=response.raw, mode="r|gz") as tar:
@@ -247,46 +297,52 @@ class EMGDownloader:
                     if not member.isfile():
                         continue
 
-                    # Strip tar prefix to get the bare filename
+                    # Strip tar prefix directory
                     name = member.name
                     if name.startswith(tar_prefix):
                         name = name[len(tar_prefix) :]
 
-                    # Strip .hdf5 to compare with session names
-                    if name.endswith(".hdf5"):
-                        session_name = name[: -len(".hdf5")]
-                    else:
+                    # Apply the mode-specific filter
+                    result = member_filter(name)
+                    if result is None:
                         continue
 
-                    if session_name not in pending_sessions:
+                    user, session = result
+
+                    # Skip files already in registry (both B2 and local)
+                    b2_key = self._b2_key(user, session)
+                    local_path = self._local_path(user, session)
+                    if registry.contains(b2_key) and local_path.exists():
+                        skipped_registry += 1
+                        log.debug("  Skipping (already in registry): %s", b2_key)
                         continue
 
-                    # Found a match!
-                    user, session = pending_sessions[session_name]
                     found_count += 1
                     log.info(
-                        "[%d/%d] Extracting %s (%.1f MB)...",
+                        "[#%d] %s → user=%s  (%.1f MB)",
                         found_count,
-                        len(pending_sessions),
                         name,
+                        user,
                         member.size / 1e6,
                     )
+
+                    if self.config.dry_run:
+                        log.info("  [DRY RUN] Would save to %s and B2 key %s", local_path, b2_key)
+                        continue
 
                     # Extract file content
                     fileobj = tar.extractfile(member)
                     if fileobj is None:
-                        log.warning("Could not extract %s — skipping", name)
+                        log.warning("  Could not extract %s — skipping", name)
                         continue
                     file_data = fileobj.read()
 
                     # Save locally
-                    local_path = self._local_path(user, session)
                     local_path.parent.mkdir(parents=True, exist_ok=True)
                     local_path.write_bytes(file_data)
                     log.info("  Saved locally: %s (%.1f MB)", local_path, len(file_data) / 1e6)
 
                     # Upload to B2
-                    b2_key = self._b2_key(user, session)
                     try:
                         b2 = self._make_b2_client()
                         b2.put_object(
@@ -311,12 +367,6 @@ class EMGDownloader:
                     except Exception:
                         log.exception("  Failed to upload %s to B2 — file saved locally only", b2_key)
 
-                    # Remove from pending so we can stop early
-                    del pending_sessions[session_name]
-                    if not pending_sessions:
-                        log.info("All %d target sessions extracted!", found_count)
-                        break
-
         except Exception:
             log.exception("Error streaming tar.gz")
         finally:
@@ -327,15 +377,11 @@ class EMGDownloader:
             registry.save()
 
         log.info(
-            "Done. Extracted %d / %d files (%.1f MB locally, %.1f MB to B2).",
-            found_count,
-            len(sessions),
-            sum(
-                self._local_path(u, s).stat().st_size
-                for u, s in session_lookup.values()
-                if self._local_path(u, s).exists()
-            )
-            / 1e6,
-            sum(r.size_bytes for r in uploaded) / 1e6,
+            "Done. Extracted %d new file(s), skipped %d already complete.",
+            found_count if not self.config.dry_run else 0,
+            skipped_registry,
         )
+        if uploaded:
+            total_bytes = sum(r.size_bytes for r in uploaded)
+            log.info("Total uploaded to B2: %.1f GB", total_bytes / 1e9)
         return uploaded

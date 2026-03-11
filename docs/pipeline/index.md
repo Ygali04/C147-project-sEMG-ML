@@ -70,7 +70,7 @@ uv run python scripts/train_batched.py --baseline
 |------|-------------|-------|----------|-------|
 | `--baseline` | Single user 89335547 | 1 | 18 | 2–9 GB |
 | `--test` | 10 random users | 10 | ~50–100 | 10–50 GB |
-| `--all` | All users | ~108 | ~800+ | ~200 GB |
+| `--all` | All users | 108 | 1,135 | 308 GB |
 
 !!! warning "Large download"
     The `--all` flag streams through the entire 308 GB tar.gz archive.

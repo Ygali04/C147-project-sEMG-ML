@@ -63,23 +63,20 @@ class B2Config(BaseModel):
 
 
 class SourceS3Config(BaseModel):
-    """Read-only access to Meta's public ``emg2qwerty`` dataset bucket."""
+    """Read-only access to Meta's public ``emg2qwerty`` dataset.
 
-    bucket: str = Field(
-        default="fb-baml-public",
-        description="Source S3 bucket name.",
+    Individual object access is denied; the data is distributed as a single
+    gzip-compressed tar archive (~308 GB).  We stream through it with
+    ``tarfile.open(mode='r|gz')`` and extract only the files we need.
+    """
+
+    tar_gz_url: str = Field(
+        default="https://fb-ctrl-oss.s3.amazonaws.com/emg2qwerty/emg2qwerty-data-2021-08.tar.gz",
+        description="HTTPS URL of the gzip-compressed tar archive.",
     )
-    prefix: str = Field(
-        default="emg2qwerty",
-        description="Key prefix inside the source bucket.",
-    )
-    region: str = Field(
-        default="us-east-1",
-        description="AWS region of the source bucket.",
-    )
-    anonymous: bool = Field(
-        default=True,
-        description="Whether to use anonymous (unsigned) requests.",
+    tar_prefix: str = Field(
+        default="emg2qwerty-data-2021-08",
+        description="Top-level directory inside the tar archive.",
     )
 
 

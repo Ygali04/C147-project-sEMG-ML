@@ -82,15 +82,13 @@ class TestB2Config:
 class TestSourceS3Config:
     def test_defaults(self) -> None:
         cfg = SourceS3Config()
-        assert cfg.bucket == "fb-baml-public"
-        assert cfg.prefix == "emg2qwerty"
-        assert cfg.region == "us-east-1"
-        assert cfg.anonymous is True
+        assert "fb-ctrl-oss" in cfg.tar_gz_url
+        assert cfg.tar_prefix == "emg2qwerty-data-2021-08"
 
     def test_custom_values(self) -> None:
-        cfg = SourceS3Config(bucket="my-bucket", prefix="custom/prefix")
-        assert cfg.bucket == "my-bucket"
-        assert cfg.prefix == "custom/prefix"
+        cfg = SourceS3Config(tar_gz_url="https://example.com/data.tar.gz", tar_prefix="custom")
+        assert cfg.tar_gz_url == "https://example.com/data.tar.gz"
+        assert cfg.tar_prefix == "custom"
 
 
 # ---------------------------------------------------------------------------

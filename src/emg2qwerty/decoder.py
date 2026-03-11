@@ -358,11 +358,7 @@ class BeamState:
             f" p_b={self.p_b} p_nb={self.p_nb} p_total={self.p_total}"
         )
         if self.lm_node is not None:
-            o += (
-                f" len(lm_states)={len(self.lm_states)}"
-                f" lm_score={self.lm_score}"
-                f" sum(lm_scores)={sum(self.lm_scores)}"
-            )
+            o += f" len(lm_states)={len(self.lm_states)} lm_score={self.lm_score} sum(lm_scores)={sum(self.lm_scores)}"
         return o
 
 

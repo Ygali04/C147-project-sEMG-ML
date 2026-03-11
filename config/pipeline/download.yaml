@@ -2,10 +2,8 @@
 # Usage: referenced programmatically by scripts/download_data.py.
 
 source:
-  bucket: fb-baml-public
-  prefix: emg2qwerty
-  region: us-east-1
-  anonymous: true
+  tar_gz_url: "https://fb-ctrl-oss.s3.amazonaws.com/emg2qwerty/emg2qwerty-data-2021-08.tar.gz"
+  tar_prefix: "emg2qwerty-data-2021-08"
 
 registry_key: emg2qwerty_registry.json
 

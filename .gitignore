@@ -190,6 +190,8 @@ cython_debug/
 
 # Project data & logs (downloaded HDF5 sessions, training outputs)
 data/
+# Keep the committed metadata file (HDF5 session files remain ignored)
+!data/metadata.csv
 logs/
 
 # Ruff stuff:

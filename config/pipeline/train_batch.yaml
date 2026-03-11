@@ -1,0 +1,9 @@
+# Hydra config for the batched-training pipeline.
+
+mode: baseline
+n_test_users: 10
+seed: 1501
+batch_size_profiles: 1
+hydra_config_path: config/base.yaml
+checkpoint: null
+local_data_dir: data

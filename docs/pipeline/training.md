@@ -1,6 +1,7 @@
 # Batched Training
 
-The training script (`scripts/train_batched.py`) orchestrates model training across multiple user profiles stored in Backblaze B2.
+The training script (`scripts/train_batched.py`) orchestrates model training
+across multiple user profiles stored in Backblaze B2.
 
 ## Usage
 
@@ -8,7 +9,7 @@ The training script (`scripts/train_batched.py`) orchestrates model training acr
 # Train on baseline profile (user 89335547)
 uv run python scripts/train_batched.py --baseline
 
-# Train on first 10 profiles from the registry
+# Train on 10 random profiles from the registry
 uv run python scripts/train_batched.py --test
 
 # Train on ALL profiles in the registry
@@ -28,33 +29,60 @@ make train-all
 
 ## How It Works
 
-1. **Registry scan** — The trainer reads the B2 file registry to discover which user profiles and sessions are available.
+### 1. Registry Scan
 
-2. **Profile filtering** — Based on the `--mode` flag:
-    - `--baseline`: only user `89335547`
-    - `--test`: first `n_test_users` users from the registry
-    - `--all`: every user in the registry
+The `BatchTrainer` reads the B2 file registry (`emg2qwerty_registry.json`)
+to discover which user profiles and sessions are available.
 
-3. **Data sync** — For each profile, HDF5 files are downloaded from B2 to the local `data/` directory. Files already present locally are skipped.
+### 2. Profile Filtering
 
-4. **Training** — The existing Hydra-based training entry-point (`emg2qwerty.train`) is invoked with appropriate overrides for each user profile.
+Based on the `--mode` flag:
+
+| Mode | Strategy |
+|---|---|
+| `--baseline` | Only user `89335547` |
+| `--test` | First `n_test_users` users from the registry |
+| `--all` | Every user in the registry |
+
+### 3. Data Sync
+
+For each profile, HDF5 files are downloaded from B2 to the local `data/`
+directory using `rclone sync`. Files already present locally are skipped.
+
+### 4. Training
+
+The existing Hydra-based training entry-point (`emg2qwerty.train`) is invoked
+with appropriate overrides for each user profile, using `OmegaConf.merge`
+and `OmegaConf.from_dotlist` to compose the final config.
 
 ## Configuration
 
 Training hyperparameters are controlled by the existing Hydra config system:
 
-- `config/base.yaml` — base configuration (batch size, epochs, etc.)
-- `config/model/tds_conv_ctc.yaml` — model architecture
-- `config/optimizer/adam.yaml` — optimizer settings
-- `config/lr_scheduler/` — learning rate schedules
+| Config | Purpose |
+|---|---|
+| `config/base.yaml` | Batch size, epochs, seed, logging |
+| `config/model/tds_conv_ctc.yaml` | TDS-CNN architecture |
+| `config/optimizer/adam.yaml` | Adam optimizer (lr=1e-3) |
+| `config/lr_scheduler/*.yaml` | LR schedule options |
+| `config/decoder/*.yaml` | Greedy vs beam decoder |
+| `config/user/*.yaml` | Single-user vs generic splits |
 
-The batched trainer passes user-specific overrides to Hydra automatically.
+The batched trainer passes user-specific overrides to Hydra automatically:
+
+```yaml
+# These are injected per-profile:
+dataset.root: data/<user_id>
+user: single_user       # or the appropriate user config
+```
 
 ## Checkpoint Management
 
 - Checkpoints are saved to `logs/<date>/<time>/checkpoints/`
 - Use `--checkpoint` to resume training from a saved checkpoint
-- The `ModelCheckpoint` callback saves the best model by validation CER and the last epoch
+- The `ModelCheckpoint` callback saves:
+    - Best model by validation CER
+    - Last epoch checkpoint
 
 ## Output Structure
 
@@ -69,3 +97,14 @@ logs/
         base.yaml
         overrides.yaml
 ```
+
+## Monitoring
+
+Training progress is logged to the console with:
+
+- Per-epoch train loss, validation CER
+- Learning rate schedule
+- Checkpoint save events
+
+For experiment tracking, PyTorch Lightning supports multiple loggers
+(TensorBoard, W&B, etc.) configured through Hydra.

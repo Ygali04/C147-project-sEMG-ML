@@ -543,6 +543,13 @@ class EMGDownloader:
                                     with registry_lock:
                                         registry.add(record)
                                         uploaded.append(record)
+                                        try:
+                                            registry.save()
+                                        except Exception:
+                                            log.exception(
+                                                "Registry save failed after uploading %s — will retry at end",
+                                                record.b2_key,
+                                            )
                                 except Exception:
                                     log.exception("Upload task failed")
                             else:
@@ -557,6 +564,12 @@ class EMGDownloader:
                         with registry_lock:
                             registry.add(record)
                             uploaded.append(record)
+                            try:
+                                registry.save()
+                            except Exception:
+                                log.exception(
+                                    "Registry save failed after uploading %s — will retry at end", record.b2_key
+                                )
                     except Exception:
                         log.exception("Upload task failed")
 
@@ -565,9 +578,12 @@ class EMGDownloader:
         finally:
             response.close()
 
-        # Persist registry
+        # Final registry flush — ensures consistency even if per-file saves had transient errors
         if uploaded:
-            registry.save()
+            try:
+                registry.save()
+            except Exception:
+                log.exception("Final registry save failed — %d records may not be persisted", len(uploaded))
 
         log.info(
             "Done. %d new file(s) uploaded, %d skipped (already complete).",

@@ -26,12 +26,16 @@ it without touching the archive again.  Columns::
 
 from __future__ import annotations
 
+import io
 import logging
 import tarfile
+import threading
+from concurrent.futures import Future, ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import Callable
 
 import boto3
+from boto3.s3.transfer import TransferConfig
 import numpy as np
 import requests
 import yaml
@@ -46,6 +50,27 @@ _BASELINE_USER = "89335547"
 
 # Canonical location of the committed metadata file
 _METADATA_FILENAME = "metadata.csv"
+
+# Number of concurrent B2 upload workers.
+# Each worker holds one in-flight file (~150–280 MB); 4 workers ≈ 1 GB RAM.
+_UPLOAD_WORKERS = 4
+
+# Multipart threshold / chunk size for boto3 S3 Transfer Manager.
+# Files above the threshold are split into parallel parts automatically.
+_MULTIPART_THRESHOLD = 64 * 1024 * 1024  # 64 MB
+_MULTIPART_CHUNKSIZE = 64 * 1024 * 1024  # 64 MB
+
+# Global S3 TransferConfig (reused by every worker thread)
+_TRANSFER_CFG = TransferConfig(
+    multipart_threshold=_MULTIPART_THRESHOLD,
+    multipart_chunksize=_MULTIPART_CHUNKSIZE,
+    max_concurrency=1,  # one HTTP connection per worker thread
+    use_threads=False,  # we manage our own pool
+)
+
+# Thread-local storage so each worker thread gets its own boto3 client.
+# boto3 clients are NOT safe for concurrent use from multiple threads.
+_thread_local = threading.local()
 
 
 class EMGDownloader:
@@ -70,16 +95,20 @@ class EMGDownloader:
     # ------------------------------------------------------------------
 
     def _make_b2_client(self) -> boto3.client:
-        """Create an authenticated S3 client for Backblaze B2."""
-        if self._b2_client is None:
-            self._b2_client = boto3.client(
+        """Return the boto3 S3 client for the **current thread**.
+
+        Each thread gets its own client stored in thread-local storage so
+        concurrent upload workers never share a single connection.
+        """
+        if not hasattr(_thread_local, "b2_client"):
+            _thread_local.b2_client = boto3.client(
                 "s3",
                 endpoint_url=f"https://{self.config.b2.endpoint}",
                 region_name=self.config.b2.region,
                 aws_access_key_id=self.config.b2.key_id,
                 aws_secret_access_key=self.config.b2.application_key,
             )
-        return self._b2_client
+        return _thread_local.b2_client
 
     def _get_registry(self) -> FileRegistry:
         """Return the file registry, loading it from B2 on first call."""
@@ -238,16 +267,80 @@ class EMGDownloader:
         raise ValueError(f"Unknown download mode: {mode}")  # pragma: no cover
 
     # ------------------------------------------------------------------
+    # B2 upload worker (runs in a thread-pool thread)
+    # ------------------------------------------------------------------
+
+    def _upload_one(
+        self,
+        source_key: str,
+        b2_key: str,
+        file_data: bytes,
+        semaphore: threading.Semaphore,
+    ) -> FileRecord:
+        """Upload *file_data* to B2 and return a :class:`FileRecord`.
+
+        Uses boto3's S3 Transfer Manager (multipart for files > 64 MB).
+        The *semaphore* is released when the upload finishes so the main
+        thread can read the next file from the tar stream.
+
+        This method is called from a :class:`ThreadPoolExecutor` worker.
+        """
+        try:
+            b2 = self._make_b2_client()  # thread-local client
+            b2.upload_fileobj(
+                io.BytesIO(file_data),
+                self.config.b2.bucket_name,
+                b2_key,
+                ExtraArgs={"ContentType": "application/x-hdf5"},
+                Config=_TRANSFER_CFG,
+            )
+            head = b2.head_object(Bucket=self.config.b2.bucket_name, Key=b2_key)
+            record = make_record(
+                source_key=source_key,
+                b2_key=b2_key,
+                size_bytes=head.get("ContentLength", len(file_data)),
+                etag=head.get("ETag", ""),
+            )
+            log.info("  ✓ Uploaded to B2: %s (%.1f MB)", b2_key, len(file_data) / 1e6)
+            return record
+        finally:
+            semaphore.release()  # allow main thread to submit the next file
+
+    # ------------------------------------------------------------------
     # Streaming extraction
     # ------------------------------------------------------------------
 
     def run(self) -> list[FileRecord]:
-        """Execute the full download pipeline:
+        """Execute the full download pipeline.
 
+        Architecture
+        ------------
+        The gzip stream is inherently sequential — every byte must be
+        decompressed in order.  B2 uploads, however, are pure network I/O
+        and are fully independent of the download stream.
+
+        We exploit this by running B2 uploads on a
+        :class:`~concurrent.futures.ThreadPoolExecutor` while the main
+        thread continues reading from the tar stream:
+
+        ::
+
+            Main thread:   read₁ → disk₁ → submit₁ ──────────→ read₂ → disk₂ → submit₂ → …
+            Worker 0:                       upload₁ ─────────────────────────────────────────→ ✓
+            Worker 1:                                                    upload₂ ─────────────→ ✓
+
+        A :class:`threading.Semaphore` caps in-flight file data at
+        ``_UPLOAD_WORKERS × 2`` slots (≈ 1–2 GB RAM) to prevent OOM.
+
+        Steps
+        -----
         1. Build a member-filter for the chosen mode (BASELINE/TEST/ALL).
         2. Load the B2 file registry (deduplicate already-uploaded files).
-        3. Stream the tar.gz, extracting matching HDF5 files locally + to B2.
-        4. Persist the updated registry back to B2.
+        3. Stream the tar.gz; for each matching file:
+           a. Read bytes and write to local disk (main thread).
+           b. Submit an upload task to the thread pool (non-blocking).
+        4. Wait for all pending uploads to finish.
+        5. Persist the updated registry back to B2.
 
         Returns the list of newly saved :class:`FileRecord` instances.
         """
@@ -258,104 +351,131 @@ class EMGDownloader:
 
         # 2. Load deduplication registry
         registry = self._get_registry()
+        registry_lock = threading.Lock()
 
         tar_url = self.config.source.tar_gz_url
         tar_prefix = self.config.source.tar_prefix + "/"
 
         log.info("Streaming tar.gz from %s", tar_url)
+        log.info(
+            "Parallel B2 uploads: %d worker thread(s), multipart threshold %d MB",
+            _UPLOAD_WORKERS,
+            _MULTIPART_THRESHOLD // (1024 * 1024),
+        )
         if self.config.dry_run:
             log.info("[DRY RUN] Will not download or upload — listing matches only.")
+
+        # Semaphore limits how many file payloads live in RAM simultaneously.
+        # Each slot is one in-flight upload (~150–280 MB for these HDF5 files).
+        in_flight = threading.Semaphore(_UPLOAD_WORKERS * 2)
+
+        uploaded: list[FileRecord] = []
+        futures: list[Future] = []
+        found_count = 0
+        skipped_registry = 0
 
         # Connect timeout 60 s; no read timeout (stream runs for many hours)
         response = requests.get(tar_url, stream=True, timeout=(60, None))
         response.raise_for_status()
 
-        uploaded: list[FileRecord] = []
-        found_count = 0
-        skipped_registry = 0
-
         try:
-            with tarfile.open(fileobj=response.raw, mode="r|gz") as tar:
-                for member in tar:
-                    if not member.isfile():
-                        continue
+            with ThreadPoolExecutor(max_workers=_UPLOAD_WORKERS) as pool:
+                with tarfile.open(fileobj=response.raw, mode="r|gz") as tar:
+                    for member in tar:
+                        if not member.isfile():
+                            continue
 
-                    # Strip top-level tar directory prefix
-                    name = member.name
-                    if name.startswith(tar_prefix):
-                        name = name[len(tar_prefix) :]
+                        # Strip top-level tar directory prefix
+                        name = member.name
+                        if name.startswith(tar_prefix):
+                            name = name[len(tar_prefix) :]
 
-                    # Apply mode-specific filter
-                    result = member_filter(name)
-                    if result is None:
-                        continue
+                        # Apply mode-specific filter
+                        result = member_filter(name)
+                        if result is None:
+                            continue
 
-                    user, session = result
+                        user, session = result
 
-                    # Skip files already complete (in registry AND on disk)
-                    b2_key = self._b2_key(user, session)
-                    local_path = self._local_path(user, session)
-                    if registry.contains(b2_key) and local_path.exists():
-                        skipped_registry += 1
-                        log.debug("  Skipping (already complete): %s", b2_key)
-                        continue
+                        # Skip files already complete (in registry AND on disk)
+                        b2_key = self._b2_key(user, session)
+                        local_path = self._local_path(user, session)
+                        if registry.contains(b2_key) and local_path.exists():
+                            skipped_registry += 1
+                            log.debug("  Skipping (already complete): %s", b2_key)
+                            continue
 
-                    found_count += 1
-                    log.info(
-                        "[#%d] %s  user=%s  (%.1f MB)",
-                        found_count,
-                        name,
-                        user,
-                        member.size / 1e6,
-                    )
+                        found_count += 1
+                        log.info(
+                            "[#%d] %s  user=%s  (%.1f MB)",
+                            found_count,
+                            name,
+                            user,
+                            member.size / 1e6,
+                        )
 
-                    if self.config.dry_run:
-                        log.info("  [DRY RUN] → %s  (B2: %s)", local_path, b2_key)
-                        continue
+                        if self.config.dry_run:
+                            log.info("  [DRY RUN] → %s  (B2: %s)", local_path, b2_key)
+                            continue
 
-                    # Extract file bytes
-                    fileobj = tar.extractfile(member)
-                    if fileobj is None:
-                        log.warning("  Could not extract %s — skipping", name)
-                        continue
-                    file_data = fileobj.read()
+                        # --- Read bytes from the tar stream (must be sequential) ---
+                        fileobj = tar.extractfile(member)
+                        if fileobj is None:
+                            log.warning("  Could not extract %s — skipping", name)
+                            continue
+                        file_data = fileobj.read()
 
-                    # Save locally
-                    local_path.parent.mkdir(parents=True, exist_ok=True)
-                    local_path.write_bytes(file_data)
-                    log.info("  Saved locally: %s (%.1f MB)", local_path, len(file_data) / 1e6)
+                        # --- Write to local disk (fast, blocks < 1 s on SSD) ---
+                        local_path.parent.mkdir(parents=True, exist_ok=True)
+                        local_path.write_bytes(file_data)
+                        log.info("  Saved locally: %s (%.1f MB)", local_path, len(file_data) / 1e6)
 
-                    # Upload to B2
+                        # --- Submit B2 upload to thread pool (non-blocking) ---
+                        # Acquire a semaphore slot; blocks only when _UPLOAD_WORKERS*2
+                        # uploads are already in flight (back-pressure / OOM guard).
+                        in_flight.acquire()
+                        fut = pool.submit(
+                            self._upload_one,
+                            member.name,
+                            b2_key,
+                            file_data,
+                            in_flight,
+                        )
+                        futures.append(fut)
+
+                        # Drain any already-completed futures to update the registry
+                        # and free references to large byte buffers promptly.
+                        still_pending: list[Future] = []
+                        for f in futures:
+                            if f.done():
+                                try:
+                                    record = f.result()
+                                    with registry_lock:
+                                        registry.add(record)
+                                        uploaded.append(record)
+                                except Exception:
+                                    log.exception("Upload task failed")
+                            else:
+                                still_pending.append(f)
+                        futures = still_pending
+
+                # Pool context exit: wait for all remaining uploads to finish
+                log.info("Tar stream complete — waiting for %d pending upload(s) …", len(futures))
+                for f in as_completed(futures):
                     try:
-                        b2 = self._make_b2_client()
-                        b2.put_object(
-                            Bucket=self.config.b2.bucket_name,
-                            Key=b2_key,
-                            Body=file_data,
-                            ContentType="application/x-hdf5",
-                        )
-                        head = b2.head_object(
-                            Bucket=self.config.b2.bucket_name,
-                            Key=b2_key,
-                        )
-                        record = make_record(
-                            source_key=member.name,
-                            b2_key=b2_key,
-                            size_bytes=head.get("ContentLength", len(file_data)),
-                            etag=head.get("ETag", ""),
-                        )
-                        registry.add(record)
-                        uploaded.append(record)
-                        log.info("  Uploaded to B2: %s", b2_key)
+                        record = f.result()
+                        with registry_lock:
+                            registry.add(record)
+                            uploaded.append(record)
                     except Exception:
-                        log.exception("  Failed to upload %s to B2 — file saved locally only", b2_key)
+                        log.exception("Upload task failed")
 
         except Exception:
             log.exception("Error during tar.gz stream after finding %d file(s)", found_count)
         finally:
             response.close()
 
-        # 4. Persist updated registry
+        # 5. Persist updated registry
         if uploaded:
             registry.save()
 

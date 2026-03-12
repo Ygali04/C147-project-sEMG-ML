@@ -44,6 +44,21 @@ The remaining error is dominated by substitutions rather than insertions or
 deletions, which suggests the recurrent encoder is aligning sequences well but
 still confuses some characters at decode time.
 
+For comparison, the plain `bilstm_ctc` checkpoint evaluated on the same split
+reached weaker but still competitive numbers:
+
+| Metric | Validation | Test |
+|---|---|---|
+| CER (%) | 15.37 | 22.07 |
+| DER (%) | 1.51 | 4.91 |
+| IER (%) | 3.35 | 1.73 |
+| SER (%) | 10.52 | 15.43 |
+| Loss | 0.537 | 0.814 |
+
+That comparison suggests the convolutional front-end is doing meaningful work
+before the recurrent encoder: it improves both validation and test CER, while
+also keeping deletion and substitution errors lower than the pure BiLSTM.
+
 ## Usage
 
 ```bash

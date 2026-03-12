@@ -57,9 +57,9 @@ datamodule:
 
 ---
 
-## Recurrent Alternatives
+## Recurrent and Transfer Alternatives
 
-Two additional CTC model configs are available and can be selected with
+Three additional CTC model configs are available and can be selected with
 `model=<name>` in Hydra overrides.
 
 ### BiLSTM (`config/model/bilstm_ctc.yaml`)
@@ -87,4 +87,17 @@ module:
   hidden_size: 384
   num_layers: 2
   dropout: 0.2
+```
+
+### Whisper-CTC (`config/model/whisper_ctc.yaml`)
+
+```yaml
+module:
+  _target_: emg2qwerty.lightning.WhisperCTCModule
+  in_features: 528
+  mlp_features: [384]
+  whisper_model_name: openai/whisper-tiny
+  projection_dropout: 0.1
+  freeze_whisper_encoder: true
+  unfrozen_encoder_layers: 2
 ```

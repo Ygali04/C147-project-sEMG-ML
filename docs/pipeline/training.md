@@ -9,6 +9,12 @@ across multiple user profiles stored in Backblaze B2.
 # Train on baseline profile (user 89335547)
 uv run python scripts/train_batched.py --baseline
 
+# Train baseline with BiLSTM CTC
+uv run python scripts/train_batched.py --baseline --model bilstm_ctc
+
+# Train baseline with CNN + BiLSTM CTC
+uv run python scripts/train_batched.py --baseline --model cnn_bilstm_ctc
+
 # Train on 10 random profiles from the registry
 uv run python scripts/train_batched.py --test
 
@@ -47,13 +53,13 @@ Based on the `--mode` flag:
 ### 3. Data Sync
 
 For each profile, HDF5 files are downloaded from B2 to the local `data/`
-directory using `rclone sync`. Files already present locally are skipped.
+directory using the B2 S3-compatible API (`boto3`). Files already present
+locally are skipped.
 
 ### 4. Training
 
 The existing Hydra-based training entry-point (`emg2qwerty.train`) is invoked
-with appropriate overrides for each user profile, using `OmegaConf.merge`
-and `OmegaConf.from_dotlist` to compose the final config.
+with profile-specific command-line overrides.
 
 ## Configuration
 
@@ -63,6 +69,8 @@ Training hyperparameters are controlled by the existing Hydra config system:
 |---|---|
 | `config/base.yaml` | Batch size, epochs, seed, logging |
 | `config/model/tds_conv_ctc.yaml` | TDS-CNN architecture |
+| `config/model/bilstm_ctc.yaml` | Bidirectional LSTM encoder |
+| `config/model/cnn_bilstm_ctc.yaml` | Temporal CNN front-end + BiLSTM encoder |
 | `config/optimizer/adam.yaml` | Adam optimizer (lr=1e-3) |
 | `config/lr_scheduler/*.yaml` | LR schedule options |
 | `config/decoder/*.yaml` | Greedy vs beam decoder |
@@ -72,8 +80,17 @@ The batched trainer passes user-specific overrides to Hydra automatically:
 
 ```yaml
 # These are injected per-profile:
-dataset.root: data/<user_id>
-user: single_user       # or the appropriate user config
+user: <user_id>
+model: <model_name>
+checkpoint: <checkpoint_path>   # optional
+```
+
+You can select the model from CLI:
+
+```bash
+uv run python scripts/train_batched.py --baseline --model tds_conv_ctc
+uv run python scripts/train_batched.py --baseline --model bilstm_ctc
+uv run python scripts/train_batched.py --baseline --model cnn_bilstm_ctc
 ```
 
 ## Checkpoint Management
@@ -96,7 +113,11 @@ logs/
       hydra_configs/
         base.yaml
         overrides.yaml
+      training_progress.png
 ```
+
+`training_progress.png` is generated automatically at the end of training for
+all model choices (`tds_conv_ctc`, `bilstm_ctc`, `cnn_bilstm_ctc`).
 
 ## Monitoring
 

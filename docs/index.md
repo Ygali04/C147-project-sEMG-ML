@@ -28,7 +28,7 @@ HDF5 session files (308 GB tar.gz from Meta S3)
   → Model encoder (modules.py / lightning.py)
   → CTC Loss (nn.CTCLoss)
   → Greedy / Beam decoder (decoder.py)
-  → CER metric (metrics.py)
+  → CER / DER / IER / SER metrics (metrics.py)
 ```
 
 ## Loss & Metric
@@ -36,16 +36,30 @@ HDF5 session files (308 GB tar.gz from Meta S3)
 | | |
 |---|---|
 | **Loss** | CTC (Connectionist Temporal Classification) — handles alignment without frame-level labels |
-| **Metric** | CER (Character Error Rate) = edit distance / reference length |
+| **Selection metric** | CER (Character Error Rate) = edit distance / reference length |
+| **Diagnostic metrics** | DER, IER, SER to separate deletion, insertion, and substitution errors |
 
 ## Architectures
 
 | Architecture | Status | Description |
 |---|---|---|
 | **TDS-CNN** | ✅ Baseline | Time-Depth Separable CNN (Meta baseline) |
-| **RNN / LSTM / GRU** | 🔬 In progress | Recurrent sequential decoder |
+| **BiLSTM / CNN+BiLSTM** | ✅ Implemented | Recurrent CTC encoders with bidirectional context |
 | **Transformer** | 🔬 In progress | Self-attention over EMG frames |
 | **Hybrid** | 🔬 Planned | CNN front-end + Transformer/RNN encoder |
+
+## Current Best Documented Result
+
+The strongest documented run so far is the CNN + BiLSTM model on the
+single-user split for user 89335547 with greedy decoding.
+
+| Split | CER (%) | DER (%) | IER (%) | SER (%) | Loss |
+|---|---|---|---|---|---|
+| Validation | 13.76 | 1.77 | 3.15 | 8.84 | 0.544 |
+| Test | 14.89 | 1.36 | 2.64 | 10.89 | 0.556 |
+
+Compared with the documented TDS-CNN baseline, this reduces CER on both
+validation and test for the same baseline user split.
 
 ## Quick Start
 

@@ -1,41 +1,70 @@
-# RNN / LSTM / GRU
+# RNN / LSTM
 
-> **Status:** In progress — this page will be updated as models are implemented.
+> **Status:** Implemented (BiLSTM + CNN-BiLSTM)
 
-## Planned approach
+## Implemented approach
 
-New recurrent architectures are added as new `pl.LightningModule` subclasses
-in `src/emg2qwerty/lightning.py`, following the same interface as
-`TDSConvCTCModule`.
+Recurrent CTC architectures are implemented as `pl.LightningModule`
+subclasses in `src/emg2qwerty/lightning.py` and share the same training
+loop, optimizer/scheduler wiring, and decoder metrics as the baseline model.
 
-### Planned models
+### Available models
 
 | Model | Key idea |
 |---|---|
-| Bidirectional LSTM | Full-sequence context; larger receptive field than TDS |
-| GRU | Lighter alternative to LSTM, fewer parameters |
-| CNN + BiLSTM | TDS-style front-end → bidirectional LSTM encoder |
+| BiLSTM (`model=bilstm_ctc`) | Full-sequence bidirectional context after spectral front-end |
+| CNN + BiLSTM (`model=cnn_bilstm_ctc`) | Temporal Conv1D stack before BiLSTM encoder |
 
-### Minimal example skeleton
+Both variants keep the existing front-end:
+
+1. `SpectrogramNorm`
+2. `MultiBandRotationInvariantMLP`
+3. Feature flattening across bands
+
+and then replace the temporal encoder with recurrent layers.
+
+## Documented results
+
+The strongest documented recurrent result so far is the
+`cnn_bilstm_ctc` run on the `single_user` split for user 89335547.
+That run used greedy decoding, batch size 32, and trained for 150 epochs,
+with the best checkpoint saved at epoch 132.
+
+![CNN + BiLSTM Training Progress](../images/cnn_bilstm_training_progress.png)
+
+| Metric | Validation | Test |
+|---|---|---|
+| CER (%) | 13.76 | 14.89 |
+| DER (%) | 1.77 | 1.36 |
+| IER (%) | 3.15 | 2.64 |
+| SER (%) | 8.84 | 10.89 |
+| Loss | 0.544 | 0.556 |
+
+The remaining error is dominated by substitutions rather than insertions or
+deletions, which suggests the recurrent encoder is aligning sequences well but
+still confuses some characters at decode time.
+
+## Usage
+
+```bash
+# Pure BiLSTM encoder
+uv run python -m emg2qwerty.train model=bilstm_ctc user=single_user
+
+# CNN + BiLSTM hybrid
+uv run python -m emg2qwerty.train model=cnn_bilstm_ctc user=single_user
+```
+
+## Minimal architecture sketch
 
 ```python
 class BiLSTMCTCModule(pl.LightningModule):
-    NUM_BANDS: ClassVar[int] = 2
-    ELECTRODE_CHANNELS: ClassVar[int] = 16
-
-    def __init__(self, in_features, hidden_size, num_layers, ...):
-        super().__init__()
-        self.model = nn.Sequential(
-            SpectrogramNorm(channels=self.NUM_BANDS * self.ELECTRODE_CHANNELS),
-            MultiBandRotationInvariantMLP(in_features=in_features, ...),
-            nn.Flatten(start_dim=2),
-            # Replace TDSConvEncoder with BiLSTM:
-            nn.LSTM(input_size=..., hidden_size=hidden_size,
-                    num_layers=num_layers, bidirectional=True, batch_first=False),
-            # Extract output, project to classes
-            ...
-            nn.LogSoftmax(dim=-1),
+    def __init__(self, ...):
+        self.frontend = nn.Sequential(...)
+        self.encoder = nn.LSTM(
+            input_size=..., hidden_size=..., num_layers=...,
+            bidirectional=True, batch_first=False
         )
+        self.classifier = nn.Linear(2 * hidden_size, num_classes)
 ```
 
 ## Expected trade-offs vs TDS-CNN
@@ -46,3 +75,8 @@ class BiLSTMCTCModule(pl.LightningModule):
 | Long-range context | ⚠️ Limited by kernel | ✅ Unbounded |
 | Training speed | Fast | Slower |
 | Overfitting risk | Low | Higher (more params) |
+
+In practice, the CNN + BiLSTM hybrid has been a better fit than the plain
+baseline CNN for the documented single-user experiment, likely because the
+convolutional front-end reduces local noise before the recurrent stack models
+longer-range temporal structure.

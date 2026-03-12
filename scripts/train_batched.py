@@ -67,7 +67,15 @@ log = logging.getLogger(__name__)
 )
 @click.option(
     "--model",
-    type=click.Choice(["tds_conv_ctc", "bilstm_ctc", "cnn_bilstm_ctc"]),
+    type=click.Choice(
+        [
+            "tds_conv_ctc",
+            "bilstm_ctc",
+            "cnn_bilstm_ctc",
+            "whisper_ctc",
+            "whipser_ctc",
+        ]
+    ),
     default="tds_conv_ctc",
     show_default=True,
     help="Hydra model config to use from config/model/.",
@@ -95,6 +103,9 @@ def main(
     """Train models across user profiles stored in Backblaze B2."""
     load_dotenv()
 
+    # Keep backward compatibility with the common misspelling.
+    normalized_model = "whisper_ctc" if model == "whipser_ctc" else model
+
     if local_files:
         if mode != DownloadMode.BASELINE.value:
             click.echo(
@@ -118,7 +129,7 @@ def main(
             "-m",
             "emg2qwerty.train",
             "user=single_user",
-            f"model={model}",
+            f"model={normalized_model}",
         ]
         if checkpoint:
             cmd.append(f"checkpoint={checkpoint}")
@@ -144,7 +155,7 @@ def main(
         b2=B2Config(key_id=key_id, application_key=app_key),
         batch_size_profiles=batch_size_profiles,
         checkpoint=checkpoint,
-        model=model,
+        model=normalized_model,
     )
 
     trainer = BatchTrainer(config)

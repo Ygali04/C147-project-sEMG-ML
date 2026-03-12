@@ -67,6 +67,13 @@ log = logging.getLogger(__name__)
     help="Resolve sessions but skip actual uploads.",
 )
 @click.option(
+    "--save-local",
+    is_flag=True,
+    default=False,
+    help="Also write HDF5 files to local disk (data/emg2qwerty/…). "
+    "By default files are streamed directly to B2 with no local copy.",
+)
+@click.option(
     "--n-test-users",
     type=int,
     default=10,
@@ -80,7 +87,7 @@ log = logging.getLogger(__name__)
     show_default=True,
     help="Random seed for user sampling.",
 )
-def main(mode: str, dry_run: bool, n_test_users: int, seed: int) -> None:
+def main(mode: str, dry_run: bool, save_local: bool, n_test_users: int, seed: int) -> None:
     """Download EMG session files from Meta S3 → Backblaze B2."""
     # Load .env for credentials
     load_dotenv()
@@ -100,6 +107,7 @@ def main(mode: str, dry_run: bool, n_test_users: int, seed: int) -> None:
         n_test_users=n_test_users,
         seed=seed,
         dry_run=dry_run,
+        save_local=save_local,
         b2=B2Config(key_id=key_id, application_key=app_key),
         source=SourceS3Config(),
     )

@@ -126,6 +126,14 @@ class DownloadConfig(BaseModel):
         default=False,
         description="If True, resolve sessions but skip actual uploads.",
     )
+    save_local: bool = Field(
+        default=False,
+        description=(
+            "If True, also write each HDF5 file to local disk under data_root. "
+            "By default files are streamed directly to B2 and never touch local disk "
+            "(aside from data/metadata.csv which is always cached locally)."
+        ),
+    )
     b2: B2Config = Field(description="Backblaze B2 destination configuration.")
     source: SourceS3Config = Field(
         default_factory=SourceS3Config,

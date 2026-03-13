@@ -1,18 +1,37 @@
 # Transformer
 
-> **Status:** In progress — this page will be updated as models are implemented.
+> **Status:** Whisper-based transfer model implemented; generic transformer encoder still in progress.
 
 ## Planned approach
 
 Transformer encoders are added as new `pl.LightningModule` subclasses in
 `src/emg2qwerty/lightning.py`, sharing the same CTC training loop as the baseline.
 
-### Planned models
+### Available and planned models
 
 | Model | Key idea |
 |---|---|
+| Whisper-CTC (`model=whisper_ctc`) | Project EMG features into a pretrained Whisper encoder and train a CTC head |
 | Encoder-only Transformer | Self-attention over EMG spectrogram frames |
 | CNN + Transformer | TDS/Conv front-end → Transformer encoder |
+
+## Documented Whisper-CTC result
+
+The current transformer-family result comes from the `whisper_ctc` experiment,
+which reuses the pretrained `openai/whisper-tiny` encoder with the top two
+encoder layers unfrozen.
+
+| Metric | Validation | Test |
+|---|---|---|
+| CER (%) | 17.72 | 99.91 |
+| DER (%) | 2.55 | 0.00 |
+| IER (%) | 4.10 | 99.91 |
+| SER (%) | 11.08 | 0.00 |
+| Loss | 0.615 | inf |
+
+The validation split looked promising, but the test split collapsed due to
+massive insertion errors. Right now that makes the Whisper transfer approach a
+useful experiment, not a competitive model for this task.
 
 ### Minimal example skeleton
 

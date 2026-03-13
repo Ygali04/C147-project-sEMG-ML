@@ -9,6 +9,12 @@ across multiple user profiles stored in Backblaze B2.
 # Train on baseline profile (user 89335547)
 uv run python scripts/train_batched.py --baseline
 
+# Train baseline with BiLSTM CTC
+uv run python scripts/train_batched.py --baseline --model bilstm_ctc
+
+# Train baseline with CNN + BiLSTM CTC
+uv run python scripts/train_batched.py --baseline --model cnn_bilstm_ctc
+
 # Train on 10 random profiles from the registry
 uv run python scripts/train_batched.py --test
 
@@ -63,6 +69,9 @@ Training hyperparameters are controlled by the existing Hydra config system:
 |---|---|
 | `config/base.yaml` | Batch size, epochs, seed, logging |
 | `config/model/tds_conv_ctc.yaml` | TDS-CNN architecture |
+| `config/model/bilstm_ctc.yaml` | Bidirectional LSTM encoder |
+| `config/model/cnn_bilstm_ctc.yaml` | Temporal CNN front-end + BiLSTM encoder |
+| `config/model/whisper_ctc.yaml` | Whisper encoder transfer model with CTC head |
 | `config/optimizer/adam.yaml` | Adam optimizer (lr=1e-3) |
 | `config/lr_scheduler/*.yaml` | LR schedule options |
 | `config/decoder/*.yaml` | Greedy vs beam decoder |
@@ -73,7 +82,18 @@ The batched trainer passes user-specific overrides to Hydra automatically:
 ```yaml
 # These are injected per-profile:
 dataset.root: data/<user_id>
-user: single_user       # or the appropriate user config
+user: single_user       # or the appropriate user config, <user_id>
+model: <model_name>
+checkpoint: <checkpoint_path>   # optional
+```
+
+You can select the model from CLI:
+
+```bash
+uv run python scripts/train_batched.py --baseline --model tds_conv_ctc
+uv run python scripts/train_batched.py --baseline --model bilstm_ctc
+uv run python scripts/train_batched.py --baseline --model cnn_bilstm_ctc
+uv run python scripts/train_batched.py --baseline --model whisper_ctc
 ```
 
 ## Checkpoint Management
@@ -96,7 +116,26 @@ logs/
       hydra_configs/
         base.yaml
         overrides.yaml
+      training_progress.png
 ```
+
+`training_progress.png` is generated automatically at the end of training for
+all model choices (`tds_conv_ctc`, `bilstm_ctc`, `cnn_bilstm_ctc`, `whisper_ctc`).
+
+If you change the plotting code or want to backfill older runs, regenerate the
+images directly from the saved metrics CSV files:
+
+```bash
+# Rebuild all plots for one training day
+uv run python -m emg2qwerty.plot_training_curves logs/2026-03-12/*
+
+# Rebuild a single run
+uv run python -m emg2qwerty.plot_training_curves logs/2026-03-12/09-20-04
+```
+
+This command scans each run directory for `lightning_logs/version_*/metrics.csv`
+and writes a fresh `training_progress.png` next to the run's checkpoints and
+Hydra config outputs.
 
 ## Monitoring
 

@@ -152,10 +152,11 @@ class BatchTrainer:
     def _build_hydra_overrides(
         user_id: str,
         session_paths: list[Path],
+        model: str,
         checkpoint: str | None = None,
     ) -> list[str]:
         """Build Hydra CLI override strings for a single user."""
-        overrides = [f"user={user_id}"]
+        overrides = [f"user={user_id}", f"model={model}"]
 
         if checkpoint:
             overrides.append(f"checkpoint={checkpoint}")
@@ -170,6 +171,7 @@ class BatchTrainer:
         overrides = self._build_hydra_overrides(
             user_id=user_id,
             session_paths=session_paths,
+            model=self.config.model,
             checkpoint=self.config.checkpoint,
         )
 

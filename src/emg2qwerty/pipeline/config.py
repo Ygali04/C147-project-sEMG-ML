@@ -176,6 +176,10 @@ class TrainBatchConfig(BaseModel):
         default=None,
         description="Optional path to a training checkpoint to resume from.",
     )
+    model: str = Field(
+        default="tds_conv_ctc",
+        description="Hydra model config name under config/model/ (e.g., tds_conv_ctc, bilstm_ctc).",
+    )
     local_data_dir: Path = Field(
         default=Path("data"),
         description="Local directory where HDF5 files are synced for training.",

@@ -53,13 +53,13 @@ Based on the `--mode` flag:
 ### 3. Data Sync
 
 For each profile, HDF5 files are downloaded from B2 to the local `data/`
-directory using the B2 S3-compatible API (`boto3`). Files already present
-locally are skipped.
+directory using `rclone sync`. Files already present locally are skipped.
 
 ### 4. Training
 
 The existing Hydra-based training entry-point (`emg2qwerty.train`) is invoked
-with profile-specific command-line overrides.
+with appropriate overrides for each user profile, using `OmegaConf.merge`
+and `OmegaConf.from_dotlist` to compose the final config.
 
 ## Configuration
 
@@ -81,7 +81,8 @@ The batched trainer passes user-specific overrides to Hydra automatically:
 
 ```yaml
 # These are injected per-profile:
-user: <user_id>
+dataset.root: data/<user_id>
+user: single_user       # or the appropriate user config, <user_id>
 model: <model_name>
 checkpoint: <checkpoint_path>   # optional
 ```

@@ -1,0 +1,14 @@
+# Backblaze B2 connection settings.
+# Credentials are read from environment variables — NEVER hard-code them.
+#
+# Set them in your shell or in a .env file at the project root:
+#   export B2_KEY_ID="your-key-id"
+#   export B2_APPLICATION_KEY="your-application-key"
+
+b2:
+  endpoint: s3.us-west-004.backblazeb2.com
+  region: us-west-004
+  bucket_name: C147-project
+  bucket_id: 857ef5759126dac299c10e13
+  key_id: ${oc.env:B2_KEY_ID}
+  application_key: ${oc.env:B2_APPLICATION_KEY}

@@ -158,7 +158,7 @@ def dump_split(user: str, train: pd.DataFrame, val: pd.DataFrame, test: pd.DataF
     "--min-train-sessions-per-user",
     type=int,
     default=2,
-    help="Drop users for whom at least these many training sessions " "cannot be satisfied after considering val/test",
+    help="Drop users for whom at least these many training sessions cannot be satisfied after considering val/test",
 )
 @click.option(
     "--n-val-sessions-per-user",

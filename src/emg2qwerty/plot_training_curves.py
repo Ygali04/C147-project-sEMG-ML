@@ -47,7 +47,17 @@ def _resolve_metrics_path(run_path: Path) -> Path | None:
 
 def _resolve_output_path(run_path: Path, output_name: str) -> Path:
     if run_path.is_file():
-        return run_path.parent.parent.parent / output_name
+        # When given a metrics.csv file produced by PyTorch Lightning, the expected
+        # layout is .../lightning_logs/version_*/metrics.csv and we want to write the
+        # output into the run directory above lightning_logs.
+        if (
+            run_path.name == "metrics.csv"
+            and run_path.parent.name.startswith("version_")
+            and run_path.parent.parent.name == "lightning_logs"
+        ):
+            return run_path.parent.parent.parent / output_name
+        # For any other file layout, place the output alongside the given file.
+        return run_path.parent / output_name
     return run_path / output_name
 
 

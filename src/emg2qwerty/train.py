@@ -11,6 +11,7 @@ from collections.abc import Sequence
 from pathlib import Path
 from typing import Any
 
+import torch
 import hydra
 import pytorch_lightning as pl
 from hydra.utils import get_original_cwd, instantiate
@@ -18,6 +19,19 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from emg2qwerty import transforms, utils
 from emg2qwerty.transforms import Transform
+
+# PyTorch ≥2.6 defaults torch.load to weights_only=True, which breaks
+# Lightning checkpoint loading (checkpoints contain OmegaConf objects).
+# Force weights_only=False for all torch.load calls.
+_original_torch_load = torch.load
+
+
+def _patched_torch_load(*args, **kwargs):
+    kwargs["weights_only"] = False
+    return _original_torch_load(*args, **kwargs)
+
+
+torch.load = _patched_torch_load
 
 
 log = logging.getLogger(__name__)
@@ -61,7 +75,7 @@ def main(config: DictConfig):
     )
     if config.checkpoint is not None:
         log.info(f"Loading module from checkpoint {config.checkpoint}")
-        module = module.load_from_checkpoint(
+        module = type(module).load_from_checkpoint(
             config.checkpoint,
             optimizer=config.optimizer,
             lr_scheduler=config.lr_scheduler,
@@ -104,7 +118,7 @@ def main(config: DictConfig):
         trainer.fit(module, datamodule, ckpt_path=resume_from_checkpoint)
 
         # Load best checkpoint
-        module = module.load_from_checkpoint(trainer.checkpoint_callback.best_model_path)
+        module = type(module).load_from_checkpoint(trainer.checkpoint_callback.best_model_path)
 
     # Validate and test on the best checkpoint (if training), or on the
     # loaded `config.checkpoint` (otherwise)

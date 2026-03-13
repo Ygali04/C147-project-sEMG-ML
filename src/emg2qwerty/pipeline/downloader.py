@@ -184,7 +184,7 @@ class EMGDownloader:
         self._metadata_local_path.parent.mkdir(parents=True, exist_ok=True)
         self._metadata_local_path.write_bytes(raw_bytes)
         log.info(
-            "Captured metadata.csv → saved locally (%d KB). " "Please commit data/metadata.csv to the repo.",
+            "Captured metadata.csv → saved locally (%d KB). Please commit data/metadata.csv to the repo.",
             len(raw_bytes) // 1024,
         )
 
@@ -329,7 +329,7 @@ class EMGDownloader:
                 reservoir: list[tuple[float, str]] = []
 
                 log.info(
-                    "TEST mode (no metadata.csv yet) — reservoir-sampling %d users " "from the stream (seed=%d)",
+                    "TEST mode (no metadata.csv yet) — reservoir-sampling %d users from the stream (seed=%d)",
                     n_users,
                     self.config.seed,
                 )

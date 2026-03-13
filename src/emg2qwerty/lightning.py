@@ -405,8 +405,21 @@ class T5CTCModule(pl.LightningModule):
 
         T_len = x.shape[0]
 
-        # Add sinusoidal positional encoding
-        x = self.pe_dropout(x + self.pos_encoding[:T_len])
+        # Add sinusoidal positional encoding.
+        # At test time, full sessions can exceed the pre-computed buffer length,
+        # so we dynamically extend the encoding if necessary.
+        if T_len <= self.pos_encoding.shape[0]:
+            pe = self.pos_encoding[:T_len]
+        else:
+            d_model = self.pos_encoding.shape[2]
+            pe = torch.zeros(T_len, 1, d_model, device=x.device)
+            position = torch.arange(0, T_len, dtype=torch.float, device=x.device).unsqueeze(1)
+            div_term = torch.exp(
+                torch.arange(0, d_model, 2, dtype=torch.float, device=x.device) * (-math.log(10000.0) / d_model)
+            )
+            pe[:, 0, 0::2] = torch.sin(position * div_term)
+            pe[:, 0, 1::2] = torch.cos(position * div_term)
+        x = self.pe_dropout(x + pe)
 
         # Build key_padding_mask: True = ignore (PyTorch convention)
         key_padding_mask = torch.arange(T_len, device=x.device).unsqueeze(0) >= input_lengths.unsqueeze(1)  # (N, T)

@@ -99,8 +99,7 @@ class BatchTrainer:
                 # keys (ALL mode without metadata.csv).  Use metadata.csv to
                 # find the UUID and match by session name.
                 log.info(
-                    "Baseline user %s not found by numeric ID — "
-                    "searching registry by session name via metadata.csv …",
+                    "Baseline user %s not found by numeric ID — searching registry by session name via metadata.csv …",
                     baseline_user,
                 )
                 matched_keys = self._find_baseline_keys_by_session(all_keys)

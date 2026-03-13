@@ -80,6 +80,7 @@ def main(config: DictConfig):
             optimizer=config.optimizer,
             lr_scheduler=config.lr_scheduler,
             decoder=config.decoder,
+            weights_only=False,
         )
 
     # Instantiate LightningDataModule
@@ -117,8 +118,12 @@ def main(config: DictConfig):
         # Train
         trainer.fit(module, datamodule, ckpt_path=resume_from_checkpoint)
 
-        # Load best checkpoint
-        module = type(module).load_from_checkpoint(trainer.checkpoint_callback.best_model_path)
+        # Load best checkpoint when available (fast_dev_run can skip checkpointing).
+        best_checkpoint = trainer.checkpoint_callback.best_model_path
+        if best_checkpoint and Path(best_checkpoint).is_file():
+            module = type(module).load_from_checkpoint(best_checkpoint)
+        else:
+            log.warning("No best checkpoint available; continuing with in-memory model weights.")
 
     # Validate and test on the best checkpoint (if training), or on the
     # loaded `config.checkpoint` (otherwise)

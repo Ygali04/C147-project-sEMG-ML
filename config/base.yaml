@@ -3,7 +3,7 @@ defaults:
   - transforms: log_spectrogram
   - model: tds_conv_ctc
   - optimizer: adam
-  - lr_scheduler: linear_warmup_cosine_annealing
+  - lr_scheduler: cosine_annealing
   - decoder: ctc_greedy
   - cluster: local
   - _self_
@@ -26,6 +26,8 @@ trainer:
 
 callbacks:
   - _target_: pytorch_lightning.callbacks.LearningRateMonitor
+  - _target_: emg2qwerty.callbacks.TrainingCurvePlotCallback
+    filename: training_progress.png
   - _target_: pytorch_lightning.callbacks.ModelCheckpoint
     dirpath: ${hydra:runtime.output_dir}/checkpoints
     monitor: ${monitor_metric}

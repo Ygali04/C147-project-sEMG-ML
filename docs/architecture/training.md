@@ -39,7 +39,8 @@ uv run python -m emg2qwerty.train [HYDRA_OVERRIDES...]
 This:
 
 1. Loads the composed Hydra config
-2. Instantiates the `WindowedEMGDataModule` and `TDSConvCTCModule`
+2. Instantiates the `WindowedEMGDataModule` and the configured model module
+  (`TDSConvCTCModule`, `BiLSTMCTCModule`, or `CNNBiLSTMCTCModule`)
 3. Creates a `pl.Trainer` with configured callbacks (LR monitor, checkpointing)
 4. Calls `trainer.fit()` if `train=True`, then `trainer.test()`
 

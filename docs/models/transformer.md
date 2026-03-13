@@ -1,6 +1,6 @@
 # Transformer Encoder + CTC
 
-> **Status:** Active — architecture sweep running on 8×H200 (Verda).
+> **Status:** Whisper-based transfer model implemented. General Transformer architecture sweep ran on 8×H200 (Verda).
 > **Module:** `emg2qwerty.lightning.T5CTCModule`
 > **Config:** `config/model/t5_ctc.yaml`
 
@@ -46,6 +46,34 @@ Linear → log_softmax → CTC Loss
 | Anti-blank bias | Output layer initialized with `bias[blank] = -5.0` to discourage CTC blank collapse |
 | CTC variant | `zero_infinity=True` to handle edge cases |
 | Time format | Time-first `(T, N, D)` throughout, matching baseline convention |
+
+### Available and planned models
+
+| Model | Key idea |
+|---|---|
+| Whisper-CTC (`model=whisper_ctc`) | Project EMG features into a pretrained Whisper encoder and train a CTC head |
+| Encoder-only Transformer | Self-attention over EMG spectrogram frames |
+| CNN + Transformer | TDS/Conv front-end → Transformer encoder |
+
+## Documented Whisper-CTC result
+
+The current transformer-family result comes from the `whisper_ctc` experiment,
+which reuses the pretrained `openai/whisper-tiny` encoder with the top two
+encoder layers unfrozen.
+
+| Metric | Validation | Test |
+|---|---|---|
+| CER (%) | 17.72 | 99.91 |
+| DER (%) | 2.55 | 0.00 |
+| IER (%) | 4.10 | 99.91 |
+| SER (%) | 11.08 | 0.00 |
+| Loss | 0.615 | inf |
+
+The validation split looked promising, but the test split collapsed due to
+massive insertion errors. Right now that makes the Whisper transfer approach a
+useful experiment, not a competitive model for this task.
+
+### Minimal example skeleton
 
 ### Configurable parameters
 

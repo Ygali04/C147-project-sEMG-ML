@@ -54,3 +54,50 @@ datamodule:
   window_length: 8000        # 4 sec at 2 kHz
   padding: [1800, 200]       # 900 ms past + 100 ms future
 ```
+
+---
+
+## Recurrent and Transfer Alternatives
+
+Three additional CTC model configs are available and can be selected with
+`model=<name>` in Hydra overrides.
+
+### BiLSTM (`config/model/bilstm_ctc.yaml`)
+
+```yaml
+module:
+  _target_: emg2qwerty.lightning.BiLSTMCTCModule
+  in_features: 528
+  mlp_features: [384]
+  hidden_size: 384
+  num_layers: 3
+  dropout: 0.2
+```
+
+### CNN + BiLSTM (`config/model/cnn_bilstm_ctc.yaml`)
+
+```yaml
+module:
+  _target_: emg2qwerty.lightning.CNNBiLSTMCTCModule
+  in_features: 528
+  mlp_features: [384]
+  conv_channels: [512, 512]
+  conv_kernel_size: 5
+  conv_dropout: 0.1
+  hidden_size: 384
+  num_layers: 2
+  dropout: 0.2
+```
+
+### Whisper-CTC (`config/model/whisper_ctc.yaml`)
+
+```yaml
+module:
+  _target_: emg2qwerty.lightning.WhisperCTCModule
+  in_features: 528
+  mlp_features: [384]
+  whisper_model_name: openai/whisper-tiny
+  projection_dropout: 0.1
+  freeze_whisper_encoder: true
+  unfrozen_encoder_layers: 2
+```

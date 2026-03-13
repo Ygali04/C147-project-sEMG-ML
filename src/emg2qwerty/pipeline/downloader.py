@@ -145,9 +145,10 @@ class EMGDownloader:
                 aws_access_key_id=self.config.b2.key_id,
                 aws_secret_access_key=self.config.b2.application_key,
             )
-        return _thread_local.b2_client
+        return self._b2_client
 
     def _get_registry(self) -> FileRegistry:
+        """Return the file registry, loading it from B2 on first call."""
         if self._registry is None:
             self._registry = FileRegistry(
                 b2_client=self._make_b2_client(),
@@ -206,12 +207,17 @@ class EMGDownloader:
     # ------------------------------------------------------------------
 
     def _load_baseline_sessions(self) -> set[str]:
-        """Read baseline session names from ``config/user/single_user.yaml``."""
+        """Read baseline session names from ``config/user/single_user.yaml``.
+
+        Returns a set of bare session names (no ``.hdf5``) to match against
+        tar member filenames.
+        """
         config_path = Path("config/user/single_user.yaml")
         if not config_path.exists():
             raise FileNotFoundError(f"Baseline config not found at {config_path}. Run from the project root directory.")
         with open(config_path) as f:
             data = yaml.safe_load(f)
+
         sessions: set[str] = set()
         for split in ("train", "val", "test"):
             for entry in data.get("dataset", {}).get(split, []) or []:
@@ -224,9 +230,11 @@ class EMGDownloader:
 
     @staticmethod
     def _b2_key(user: str, session: str) -> str:
+        """Compute the B2 object key for a given user/session pair."""
         return f"emg2qwerty/{user}/{session}.hdf5"
 
     def _local_path(self, user: str, session: str) -> Path:
+        """Compute the local file path for a given user/session pair."""
         return self.config.data_root / "emg2qwerty" / user / f"{session}.hdf5"
 
     # ------------------------------------------------------------------

@@ -4,8 +4,11 @@ Backblaze B2.
 
 Usage::
 
-    # Train on baseline profile (user 89335547)
+    # Train baseline TDS-CNN on baseline profile (user 89335547)
     uv run python scripts/train_batched.py --baseline
+
+    # Train T5-small + CTC on baseline profile
+    uv run python scripts/train_batched.py --baseline --model t5_ctc
 
     # Train on first 10 profiles from the registry
     uv run python scripts/train_batched.py --test
@@ -185,7 +188,7 @@ def main(
         b2=B2Config(key_id=key_id, application_key=app_key),
         batch_size_profiles=batch_size_profiles,
         checkpoint=checkpoint,
-        model=normalized_model,
+        model=model,
     )
 
     trainer = BatchTrainer(config)

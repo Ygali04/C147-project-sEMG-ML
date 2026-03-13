@@ -51,6 +51,7 @@ dependencies = [
     "click>=8.1",
     "pandas>=2.1",
     "kenlm",
+    "transformers>=4.40",
 ]
 
 [dependency-groups]

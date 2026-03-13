@@ -4,8 +4,11 @@ Backblaze B2.
 
 Usage::
 
-    # Train on baseline profile (user 89335547)
+    # Train baseline TDS-CNN on baseline profile (user 89335547)
     uv run python scripts/train_batched.py --baseline
+
+    # Train T5-small + CTC on baseline profile
+    uv run python scripts/train_batched.py --baseline --model t5_ctc
 
     # Train on first 10 profiles from the registry
     uv run python scripts/train_batched.py --test
@@ -70,7 +73,14 @@ log = logging.getLogger(__name__)
     show_default=True,
     help="Number of user profiles per training batch.",
 )
-def main(mode: str, checkpoint: str | None, batch_size_profiles: int) -> None:
+@click.option(
+    "--model",
+    type=str,
+    default="tds_conv_ctc",
+    show_default=True,
+    help="Hydra model config to use (e.g. tds_conv_ctc, t5_ctc).",
+)
+def main(mode: str, checkpoint: str | None, batch_size_profiles: int, model: str) -> None:
     """Train models across user profiles stored in Backblaze B2."""
     load_dotenv()
 
@@ -89,6 +99,7 @@ def main(mode: str, checkpoint: str | None, batch_size_profiles: int) -> None:
         b2=B2Config(key_id=key_id, application_key=app_key),
         batch_size_profiles=batch_size_profiles,
         checkpoint=checkpoint,
+        model=model,
     )
 
     trainer = BatchTrainer(config)

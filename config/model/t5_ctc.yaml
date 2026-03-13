@@ -1,0 +1,15 @@
+# @package _global_
+module:
+  _target_: emg2qwerty.lightning.T5CTCModule
+  in_features: 528          # freq(33) * channels(16) — same as baseline
+  mlp_features: [384]       # same MLP front-end as baseline → 768 features
+  d_model: 512              # T5-small d_model
+  num_layers: 6             # T5-small encoder depth
+  num_heads: 8
+  d_ff: 2048
+  d_kv: 64
+
+datamodule:
+  _target_: emg2qwerty.lightning.WindowedEMGDataModule
+  window_length: 8000       # unchanged 4-sec windows
+  padding: [1800, 200]      # unchanged context padding

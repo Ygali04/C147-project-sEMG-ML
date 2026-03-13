@@ -180,3 +180,7 @@ class TrainBatchConfig(BaseModel):
         default=Path("data"),
         description="Local directory where HDF5 files are synced for training.",
     )
+    model: str = Field(
+        default="tds_conv_ctc",
+        description="Hydra model config name (e.g. tds_conv_ctc, t5_ctc).",
+    )

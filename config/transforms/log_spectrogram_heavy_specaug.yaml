@@ -1,0 +1,28 @@
+# @package _global_
+to_tensor:
+  _target_: emg2qwerty.transforms.ToTensor
+  fields: [emg_left, emg_right]
+
+logspec:
+  _target_: emg2qwerty.transforms.LogSpectrogram
+  n_fft: 64
+  hop_length: 16
+
+specaug:
+  _target_: emg2qwerty.transforms.SpecAugment
+  n_time_masks: 5
+  time_mask_param: 40
+  n_freq_masks: 3
+  freq_mask_param: 6
+
+transforms:
+  train:
+    - ${to_tensor}
+    - ${logspec}
+    - ${specaug}
+
+  val:
+    - ${to_tensor}
+    - ${logspec}
+
+  test: ${transforms.val}

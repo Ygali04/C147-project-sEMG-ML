@@ -87,7 +87,27 @@ uv run python -m emg2qwerty.train \
 make test
 ```
 
-### 7. Serve documentation locally
+### 7. Set up experiment sweeps
+
+```bash
+# Preview preprocessing/augmentation experiments
+uv run python scripts/run_experiments.py preprocessing --dry-run
+
+# Preview channel-ablation experiments (counts are per wrist, so total active channels = 2x)
+uv run python scripts/run_experiments.py channels --dry-run
+
+# Execute both suites with extra Hydra overrides
+uv run python scripts/run_experiments.py all --execute \
+  --extra-override trainer.devices=1 \
+  --extra-override trainer.max_epochs=50
+```
+
+The preprocessing suite compares no augmentation, isolated augmentation
+components, and a heavier SpecAugment setting. The channel suite keeps the
+model architecture fixed and masks inactive electrodes symmetrically on both
+wrists so CER can be compared directly against the full-channel baseline.
+
+### 8. Serve documentation locally
 
 ```bash
 make docs-serve

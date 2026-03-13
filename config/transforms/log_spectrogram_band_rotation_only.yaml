@@ -1,0 +1,27 @@
+# @package _global_
+to_tensor:
+  _target_: emg2qwerty.transforms.ToTensor
+  fields: [emg_left, emg_right]
+
+band_rotation:
+  _target_: emg2qwerty.transforms.ForEach
+  transform:
+    _target_: emg2qwerty.transforms.RandomBandRotation
+    offsets: [-1, 0, 1]
+
+logspec:
+  _target_: emg2qwerty.transforms.LogSpectrogram
+  n_fft: 64
+  hop_length: 16
+
+transforms:
+  train:
+    - ${to_tensor}
+    - ${band_rotation}
+    - ${logspec}
+
+  val:
+    - ${to_tensor}
+    - ${logspec}
+
+  test: ${transforms.val}

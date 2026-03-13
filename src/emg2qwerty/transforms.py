@@ -119,6 +119,60 @@ class RandomBandRotation:
 
 
 @dataclass
+class ElectrodeChannelSubset:
+    """Keep only the specified electrode channels.
+
+    By default this preserves the original tensor shape by zeroing inactive
+    channels, which keeps the downstream model input size unchanged and makes
+    channel-ablation studies comparable to the full-channel baseline.
+
+    Args:
+        channels (list): Zero-based electrode indices to keep for each band.
+            An empty list leaves the tensor unchanged.
+        channel_dim (int): Tensor dimension corresponding to electrode
+            channels. (default: -1)
+        keep_shape (bool): If True, keep the original tensor shape and fill
+            inactive channels with ``fill_value``. If False, compact the tensor
+            to only the selected channels. (default: True)
+        fill_value (float): Value used for inactive channels when
+            ``keep_shape=True``. (default: 0.0)
+    """
+
+    channels: Sequence[int] = ()
+    channel_dim: int = -1
+    keep_shape: bool = True
+    fill_value: float = 0.0
+
+    def __post_init__(self) -> None:
+        if len(set(self.channels)) != len(self.channels):
+            raise ValueError("channels must be unique")
+        if any(channel < 0 for channel in self.channels):
+            raise ValueError("channels must be non-negative")
+
+    def __call__(self, tensor: torch.Tensor) -> torch.Tensor:
+        if len(self.channels) == 0:
+            return tensor
+
+        channel_dim = self.channel_dim % tensor.ndim
+        num_channels = tensor.shape[channel_dim]
+        if any(channel >= num_channels for channel in self.channels):
+            raise ValueError(
+                f"channels {list(self.channels)} exceed available channels {num_channels}"
+            )
+
+        indices = torch.as_tensor(self.channels, device=tensor.device, dtype=torch.long)
+
+        if not self.keep_shape:
+            return tensor.index_select(channel_dim, indices)
+
+        masked = torch.full_like(tensor, self.fill_value)
+        view = [slice(None)] * tensor.ndim
+        view[channel_dim] = indices
+        masked[tuple(view)] = tensor.index_select(channel_dim, indices)
+        return masked
+
+
+@dataclass
 class TemporalAlignmentJitter:
     """Applies a temporal jittering augmentation that randomly jitters the
     alignment of left and right EMG data by up to ``max_offset`` timesteps.

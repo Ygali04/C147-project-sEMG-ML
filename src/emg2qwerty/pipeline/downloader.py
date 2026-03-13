@@ -184,7 +184,7 @@ class EMGDownloader:
         self._metadata_local_path.parent.mkdir(parents=True, exist_ok=True)
         self._metadata_local_path.write_bytes(raw_bytes)
         log.info(
-            "Captured metadata.csv → saved locally (%d KB). " "Please commit data/metadata.csv to the repo.",
+            "Captured metadata.csv → saved locally (%d KB). Please commit data/metadata.csv to the repo.",
             len(raw_bytes) // 1024,
         )
 
@@ -360,6 +360,7 @@ class EMGDownloader:
 
                     return None
 
+                return _test_nomd_filter
                 return _test_nomd_filter
 
         raise ValueError(f"Unknown download mode: {mode}")  # pragma: no cover

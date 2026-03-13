@@ -156,16 +156,20 @@ class TestHydraOverrides:
         overrides = BatchTrainer._build_hydra_overrides(
             user_id="89335547",
             session_paths=[Path("data/session0.hdf5")],
+            model="bilstm_ctc",
         )
         assert "user=89335547" in overrides
+        assert "model=bilstm_ctc" in overrides
 
     def test_build_overrides_with_checkpoint(self) -> None:
         overrides = BatchTrainer._build_hydra_overrides(
             user_id="89335547",
             session_paths=[Path("data/session0.hdf5")],
+            model="cnn_bilstm_ctc",
             checkpoint="logs/best.ckpt",
         )
         assert "checkpoint=logs/best.ckpt" in overrides
+        assert "model=cnn_bilstm_ctc" in overrides
 
 
 class TestBatchTrainerRun:

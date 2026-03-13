@@ -4,8 +4,11 @@ Backblaze B2.
 
 Usage::
 
-    # Train on baseline profile (user 89335547)
+    # Train baseline TDS-CNN on baseline profile (user 89335547)
     uv run python scripts/train_batched.py --baseline
+
+    # Train T5-small + CTC on baseline profile
+    uv run python scripts/train_batched.py --baseline --model t5_ctc
 
     # Train on first 10 profiles from the registry
     uv run python scripts/train_batched.py --test
@@ -18,7 +21,9 @@ from __future__ import annotations
 
 import logging
 import os
+import subprocess
 import sys
+from pathlib import Path
 
 import click
 from dotenv import load_dotenv
@@ -70,9 +75,55 @@ log = logging.getLogger(__name__)
     show_default=True,
     help="Number of user profiles per training batch.",
 )
-def main(mode: str, checkpoint: str | None, batch_size_profiles: int) -> None:
+@click.option(
+    "--local-files",
+    is_flag=True,
+    default=False,
+    help="Train from local data/ files only (skip B2 registry + sync).",
+)
+def main(
+    mode: str,
+    checkpoint: str | None,
+    model: str,
+    batch_size_profiles: int,
+    local_files: bool,
+) -> None:
     """Train models across user profiles stored in Backblaze B2."""
     load_dotenv()
+
+    if local_files:
+        if mode != DownloadMode.BASELINE.value:
+            click.echo(
+                "ERROR: --local-files currently supports only --baseline mode.",
+                err=True,
+            )
+            raise SystemExit(1)
+
+        # Baseline uses the static split in config/user/single_user.yaml.
+        data_root = Path("data")
+        if not data_root.exists():
+            click.echo(
+                "ERROR: Local data directory not found at data/.\n"
+                "  Place baseline HDF5 files under data/ and rerun.",
+                err=True,
+            )
+            raise SystemExit(1)
+
+        cmd = [
+            sys.executable,
+            "-m",
+            "emg2qwerty.train",
+            "user=single_user",
+            f"model={model}",
+        ]
+        if checkpoint:
+            cmd.append(f"checkpoint={checkpoint}")
+
+        log.info("Local-only training command: %s", " ".join(cmd))
+        result = subprocess.run(cmd, cwd=Path.cwd())
+        if result.returncode != 0:
+            raise SystemExit(result.returncode)
+        return
 
     key_id = os.environ.get("B2_KEY_ID", "")
     app_key = os.environ.get("B2_APPLICATION_KEY", "")
@@ -89,6 +140,7 @@ def main(mode: str, checkpoint: str | None, batch_size_profiles: int) -> None:
         b2=B2Config(key_id=key_id, application_key=app_key),
         batch_size_profiles=batch_size_profiles,
         checkpoint=checkpoint,
+        model=model,
     )
 
     trainer = BatchTrainer(config)

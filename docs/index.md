@@ -28,7 +28,7 @@ HDF5 session files (308 GB tar.gz from Meta S3)
   → Model encoder (modules.py / lightning.py)
   → CTC Loss (nn.CTCLoss)
   → Greedy / Beam decoder (decoder.py)
-  → CER metric (metrics.py)
+  → CER / DER / IER / SER metrics (metrics.py)
 ```
 
 ## Loss & Metric
@@ -36,15 +36,17 @@ HDF5 session files (308 GB tar.gz from Meta S3)
 | | |
 |---|---|
 | **Loss** | CTC (Connectionist Temporal Classification) — handles alignment without frame-level labels |
-| **Metric** | CER (Character Error Rate) = edit distance / reference length |
+| **Selection metric** | CER (Character Error Rate) = edit distance / reference length |
+| **Diagnostic metrics** | DER, IER, SER to separate deletion, insertion, and substitution errors |
 
 ## Architectures
 
 | Architecture | Status | Description |
 |---|---|---|
 | **TDS-CNN** | ✅ Baseline | Time-Depth Separable CNN (Meta baseline) |
-| **RNN / LSTM / GRU** | 🔬 In progress | Recurrent sequential decoder |
-| **Transformer** | 🔬 In progress | Self-attention over EMG frames |
+| **BiLSTM / CNN+BiLSTM** | ✅ Implemented | Recurrent CTC encoders with bidirectional context |
+| **Whisper-CTC** | ✅ Implemented | Transfer-learning variant using a pretrained Whisper encoder with a CTC head |
+| **Transformer** | 🔬 In progress | Generic self-attention encoder over EMG frames |
 | **Hybrid** | 🔬 Planned | CNN front-end + Transformer/RNN encoder |
 
 ## Quick Start

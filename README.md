@@ -39,7 +39,8 @@ HDF5 session files (308 GB tar.gz from Meta S3)
 | Architecture | Status | Description |
 |---|---|---|
 | **TDS-CNN** | ✅ Baseline | Time-Depth Separable CNN (Meta baseline) |
-| **RNN / LSTM / GRU** | 🔬 In progress | Recurrent sequential encoder |
+| **BiLSTM / CNN+BiLSTM** | ✅ Implemented | Bidirectional recurrent CTC encoders |
+| **GRU** | 🔬 In progress | Recurrent sequential encoder |
 | **Transformer** | 🔬 In progress | Self-attention over EMG frames |
 | **Hybrid** | 🔬 Planned | CNN front-end + Transformer/RNN encoder |
 

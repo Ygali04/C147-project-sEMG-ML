@@ -52,6 +52,7 @@ dependencies = [
     "pandas>=2.1",
     "kenlm",
     "transformers>=4.40",
+    "lightning-bolts>=0.7",
 ]
 
 [dependency-groups]
@@ -91,6 +92,15 @@ line-length = 120
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.uv]
+# lightning-bolts 0.7.0 pins pytorch-lightning<2.0, but the only class we
+# use (LinearWarmupCosineAnnealingLR) is a pure _LRScheduler subclass that
+# works fine with PL 2.x at runtime.  Override the constraint so uv can
+# resolve both packages together.
+override-dependencies = [
+    "pytorch-lightning>=2.0",
+]
 
 [tool.uv.sources]
 kenlm = { path = "vendor/kenlm" }

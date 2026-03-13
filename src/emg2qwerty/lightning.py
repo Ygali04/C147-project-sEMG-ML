@@ -4,6 +4,7 @@
 # This source code is licensed under the license found in the
 # LICENSE file in the root directory of this source tree.
 
+import math
 from collections.abc import Sequence
 from pathlib import Path
 from typing import Any, ClassVar
@@ -18,7 +19,6 @@ from torch.utils.data import ConcatDataset, DataLoader
 from torchmetrics import MetricCollection
 
 import torch.nn.functional as F
-from transformers import T5Config, T5EncoderModel
 
 from emg2qwerty import utils
 from emg2qwerty.charset import charset
@@ -270,11 +270,12 @@ class TDSConvCTCModule(pl.LightningModule):
 
 
 class T5CTCModule(pl.LightningModule):
-    """T5-small encoder + CTC head for EMG-to-text prediction.
+    """Transformer encoder + CTC head for EMG-to-text prediction.
 
     Reuses the same EMG front-end as :class:`TDSConvCTCModule`
     (SpectrogramNorm → MultiBandRotationInvariantMLP → Flatten) and replaces
-    the TDS convolutional encoder with a HuggingFace T5 encoder (random init).
+    the TDS convolutional encoder with a standard PyTorch TransformerEncoder
+    with sinusoidal positional encoding.
     The CTC loss, decoder, and metrics are identical to the baseline."""
 
     NUM_BANDS: ClassVar[int] = 2
@@ -292,9 +293,16 @@ class T5CTCModule(pl.LightningModule):
         optimizer: DictConfig,
         lr_scheduler: DictConfig,
         decoder: DictConfig,
+        use_cnn: bool = True,
+        blank_penalty_epochs: int = 40,
+        blank_alpha_max: float = 50.0,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
+
+        self._use_cnn = use_cnn
+        self._BLANK_PENALTY_EPOCHS = blank_penalty_epochs
+        self._BLANK_ALPHA_MAX = blank_alpha_max
 
         num_features = self.NUM_BANDS * mlp_features[-1]  # 2 * 384 = 768
 
@@ -309,28 +317,68 @@ class T5CTCModule(pl.LightningModule):
         )
         self.flatten = nn.Flatten(start_dim=2)
 
-        # --- Project to T5 d_model ---
+        # --- Project to transformer d_model ---
         self.input_proj = nn.Linear(num_features, d_model)
 
-        # --- T5-small encoder (random init — pretrained NLP weights are
-        #     not applicable to EMG spectrograms) ---
-        t5_config = T5Config(
+        # --- Temporal CNN featurizer (optional) ---
+        # Research: CNN on sEMG before transformer gives ~8 CER improvement.
+        # Conv1d expects (N, C, T), so we transpose around the conv block.
+        if use_cnn:
+            self.temporal_cnn = nn.Sequential(
+                nn.Conv1d(d_model, d_model, kernel_size=5, padding=2),
+                nn.BatchNorm1d(d_model),
+                nn.GELU(),
+                nn.Dropout(0.1),
+                nn.Conv1d(d_model, d_model, kernel_size=5, padding=2),
+                nn.BatchNorm1d(d_model),
+                nn.GELU(),
+                nn.Dropout(0.1),
+                nn.Conv1d(d_model, d_model, kernel_size=3, padding=1),
+                nn.BatchNorm1d(d_model),
+                nn.GELU(),
+                nn.Dropout(0.1),
+            )
+        self.proj_norm = nn.LayerNorm(d_model)
+
+        # --- Sinusoidal positional encoding ---
+        max_len = 16000
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2, dtype=torch.float) * (-math.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        self.register_buffer("pos_encoding", pe.unsqueeze(1))  # (max_len, 1, d_model)
+        self.pe_dropout = nn.Dropout(0.1)
+
+        # --- Standard PyTorch Transformer encoder ---
+        encoder_layer = nn.TransformerEncoderLayer(
             d_model=d_model,
-            d_ff=d_ff,
-            num_heads=num_heads,
-            num_layers=num_layers,
-            d_kv=d_kv,
-            is_decoder=False,
-            # Disable token embeddings — we feed inputs_embeds directly
-            vocab_size=1,
+            nhead=num_heads,
+            dim_feedforward=d_ff,
+            dropout=0.1,
+            activation="gelu",
+            batch_first=False,  # time-first: (T, N, d_model)
+            norm_first=True,  # Pre-LN for better gradient flow
         )
-        self.t5_encoder = T5EncoderModel(t5_config)
+        self.transformer_encoder = nn.TransformerEncoder(
+            encoder_layer,
+            num_layers=num_layers,
+            norm=nn.LayerNorm(d_model),
+        )
 
         # --- CTC output head ---
         self.output_proj = nn.Linear(d_model, charset().num_classes)
 
+        # Anti-blank initialization: discourage blank collapse at init.
+        with torch.no_grad():
+            nn.init.uniform_(self.output_proj.weight, -0.01, 0.01)
+            blank_idx = charset().null_class
+            num_chars = charset().num_classes - 1
+            self.output_proj.bias.fill_(math.log(1.0 / num_chars))
+            self.output_proj.bias[blank_idx] = -5.0
+
         # Criterion
-        self.ctc_loss = nn.CTCLoss(blank=charset().null_class)
+        self.ctc_loss = nn.CTCLoss(blank=charset().null_class, zero_infinity=True)
 
         # Decoder
         self.decoder = instantiate(decoder)
@@ -348,15 +396,22 @@ class T5CTCModule(pl.LightningModule):
         x = self.flatten(x)  # (T, N, 768)
         x = self.input_proj(x)  # (T, N, d_model)
 
-        # HuggingFace T5 is batch-first: transpose to (N, T, d_model)
-        x = x.transpose(0, 1)
-        T_len = x.shape[1]
+        # --- Optional temporal CNN featurizer ---
+        if self._use_cnn:
+            x = x.permute(1, 2, 0)  # (N, C, T)
+            x = self.temporal_cnn(x)  # (N, C, T)
+            x = x.permute(2, 0, 1)  # (T, N, C)
+        x = self.proj_norm(x)
 
-        # Build attention mask from input_lengths (1 = attend, 0 = pad)
-        attn_mask = (torch.arange(T_len, device=x.device).unsqueeze(0) < input_lengths.unsqueeze(1)).long()  # (N, T)
+        T_len = x.shape[0]
 
-        out = self.t5_encoder(inputs_embeds=x, attention_mask=attn_mask)
-        x = out.last_hidden_state.transpose(0, 1)  # back to (T, N, d_model)
+        # Add sinusoidal positional encoding
+        x = self.pe_dropout(x + self.pos_encoding[:T_len])
+
+        # Build key_padding_mask: True = ignore (PyTorch convention)
+        key_padding_mask = torch.arange(T_len, device=x.device).unsqueeze(0) >= input_lengths.unsqueeze(1)  # (N, T)
+
+        x = self.transformer_encoder(x, src_key_padding_mask=key_padding_mask)
 
         return F.log_softmax(self.output_proj(x), dim=-1)  # (T, N, num_classes)
 
@@ -365,20 +420,30 @@ class T5CTCModule(pl.LightningModule):
         targets = batch["targets"]
         input_lengths = batch["input_lengths"]
         target_lengths = batch["target_lengths"]
-        N = len(input_lengths)  # batch_size
+        N = len(input_lengths)
 
         emissions = self.forward(inputs, input_lengths)
-
-        # T5 encoder does not shrink the temporal dimension (no causal conv),
-        # so emission_lengths == input_lengths.
         emission_lengths = input_lengths
 
         loss = self.ctc_loss(
-            log_probs=emissions,  # (T, N, num_classes)
-            targets=targets.transpose(0, 1),  # (T, N) -> (N, T)
-            input_lengths=emission_lengths,  # (N,)
-            target_lengths=target_lengths,  # (N,)
+            log_probs=emissions,
+            targets=targets.transpose(0, 1),
+            input_lengths=emission_lengths,
+            target_lengths=target_lengths,
         )
+
+        # --- Anti-blank-collapse regularisation ---
+        # The CTC loss is O(10-100), so the penalty must be on the same scale.
+        # We penalise mean blank probability with a coefficient that decays
+        # linearly from _BLANK_ALPHA_MAX to 0 over _BLANK_PENALTY_EPOCHS.
+        blank_idx = charset().null_class
+        current_epoch = self.current_epoch
+        if current_epoch < self._BLANK_PENALTY_EPOCHS:
+            blank_prob = emissions[:, :, blank_idx].exp().mean()
+            alpha = self._BLANK_ALPHA_MAX * (1.0 - current_epoch / self._BLANK_PENALTY_EPOCHS)
+            loss = loss + alpha * blank_prob
+            self.log("train/blank_prob", blank_prob, prog_bar=True, sync_dist=True)
+            self.log("train/blank_alpha", alpha, prog_bar=False, sync_dist=True)
 
         # Decode emissions
         predictions = self.decoder.decode_batch(

@@ -19,6 +19,13 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 from emg2qwerty import transforms, utils
 from emg2qwerty.transforms import Transform
 
+import torch
+import omegaconf.listconfig
+import omegaconf.dictconfig
+torch.serialization.add_safe_globals([
+    omegaconf.listconfig.ListConfig,
+    omegaconf.dictconfig.DictConfig,
+])
 
 log = logging.getLogger(__name__)
 
@@ -61,7 +68,7 @@ def main(config: DictConfig):
     )
     if config.checkpoint is not None:
         log.info(f"Loading module from checkpoint {config.checkpoint}")
-        module = module.load_from_checkpoint(
+        module = type(module).load_from_checkpoint(
             config.checkpoint,
             optimizer=config.optimizer,
             lr_scheduler=config.lr_scheduler,

@@ -274,3 +274,61 @@ class TDSConvEncoder(nn.Module):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         return self.tds_conv_blocks(inputs)  # (T, N, num_features)
+    
+class CNNGRUEncoder(nn.Module):
+    def __init__(
+        self,
+        num_features: int,
+        gru_hidden_size: int,
+        num_gru_layers: int,
+        run_cnn: bool,
+        bidirectional: bool,
+        conv_channels: Sequence[int],
+        conv_kernel_size: int, 
+        conv_dropout: float,
+    ) -> None:
+        super().__init__()
+        self.run_cnn = run_cnn
+        
+        if self.run_cnn:
+            channels = [num_features, *conv_channels]
+            conv_blocks: list[nn.Module] = []
+            for in_ch, out_ch in zip(channels[:-1], channels[1:]):
+                conv_blocks.extend(
+                    [
+                        nn.Conv1d(
+                            in_channels=in_ch,
+                            out_channels=out_ch,
+                            kernel_size=conv_kernel_size,
+                            padding=conv_kernel_size // 2,
+                        ),
+                        nn.BatchNorm1d(out_ch),
+                        nn.ReLU(),
+                        nn.Dropout(conv_dropout),
+                    ]
+                )
+            self.cnn_frontend = nn.Sequential(*conv_blocks)
+            gru_input_size = channels[-1]
+        else:
+            gru_input_size = num_features
+
+        self.gru = nn.GRU(
+            input_size=gru_input_size, 
+            hidden_size=gru_hidden_size, 
+            num_layers=num_gru_layers, 
+            bidirectional=bidirectional
+        )
+
+        self.fc = nn.Linear(
+            gru_hidden_size * 2 if bidirectional else gru_hidden_size, 
+            num_features
+        )
+    
+    def forward(self, x: torch.Tensor) -> torch.Tensor:
+        if self.run_cnn:
+            x = x.permute(1, 2, 0)  # (Time, Batch, Channels) -> (Batch, Channels, Time)
+            x = self.cnn_frontend(x)
+            x = x.permute(2, 0, 1)  # (Batch, Channels, Time) -> (Time, Batch, Channels)
+
+        gru_out, _ = self.gru(x)
+        return self.fc(gru_out)

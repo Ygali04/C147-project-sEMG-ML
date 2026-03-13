@@ -30,7 +30,7 @@ def metric_to_float(value) -> float | None:
         return None
 
 
-def load_training_history(metrics_path: Path) -> dict[str, list[float]]:
+def load_training_history(metrics_path: Path) -> dict[str, list[int] | list[float]]:
     """Load epoch-level train/val loss and CER from a Lightning metrics CSV."""
 
     epoch_history: dict[int, dict[str, float]] = {}

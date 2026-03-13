@@ -18,7 +18,7 @@ The `CharacterErrorRates` module (`metrics.py`) also reports decomposed error ty
 These metrics satisfy:
 
 \[
-	ext{CER} = \text{IER} + \text{DER} + \text{SER}
+	\text{CER} = \text{IER} + \text{DER} + \text{SER}
 \]
 
 when each term is normalized by the reference sequence length.

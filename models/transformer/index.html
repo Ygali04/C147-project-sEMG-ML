@@ -25,7 +25,7 @@
     
     
       
-        <title>Transformer - EMG2QWERTY — ECE C147/C247 Final Project</title>
+        <title>Transformer Encoder + CTC - EMG2QWERTY — ECE C147/C247 Final Project</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#transformer" class="md-skip">
+        <a href="#transformer-encoder-ctc" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Transformer
+              Transformer Encoder + CTC
             
           </span>
         </div>
@@ -1135,7 +1135,7 @@
   <span class="md-ellipsis">
     
   
-    Transformer
+    Transformer Encoder + CTC
   
 
     
@@ -1153,7 +1153,7 @@
   <span class="md-ellipsis">
     
   
-    Transformer
+    Transformer Encoder + CTC
   
 
     
@@ -1179,22 +1179,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#planned-approach" class="md-nav__link">
+  <a href="#architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned approach
+        Architecture
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Planned approach">
+    <nav class="md-nav" aria-label="Architecture">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#planned-models" class="md-nav__link">
+  <a href="#key-design-choices" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned models
+        Key design choices
       
     </span>
   </a>
@@ -1202,10 +1202,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#minimal-example-skeleton" class="md-nav__link">
+  <a href="#configurable-parameters" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Minimal example skeleton
+        Configurable parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-size-variants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model size variants
       
     </span>
   </a>
@@ -1218,10 +1229,227 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#expected-trade-offs-vs-tds-cnn" class="md-nav__link">
+  <a href="#architecture-sweep-results-march-2026" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Expected trade-offs vs TDS-CNN
+        Architecture Sweep Results (March 2026)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Sweep Results (March 2026)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cer-leaderboard-our-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CER Leaderboard (our experiments)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key findings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#difficulties-and-lessons-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Difficulties and Lessons Learned
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Difficulties and Lessons Learned">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ddp-pitfall-cer-collapse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DDP Pitfall: CER Collapse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DDP Pitfall: CER Collapse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-happened" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What happened
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-cause" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root cause
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#things-we-tried-that-did-not-fix-the-ddp-collapse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Things we tried that did NOT fix the DDP collapse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-issues-encountered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other issues encountered
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verda-8h200-training-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verda 8×H200 Training Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verda 8×H200 Training Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instance-specs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instance specs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-training-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key training parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#literature-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Literature Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Literature Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fairemg-comparison-most-relevant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FairEMG comparison (most relevant)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
       
     </span>
   </a>
@@ -1356,22 +1584,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#planned-approach" class="md-nav__link">
+  <a href="#architecture" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned approach
+        Architecture
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Planned approach">
+    <nav class="md-nav" aria-label="Architecture">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#planned-models" class="md-nav__link">
+  <a href="#key-design-choices" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned models
+        Key design choices
       
     </span>
   </a>
@@ -1379,10 +1607,21 @@
 </li>
         
           <li class="md-nav__item">
-  <a href="#minimal-example-skeleton" class="md-nav__link">
+  <a href="#configurable-parameters" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Minimal example skeleton
+        Configurable parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#model-size-variants" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Model size variants
       
     </span>
   </a>
@@ -1395,10 +1634,227 @@
 </li>
       
         <li class="md-nav__item">
-  <a href="#expected-trade-offs-vs-tds-cnn" class="md-nav__link">
+  <a href="#architecture-sweep-results-march-2026" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Expected trade-offs vs TDS-CNN
+        Architecture Sweep Results (March 2026)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Sweep Results (March 2026)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Setup
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cer-leaderboard-our-experiments" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CER Leaderboard (our experiments)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key findings
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#difficulties-and-lessons-learned" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Difficulties and Lessons Learned
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Difficulties and Lessons Learned">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#ddp-pitfall-cer-collapse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        DDP Pitfall: CER Collapse
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="DDP Pitfall: CER Collapse">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#what-happened" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        What happened
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#root-cause" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Root cause
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#solution" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Solution
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#things-we-tried-that-did-not-fix-the-ddp-collapse" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Things we tried that did NOT fix the DDP collapse
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#other-issues-encountered" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Other issues encountered
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#verda-8h200-training-setup" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Verda 8×H200 Training Setup
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Verda 8×H200 Training Setup">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#instance-specs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Instance specs
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#deployment-workflow" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Deployment workflow
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-training-parameters" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key training parameters
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#literature-context" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Literature Context
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Literature Context">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#fairemg-comparison-most-relevant" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        FairEMG comparison (most relevant)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#next-steps" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Next Steps
       
     </span>
   </a>
@@ -1425,86 +1881,554 @@
   
 
 
-<h1 id="transformer">Transformer<a class="headerlink" href="#transformer" title="Permanent link">&para;</a></h1>
+<h1 id="transformer-encoder-ctc">Transformer Encoder + CTC<a class="headerlink" href="#transformer-encoder-ctc" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Status:</strong> In progress — this page will be updated as models are implemented.</p>
+<p><strong>Status:</strong> Active — architecture sweep running on 8×H200 (Verda).
+<strong>Module:</strong> <code>emg2qwerty.lightning.T5CTCModule</code>
+<strong>Config:</strong> <code>config/model/t5_ctc.yaml</code></p>
 </blockquote>
-<h2 id="planned-approach">Planned approach<a class="headerlink" href="#planned-approach" title="Permanent link">&para;</a></h2>
-<p>Transformer encoders are added as new <code>pl.LightningModule</code> subclasses in
-<code>src/emg2qwerty/lightning.py</code>, sharing the same CTC training loop as the baseline.</p>
-<h3 id="planned-models">Planned models<a class="headerlink" href="#planned-models" title="Permanent link">&para;</a></h3>
-<table>
-<thead>
-<tr>
-<th>Model</th>
-<th>Key idea</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Encoder-only Transformer</td>
-<td>Self-attention over EMG spectrogram frames</td>
-</tr>
-<tr>
-<td>CNN + Transformer</td>
-<td>TDS/Conv front-end → Transformer encoder</td>
-</tr>
-</tbody>
-</table>
-<h3 id="minimal-example-skeleton">Minimal example skeleton<a class="headerlink" href="#minimal-example-skeleton" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">TransformerCTCModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_features</span><span class="p">,</span> <span class="n">d_model</span><span class="p">,</span> <span class="n">nhead</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">input_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">in_features</span><span class="p">,</span> <span class="n">d_model</span><span class="p">)</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>        <span class="n">encoder_layer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">TransformerEncoderLayer</span><span class="p">(</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>            <span class="n">d_model</span><span class="o">=</span><span class="n">d_model</span><span class="p">,</span> <span class="n">nhead</span><span class="o">=</span><span class="n">nhead</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">False</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="p">)</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">TransformerEncoder</span><span class="p">(</span><span class="n">encoder_layer</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">)</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="n">d_model</span><span class="p">,</span> <span class="n">charset</span><span class="p">()</span><span class="o">.</span><span class="n">num_classes</span><span class="p">)</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>    <span class="k">def</span><span class="w"> </span><span class="nf">forward</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">inputs</span><span class="p">):</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>        <span class="c1"># inputs: (T, N, bands=2, C=16, freq) after SpectrogramNorm + MLP</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">input_proj</span><span class="p">(</span><span class="n">inputs</span><span class="p">)</span>          <span class="c1"># (T, N, d_model)</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>        <span class="n">x</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">transformer</span><span class="p">(</span><span class="n">x</span><span class="p">)</span>              <span class="c1"># (T, N, d_model)</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>        <span class="k">return</span> <span class="n">F</span><span class="o">.</span><span class="n">log_softmax</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">output_proj</span><span class="p">(</span><span class="n">x</span><span class="p">),</span> <span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+<h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
+<p>The Transformer-CTC model reuses the same EMG front-end as the TDS-ConvNet baseline
+(SpectrogramNorm → MultiBandRotationInvariantMLP → Flatten) and replaces the TDS
+convolutional encoder with a standard PyTorch <code>nn.TransformerEncoder</code>.</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a>Raw sEMG (2kHz, 2 bands × 16 channels)
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>  │
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>  ▼
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>SpectrogramNorm (BatchNorm2d per channel)
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  │
+<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  ▼
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>MultiBandRotationInvariantMLP → 768 features
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  │
+<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>  ▼
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>Linear projection → d_model
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>  │
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>  ▼
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>[Optional] Temporal CNN Featurizer (3 × Conv1d, BN, GELU)
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>  │
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>  ▼
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>LayerNorm + Sinusoidal Positional Encoding + Dropout
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>  │
+<a id="__codelineno-0-18" name="__codelineno-0-18" href="#__codelineno-0-18"></a>  ▼
+<a id="__codelineno-0-19" name="__codelineno-0-19" href="#__codelineno-0-19"></a>nn.TransformerEncoder (Pre-LN, GELU, configurable depth)
+<a id="__codelineno-0-20" name="__codelineno-0-20" href="#__codelineno-0-20"></a>  │
+<a id="__codelineno-0-21" name="__codelineno-0-21" href="#__codelineno-0-21"></a>  ▼
+<a id="__codelineno-0-22" name="__codelineno-0-22" href="#__codelineno-0-22"></a>Linear → log_softmax → CTC Loss
 </code></pre></div>
-<h2 id="expected-trade-offs-vs-tds-cnn">Expected trade-offs vs TDS-CNN<a class="headerlink" href="#expected-trade-offs-vs-tds-cnn" title="Permanent link">&para;</a></h2>
+<h3 id="key-design-choices">Key design choices<a class="headerlink" href="#key-design-choices" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
-<th></th>
-<th>TDS-CNN</th>
-<th>Transformer</th>
+<th>Choice</th>
+<th>Detail</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Parallelism</td>
-<td>✅ Parallel</td>
-<td>✅ Fully parallel</td>
+<td>Pre-LayerNorm</td>
+<td><code>norm_first=True</code> for better gradient flow</td>
 </tr>
 <tr>
-<td>Long-range context</td>
-<td>⚠️ Limited</td>
-<td>✅ Global attention</td>
+<td>Activation</td>
+<td>GELU (matches modern transformer practice)</td>
 </tr>
 <tr>
-<td>Training speed</td>
-<td>Fast</td>
-<td>Moderate (O(T²) attention)</td>
+<td>Positional encoding</td>
+<td>Sinusoidal (no learned PE — avoids overfitting on small data)</td>
 </tr>
 <tr>
-<td>Data hunger</td>
-<td>Low</td>
-<td>Higher</td>
+<td>Temporal CNN</td>
+<td>Optional 3-layer Conv1d block before transformer (kernel sizes 5, 5, 3)</td>
 </tr>
 <tr>
-<td>Interpretability</td>
-<td>Low</td>
-<td>✅ Attention maps</td>
+<td>Anti-blank bias</td>
+<td>Output layer initialized with <code>bias[blank] = -5.0</code> to discourage CTC blank collapse</td>
+</tr>
+<tr>
+<td>CTC variant</td>
+<td><code>zero_infinity=True</code> to handle edge cases</td>
+</tr>
+<tr>
+<td>Time format</td>
+<td>Time-first <code>(T, N, D)</code> throughout, matching baseline convention</td>
 </tr>
 </tbody>
 </table>
+<h3 id="configurable-parameters">Configurable parameters<a class="headerlink" href="#configurable-parameters" title="Permanent link">&para;</a></h3>
+<p>All controllable via Hydra overrides:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">module</span><span class="p">:</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">  </span><span class="nt">d_model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">128</span><span class="w">        </span><span class="c1"># hidden dimension</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">  </span><span class="nt">num_layers</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">        </span><span class="c1"># transformer layers</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">  </span><span class="nt">num_heads</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">4</span><span class="w">         </span><span class="c1"># attention heads</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">  </span><span class="nt">d_ff</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">512</span><span class="w">            </span><span class="c1"># feedforward dimension</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a><span class="w">  </span><span class="nt">use_cnn</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">true</span><span class="w">        </span><span class="c1"># toggle temporal CNN featurizer</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a><span class="w">  </span><span class="nt">blank_penalty_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">40</span><span class="w">   </span><span class="c1"># epochs of anti-blank penalty (0 = disable)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a><span class="w">  </span><span class="nt">blank_alpha_max</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">50.0</span><span class="w">      </span><span class="c1"># peak penalty weight</span>
+</code></pre></div>
+<h3 id="model-size-variants">Model size variants<a class="headerlink" href="#model-size-variants" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Variant</th>
+<th>d_model</th>
+<th>Layers</th>
+<th>Heads</th>
+<th>d_ff</th>
+<th>~Params</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tiny</td>
+<td>64</td>
+<td>2</td>
+<td>2</td>
+<td>256</td>
+<td>~300K</td>
+</tr>
+<tr>
+<td>Small</td>
+<td>128</td>
+<td>4</td>
+<td>4</td>
+<td>512</td>
+<td>~1.3M</td>
+</tr>
+<tr>
+<td>Large</td>
+<td>256</td>
+<td>6</td>
+<td>8</td>
+<td>1024</td>
+<td>~5M</td>
+</tr>
+</tbody>
+</table>
+<h2 id="architecture-sweep-results-march-2026">Architecture Sweep Results (March 2026)<a class="headerlink" href="#architecture-sweep-results-march-2026" title="Permanent link">&para;</a></h2>
+<h3 id="setup">Setup<a class="headerlink" href="#setup" title="Permanent link">&para;</a></h3>
+<ul>
+<li><strong>Hardware:</strong> 8×NVIDIA H200 (141 vCPU, 1450GB RAM, 1128GB GPU VRAM)</li>
+<li><strong>Instance:</strong> Verda FIN-03, Ubuntu 24.04, CUDA 12.8</li>
+<li><strong>Training:</strong> Single GPU per experiment (no DDP — see <a href="#ddp-pitfall-cer-collapse">DDP Pitfall</a> below)</li>
+<li><strong>Data:</strong> User 89335547 (baseline profile), 3835 training windows, 120 steps/epoch</li>
+<li><strong>LR schedule:</strong> LinearWarmupCosineAnnealing, warmup=10 epochs, max_epochs=80 (transformers) / 150 (baseline)</li>
+</ul>
+<h3 id="cer-leaderboard-our-experiments">CER Leaderboard (our experiments)<a class="headerlink" href="#cer-leaderboard-our-experiments" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>GPU</th>
+<th>Architecture</th>
+<th>Params</th>
+<th>Val CER</th>
+<th>Test CER</th>
+<th>Epoch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0</td>
+<td><strong>TDS-ConvNet (baseline)</strong></td>
+<td>5.3M</td>
+<td>19.45%</td>
+<td><strong>22.48%</strong></td>
+<td>124/150 ✅</td>
+</tr>
+<tr>
+<td>5</td>
+<td><strong>Large Transformer + CNN</strong> (d=256, 6L, 8H)</td>
+<td>~5M</td>
+<td><strong>16.79%</strong></td>
+<td>78.52%</td>
+<td>76/80 ✅</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Transformer + CNN (Small, d=128, 4L)</td>
+<td>~1.3M</td>
+<td>28.71%</td>
+<td>67.54%</td>
+<td>77/80 ✅</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Transformer + CNN, LR=5e-4</td>
+<td>~1.3M</td>
+<td>39.52%</td>
+<td>58.81%</td>
+<td>78/80 ✅</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Transformer + CNN + blank penalty</td>
+<td>~1.3M</td>
+<td>47.76%</td>
+<td>64.82%</td>
+<td>78/80 ✅</td>
+</tr>
+<tr>
+<td>1</td>
+<td>Pure Transformer (no CNN)</td>
+<td>~1.3M</td>
+<td>48.76%</td>
+<td>84.78%</td>
+<td>79/80 ✅</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Transformer + blank penalty (no CNN)</td>
+<td>~1.3M</td>
+<td>94.84%</td>
+<td>98.92%</td>
+<td>74/80 ✅</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Tiny Transformer (d=64, 2L)</td>
+<td>~300K</td>
+<td>96.37%</td>
+<td>100.0%</td>
+<td>1/80 ❌</td>
+</tr>
+</tbody>
+</table>
+<blockquote>
+<p>⚠️ <strong>Critical caveat:</strong> Test CER is much higher than Val CER for all transformers
+because test feeds the entire session (~140K timesteps) without windowing, while
+training/val use 4-sec windows (8K timesteps). See
+<a href="../../experiments/results/#critical-finding-sequence-length-generalization-gap">Sequence-Length Generalization Gap</a>.</p>
+</blockquote>
+<h3 id="key-findings">Key findings<a class="headerlink" href="#key-findings" title="Permanent link">&para;</a></h3>
+<ol>
+<li>
+<p><strong>Large Transformer + CNN beats baseline on validation.</strong> Val CER 16.79% vs baseline's
+   19.45% — a <strong>14% relative improvement</strong>. However, it catastrophically fails on test
+   (78.5%) due to the sequence-length generalization gap (see below).</p>
+</li>
+<li>
+<p><strong>CNN featurizer is essential.</strong> All CNN-equipped variants escaped blank collapse by
+   epoch 10. The pure transformer (no CNN) didn't start learning until epoch ~40 and
+   plateaued at 48.8% val CER. Temporal convolutions provide local context that
+   bootstraps early learning.</p>
+</li>
+<li>
+<p><strong>Anti-blank penalty hurts more than it helps.</strong> CNN + penalty (47.8%) vs CNN alone
+   (28.7%). The worst combination is penalty + no CNN (94.8%). The penalty's additive
+   loss term interferes with the CTC gradient. Anti-blank bias initialization alone
+   (biasing output layer weights) is sufficient.</p>
+</li>
+<li>
+<p><strong>Default LR (1e-3) beats higher LR (5e-4).</strong> GPU 2 (28.7%) outperforms GPU 7 (39.5%)
+   at the same epoch count with the same architecture.</p>
+</li>
+<li>
+<p><strong>Model capacity matters.</strong> Large (16.8%) &gt;&gt; Small (28.7%) &gt;&gt; Tiny (96.4%).
+   This aligns with FairEMG which found scaling consistently improves CER.</p>
+</li>
+<li>
+<p><strong>Sequence-length generalization is the #1 open problem.</strong> Transformers trained on
+   4-sec windows cannot generalize to 70-sec full sessions at test time. The baseline
+   TDS-ConvNet has only a +3% gap (19.5% → 22.5%) while the Large Transformer has a
+   +62% gap (16.8% → 78.5%). This is because self-attention patterns and positional
+   encodings don't extrapolate to 17× longer sequences.</p>
+</li>
+</ol>
+<h2 id="difficulties-and-lessons-learned">Difficulties and Lessons Learned<a class="headerlink" href="#difficulties-and-lessons-learned" title="Permanent link">&para;</a></h2>
+<h3 id="ddp-pitfall-cer-collapse">DDP Pitfall: CER Collapse<a class="headerlink" href="#ddp-pitfall-cer-collapse" title="Permanent link">&para;</a></h3>
+<p><strong>The most significant challenge</strong> was a complete CTC blank collapse when training with
+Distributed Data Parallel (DDP) across 8 GPUs. The model would predict only blank tokens,
+resulting in 100% CER that never improved.</p>
+<h4 id="what-happened">What happened<a class="headerlink" href="#what-happened" title="Permanent link">&para;</a></h4>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a>Epoch 0: val/CER = 1365.1  (random predictions)
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a>Epoch 1: val/CER = 100.0   (BLANK COLLAPSE — all blank tokens)
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a>Epoch 2: val/CER = 100.0   (stuck)
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a>Epoch 3: val/CER = 100.0   (stuck)
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a>...
+<a id="__codelineno-2-6" name="__codelineno-2-6" href="#__codelineno-2-6"></a>Epoch 53: val/CER = 99.15   (barely moved after 53 epochs)
+</code></pre></div>
+<p>This pattern repeated across <strong>every architecture</strong> we tried:
+- HuggingFace T5EncoderModel + CTC
+- Standard nn.TransformerEncoder + CTC
+- nn.TransformerEncoder + CNN + CTC
+- <strong>Even the baseline TDS-ConvNet</strong> collapsed with DDP</p>
+<h4 id="root-cause">Root cause<a class="headerlink" href="#root-cause" title="Permanent link">&para;</a></h4>
+<p>With 8 GPUs and batch_size=32, each GPU saw only <code>3835 / 8 / 32 ≈ 15 steps per epoch</code>.
+The LinearWarmupCosineAnnealing schedule warms up over 10 epochs, so the model had only
+<code>15 × 10 = 150 gradient updates</code> at a very small learning rate (1e-8 → 1e-3) before
+the warmup finished. This was insufficient to learn any character-level patterns before
+the CTC loss landscape pushed the model toward the blank attractor.</p>
+<p>On a <strong>single GPU</strong>, steps per epoch = <code>3835 / 32 = 120</code>, giving <code>120 × 10 = 1200</code>
+gradient updates during warmup — 8× more signal, enough to escape the blank attractor.</p>
+<h4 id="solution">Solution<a class="headerlink" href="#solution" title="Permanent link">&para;</a></h4>
+<p><strong>Train on a single GPU per experiment.</strong> The H200 has enough memory (141GB VRAM) to
+handle the full dataset comfortably. For larger datasets, increase batch size or use
+gradient accumulation rather than DDP, unless the per-GPU step count is high enough
+(recommendation: ≥50 steps/epoch per GPU).</p>
+<h4 id="things-we-tried-that-did-not-fix-the-ddp-collapse">Things we tried that did NOT fix the DDP collapse<a class="headerlink" href="#things-we-tried-that-did-not-fix-the-ddp-collapse" title="Permanent link">&para;</a></h4>
+<table>
+<thead>
+<tr>
+<th>Attempt</th>
+<th>Result</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Anti-blank bias initialization (bias[blank] = -5.0)</td>
+<td>❌ Still collapsed</td>
+</tr>
+<tr>
+<td>Blank penalty loss (alpha * mean_blank_prob)</td>
+<td>❌ Made it worse</td>
+</tr>
+<tr>
+<td>Reduce num_layers from 6 → 1</td>
+<td>❌ Still collapsed</td>
+</tr>
+<tr>
+<td>Add dropout 0.1 everywhere</td>
+<td>❌ Still collapsed</td>
+</tr>
+<tr>
+<td>Lower LR (3e-4 instead of 1e-3)</td>
+<td>❌ Still collapsed</td>
+</tr>
+<tr>
+<td>Gradient clipping (1.0)</td>
+<td>❌ Still collapsed</td>
+</tr>
+<tr>
+<td>Reduce warmup_epochs to 1</td>
+<td>❌ Still collapsed</td>
+</tr>
+<tr>
+<td>Replace T5 with nn.TransformerEncoder</td>
+<td>❌ Still collapsed</td>
+</tr>
+<tr>
+<td>Add CNN featurizer</td>
+<td>❌ Still collapsed (with DDP)</td>
+</tr>
+<tr>
+<td>Mixed precision (fp16)</td>
+<td>❌ Still collapsed</td>
+</tr>
+</tbody>
+</table>
+<p><strong>The only thing that worked was switching to single GPU.</strong></p>
+<h3 id="other-issues-encountered">Other issues encountered<a class="headerlink" href="#other-issues-encountered" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Issue</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>pkill -f 'emg2qwerty'</code> kills the SSH session</td>
+<td>The grep pattern matches the SSH command itself; use PID-based kill instead</td>
+</tr>
+<tr>
+<td><code>uv: command not found</code> on remote</td>
+<td>Add <code>export PATH=$HOME/.local/bin:$PATH</code> in every SSH block</td>
+</tr>
+<tr>
+<td><code>Python.h: No such file</code> building kenlm</td>
+<td>Install <code>python3-dev build-essential cmake zlib1g-dev libbz2-dev liblzma-dev</code></td>
+</tr>
+<tr>
+<td><code>pl_bolts</code> broken with PyTorch Lightning 2.x</td>
+<td>Patch <code>__init__.py</code> with sed to bypass eager imports</td>
+</tr>
+<tr>
+<td>Hydra <code>+</code> prefix needed for new keys</td>
+<td>Use <code>+optimizer.weight_decay=0.01</code> not <code>optimizer.weight_decay=0.01</code></td>
+</tr>
+<tr>
+<td>Zombie DDP processes after crashes</td>
+<td><code>killall -9 python3</code> before relaunching</td>
+</tr>
+<tr>
+<td>Stale <code>__pycache__</code> bytecode</td>
+<td>Always <code>find . -name __pycache__ -exec rm -rf {} +</code> after rsync</td>
+</tr>
+</tbody>
+</table>
+<h2 id="verda-8h200-training-setup">Verda 8×H200 Training Setup<a class="headerlink" href="#verda-8h200-training-setup" title="Permanent link">&para;</a></h2>
+<h3 id="instance-specs">Instance specs<a class="headerlink" href="#instance-specs" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Spec</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPUs</td>
+<td>8× NVIDIA H200</td>
+</tr>
+<tr>
+<td>GPU VRAM</td>
+<td>1128 GB total (141 GB each)</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>176 vCPU</td>
+</tr>
+<tr>
+<td>RAM</td>
+<td>1450 GB</td>
+</tr>
+<tr>
+<td>OS</td>
+<td>Ubuntu 24.04, CUDA 12.8</td>
+</tr>
+<tr>
+<td>Location</td>
+<td>FIN-03</td>
+</tr>
+<tr>
+<td>Price</td>
+<td>$11.42/hr</td>
+</tr>
+</tbody>
+</table>
+<h3 id="deployment-workflow">Deployment workflow<a class="headerlink" href="#deployment-workflow" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="c1"># 1. Sync code to remote</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>rsync<span class="w"> </span>-avz<span class="w"> </span>--delete<span class="w"> </span>-e<span class="w"> </span><span class="s2">&quot;ssh -i ~/.ssh/id_ed25519&quot;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">    </span>--exclude<span class="o">=</span><span class="s1">&#39;.git/&#39;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s1">&#39;data/&#39;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s1">&#39;logs/&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">    </span>--exclude<span class="o">=</span><span class="s1">&#39;.venv/&#39;</span><span class="w"> </span>--exclude<span class="o">=</span><span class="s1">&#39;.env&#39;</span><span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a><span class="w">    </span>./<span class="w"> </span>root@&lt;verda-ip&gt;:/root/emg2qwerty/
+<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>
+<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a><span class="c1"># 2. Remote setup (first time only)</span>
+<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>ssh<span class="w"> </span>root@&lt;verda-ip&gt;
+<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>curl<span class="w"> </span>-LsSf<span class="w"> </span>https://astral.sh/uv/install.sh<span class="w"> </span><span class="p">|</span><span class="w"> </span>sh
+<a id="__codelineno-3-10" name="__codelineno-3-10" href="#__codelineno-3-10"></a>sudo<span class="w"> </span>apt-get<span class="w"> </span>install<span class="w"> </span>-y<span class="w"> </span>python3-dev<span class="w"> </span>build-essential<span class="w"> </span>cmake<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-11" name="__codelineno-3-11" href="#__codelineno-3-11"></a><span class="w">    </span>zlib1g-dev<span class="w"> </span>libbz2-dev<span class="w"> </span>liblzma-dev
+<a id="__codelineno-3-12" name="__codelineno-3-12" href="#__codelineno-3-12"></a><span class="nb">cd</span><span class="w"> </span>/root/emg2qwerty<span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span>uv<span class="w"> </span>sync
+<a id="__codelineno-3-13" name="__codelineno-3-13" href="#__codelineno-3-13"></a>
+<a id="__codelineno-3-14" name="__codelineno-3-14" href="#__codelineno-3-14"></a><span class="c1"># 3. Run single experiment</span>
+<a id="__codelineno-3-15" name="__codelineno-3-15" href="#__codelineno-3-15"></a><span class="nv">CUDA_VISIBLE_DEVICES</span><span class="o">=</span><span class="m">0</span><span class="w"> </span>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="se">\</span>
+<a id="__codelineno-3-16" name="__codelineno-3-16" href="#__codelineno-3-16"></a><span class="w">    </span><span class="nv">user</span><span class="o">=</span>single_user<span class="w"> </span><span class="nv">model</span><span class="o">=</span>t5_ctc<span class="w"> </span><span class="s1">&#39;~cluster&#39;</span><span class="w"> </span>trainer.devices<span class="o">=</span><span class="m">1</span>
+<a id="__codelineno-3-17" name="__codelineno-3-17" href="#__codelineno-3-17"></a>
+<a id="__codelineno-3-18" name="__codelineno-3-18" href="#__codelineno-3-18"></a><span class="c1"># 4. Run architecture sweep (all 8 GPUs)</span>
+<a id="__codelineno-3-19" name="__codelineno-3-19" href="#__codelineno-3-19"></a>bash<span class="w"> </span>scripts/sweep_gpus.sh
+<a id="__codelineno-3-20" name="__codelineno-3-20" href="#__codelineno-3-20"></a>
+<a id="__codelineno-3-21" name="__codelineno-3-21" href="#__codelineno-3-21"></a><span class="c1"># 5. Monitor</span>
+<a id="__codelineno-3-22" name="__codelineno-3-22" href="#__codelineno-3-22"></a>grep<span class="w"> </span><span class="s1">&#39;reached&#39;</span><span class="w"> </span>/root/sweep_gpu*.log
+<a id="__codelineno-3-23" name="__codelineno-3-23" href="#__codelineno-3-23"></a>nvidia-smi<span class="w"> </span>--query-gpu<span class="o">=</span>index,utilization.gpu,memory.used<span class="w"> </span>--format<span class="o">=</span>csv
+</code></pre></div>
+<h3 id="key-training-parameters">Key training parameters<a class="headerlink" href="#key-training-parameters" title="Permanent link">&para;</a></h3>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="c1"># Base config</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="nt">batch_size</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">32</span>
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a><span class="nt">max_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">150 (baseline) / 80 (transformer sweep)</span>
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a><span class="nt">lr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-3 (Adam)</span>
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a><span class="nt">lr_schedule</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">LinearWarmupCosineAnnealing</span>
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a><span class="nt">warmup_epochs</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">10</span>
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a><span class="nt">warmup_start_lr</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">1e-8</span>
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a><span class="nt">window_length</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">8000</span><span class="w">  </span><span class="c1"># 4 seconds at 2kHz</span>
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a><span class="nt">padding</span><span class="p">:</span><span class="w"> </span><span class="p p-Indicator">[</span><span class="nv">1800</span><span class="p p-Indicator">,</span><span class="w"> </span><span class="nv">200</span><span class="p p-Indicator">]</span><span class="w"> </span><span class="c1"># 900ms past, 100ms future</span>
+</code></pre></div>
+<h2 id="literature-context">Literature Context<a class="headerlink" href="#literature-context" title="Permanent link">&para;</a></h2>
+<p>Our results align with the findings from recent emg2qwerty papers:</p>
+<table>
+<thead>
+<tr>
+<th>Paper</th>
+<th>Architecture</th>
+<th>Zero-shot CER</th>
+<th>Personalized CER</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>emg2qwerty Baseline (NeurIPS 2024)</td>
+<td>TDS-ConvNet + CTC</td>
+<td>51.8%</td>
+<td>6.95% (+LM)</td>
+</tr>
+<tr>
+<td><strong>Ours (baseline repro)</strong></td>
+<td><strong>TDS-ConvNet + CTC</strong></td>
+<td>19.45% val / <strong>22.48% test</strong>*</td>
+<td>—</td>
+</tr>
+<tr>
+<td>SplashNet (NeurIPS 2025)</td>
+<td>Split-Share TDS</td>
+<td>35.7%</td>
+<td>5.5% (+LM)</td>
+</tr>
+<tr>
+<td>FairEMG (TMLR 2025)</td>
+<td>CNN + Transformer</td>
+<td>~30-40%</td>
+<td>—</td>
+</tr>
+<tr>
+<td><strong>Ours (Large Transformer)</strong></td>
+<td><strong>CNN + Transformer + CTC</strong></td>
+<td><strong>16.79% val</strong> / 78.52% test*</td>
+<td>—</td>
+</tr>
+<tr>
+<td>Typing Reinvented (2025)</td>
+<td>Transformer/Conformer</td>
+<td>20.34%**</td>
+<td>10.10%**</td>
+</tr>
+<tr>
+<td>MyoText (2026)</td>
+<td>CNN-BiLSTM + T5</td>
+<td>—</td>
+<td>5.4%</td>
+</tr>
+</tbody>
+</table>
+<p>* Single user (89335547), no LM. Not zero-shot — trained on that user's data.
+** Causal/online setting — not directly comparable.</p>
+<h3 id="fairemg-comparison-most-relevant">FairEMG comparison (most relevant)<a class="headerlink" href="#fairemg-comparison-most-relevant" title="Permanent link">&para;</a></h3>
+<p>The FairEMG paper (Paper 4) found that even a ~600K-param Tiny transformer substantially
+outperforms the 5.3M TDS-ConvNet baseline. They use a <strong>CNN featurizer on raw sEMG</strong>
+(not spectrograms), which gave ~8 CER improvement. Our results confirm that CNN features
+before the transformer are essential — our CNN variants all learn while non-CNN variants
+struggled to escape blank collapse during warmup.</p>
+<h2 id="next-steps">Next Steps<a class="headerlink" href="#next-steps" title="Permanent link">&para;</a></h2>
+<p>Based on the sweep results and literature analysis, prioritized by impact:</p>
+<ol>
+<li><strong>🔴 Fix sequence-length generalization</strong> — This is the #1 blocker. Options:</li>
+<li><strong>Sliding-window inference</strong>: chunk the test session into overlapping 4-sec windows,
+     run inference on each, merge predictions. Simple and effective.</li>
+<li><strong>ALiBi / RoPE</strong> positional encodings: these extrapolate to unseen lengths much
+     better than sinusoidal PE. RoPE is used by LLaMA, ALiBi by BLOOM.</li>
+<li><strong>Train with variable-length windows</strong>: randomly sample window lengths during
+     training (e.g., 2-16 sec) to improve length robustness.</li>
+<li>
+<p><strong>Conformer architecture</strong>: combines local convolution (length-invariant) with
+     global attention (content-dependent). Used in Typing Reinvented (Paper 5).</p>
+</li>
+<li>
+<p><strong>Raw sEMG CNN featurizer</strong> (FairEMG approach) — bypass log-spectrogram, apply CNN
+   directly to the raw 2kHz signal. FairEMG shows ~8 CER improvement.</p>
+</li>
+<li>
+<p><strong>Language model decoding</strong> — Add 6-gram KenLM beam search (already in
+   <code>decoder/ctc_beam.yaml</code>). This alone drops CER from ~20% → ~7% in published results.</p>
+</li>
+<li>
+<p><strong>SplashNet innovations</strong> — Rolling Time Normalization and Aggressive Channel Masking
+   are architecture-agnostic and gave 31% relative improvement.</p>
+</li>
+<li>
+<p><strong>Scale up</strong> — FairEMG shows gains up to 110M params. Our Large has ~5M;
+   try d=512, 12L (~20M).</p>
+</li>
+<li>
+<p><strong>Knowledge distillation</strong> — Train a large teacher, distill to a 2M student
+   (FairEMG: &lt;1.5% CER loss with 50× fewer params).</p>
+</li>
+</ol>
 
 
 

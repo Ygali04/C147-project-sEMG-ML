@@ -126,6 +126,14 @@ class DownloadConfig(BaseModel):
         default=False,
         description="If True, resolve sessions but skip actual uploads.",
     )
+    save_local: bool = Field(
+        default=False,
+        description=(
+            "If True, also write each HDF5 file to local disk under data_root. "
+            "By default files are streamed directly to B2 and never touch local disk "
+            "(aside from data/metadata.csv which is always cached locally)."
+        ),
+    )
     b2: B2Config = Field(description="Backblaze B2 destination configuration.")
     source: SourceS3Config = Field(
         default_factory=SourceS3Config,
@@ -168,11 +176,11 @@ class TrainBatchConfig(BaseModel):
         default=None,
         description="Optional path to a training checkpoint to resume from.",
     )
-    model: str = Field(
-        default="tds_conv_ctc",
-        description="Hydra model config name under config/model/ (e.g., tds_conv_ctc, bilstm_ctc).",
-    )
     local_data_dir: Path = Field(
         default=Path("data"),
         description="Local directory where HDF5 files are synced for training.",
+    )
+    model: str = Field(
+        default="tds_conv_ctc",
+        description="Hydra model config name (e.g. tds_conv_ctc, tds_conv_ctc, bilstm_ctc, t5_ctc).",
     )

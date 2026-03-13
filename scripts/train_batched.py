@@ -4,8 +4,11 @@ Backblaze B2.
 
 Usage::
 
-    # Train on baseline profile (user 89335547)
+    # Train baseline TDS-CNN on baseline profile (user 89335547)
     uv run python scripts/train_batched.py --baseline
+
+    # Train T5-small + CTC on baseline profile
+    uv run python scripts/train_batched.py --baseline --model t5_ctc
 
     # Train on first 10 profiles from the registry
     uv run python scripts/train_batched.py --test
@@ -39,43 +42,6 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
-# Allowed model configuration names (canonical spellings only)
-ALLOWED_MODELS = (
-    "tds_conv_ctc",
-    "bilstm_ctc",
-    "cnn_bilstm_ctc",
-    "whisper_ctc",
-)
-
-
-def _normalize_model_option(
-    ctx: click.Context | None, param: click.Parameter | None, value: str | None
-) -> str | None:
-    """Normalize and validate the --model option.
-
-    - Accepts the legacy misspelling "whipser_ctc" as an alias for "whisper_ctc"
-      without advertising it in the CLI help.
-    - Ensures the final value is one of ALLOWED_MODELS.
-    """
-    if value is None:
-        return None
-
-    value = value.strip()
-
-    if value == "whipser_ctc":
-        log.warning(
-            "Model name 'whipser_ctc' is deprecated; using 'whisper_ctc' instead."
-        )
-        return "whisper_ctc"
-
-    if value not in ALLOWED_MODELS:
-        raise click.BadParameter(
-            f"Invalid model '{value}'. Valid choices are: {', '.join(ALLOWED_MODELS)}"
-        )
-
-    return value
-
-
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.option(
     "--baseline",
@@ -103,14 +69,6 @@ def _normalize_model_option(
     help="Optional checkpoint path to resume from.",
 )
 @click.option(
-    "--model",
-    type=str,
-    callback=_normalize_model_option,
-    default="tds_conv_ctc",
-    show_default=True,
-    help="Hydra model config to use from config/model/.",
-)
-@click.option(
     "--batch-size-profiles",
     type=int,
     default=1,
@@ -132,9 +90,6 @@ def main(
 ) -> None:
     """Train models across user profiles stored in Backblaze B2."""
     load_dotenv()
-
-    # Keep backward compatibility with the common misspelling.
-    normalized_model = "whisper_ctc" if model == "whipser_ctc" else model
 
     if local_files:
         if mode != DownloadMode.BASELINE.value:
@@ -159,7 +114,7 @@ def main(
             "-m",
             "emg2qwerty.train",
             "user=single_user",
-            f"model={normalized_model}",
+            f"model={model}",
         ]
         if checkpoint:
             cmd.append(f"checkpoint={checkpoint}")
@@ -185,7 +140,7 @@ def main(
         b2=B2Config(key_id=key_id, application_key=app_key),
         batch_size_profiles=batch_size_profiles,
         checkpoint=checkpoint,
-        model=normalized_model,
+        model=model,
     )
 
     trainer = BatchTrainer(config)

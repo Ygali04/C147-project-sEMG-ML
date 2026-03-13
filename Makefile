@@ -1,5 +1,4 @@
 .PHONY: format lint test all docs-serve docs-build docs-deploy clean \
-       fetch-metadata \
        download-baseline download-test download-all \
        train-baseline train-test train-all rclone-setup
 
@@ -31,11 +30,8 @@ clean:
 # Data pipeline
 # ---------------------------------------------------------------------------
 
-## Extract metadata.csv from the 308 GB tar.gz (one-time, ~2-6 h).
-## After it finishes, commit data/metadata.csv to the repo.
-fetch-metadata:
-	uv run python scripts/fetch_metadata.py
-
+## metadata.csv is captured automatically during any download run.
+## After the first run completes, commit data/metadata.csv to the repo.
 download-baseline:
 	uv run python scripts/download_data.py --baseline
 

@@ -13,9 +13,34 @@ def _resolve_metrics_path(run_path: Path) -> Path | None:
     if not run_path.is_dir():
         return None
 
-    candidates = sorted(run_path.glob("lightning_logs/version_*/metrics.csv"))
-    if candidates:
-        return candidates[-1]
+    candidates = list(run_path.glob("lightning_logs/version_*/metrics.csv"))
+    if not candidates:
+        return None
+
+    versioned_candidates: list[tuple[int, Path]] = []
+    fallback_candidates: list[Path] = []
+
+    for path in candidates:
+        dirname = path.parent.name
+        prefix = "version_"
+        if dirname.startswith(prefix):
+            version_str = dirname[len(prefix) :]
+            try:
+                version = int(version_str)
+            except ValueError:
+                fallback_candidates.append(path)
+            else:
+                versioned_candidates.append((version, path))
+        else:
+            fallback_candidates.append(path)
+
+    if versioned_candidates:
+        # Select the metrics file from the highest numeric version directory.
+        return max(versioned_candidates, key=lambda item: item[0])[1]
+
+    if fallback_candidates:
+        # Fallback to lexicographic order if no numeric versions could be parsed.
+        return sorted(fallback_candidates)[-1]
 
     return None
 

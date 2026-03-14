@@ -182,6 +182,18 @@ Because both speech recognition and EMG-to-text decoding are sequence-to-sequenc
 
 These experiments highlighted that architectures successful in speech recognition cannot always transfer directly to biosignal decoding tasks. Differences in signal modality and feature structure often require architectural adjustments beyond simply reusing the same model.
 
+\subsection{Citrinet Transfer Experiment}
+We added a Citrinet transfer experiment using a pretrained Citrinet encoder~[10] adapted for EMG features through a learned projection and CTC head. Training was run for 150 epochs and reached best validation CER of 46.21\% (checkpoint: epoch 128). We then ran explicit checkpoint evaluation to obtain true test metrics: 47.83\% test CER.
+
+Although this is substantially worse than the CNN+BiLSTM hybrid, it outperformed the Whisper-transfer run on test CER (47.83\% vs 99.91\%), suggesting that transfer from ASR encoders can be viable when the source representation is closer to robust frame-level CTC behavior.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\linewidth]{images/citrinet_training_progress.png}
+\caption{Citrinet transfer training dynamics on the single-user split.}
+\label{fig:citrinet-training}
+\end{figure}
+
 \subsection{Transformer and T5 Experiments}
 
 Another major line of experimentation involved transformer-based architectures, including pure transformer models, CNN-transformer hybrids, and T5-style sequence models. Transformers are appealing for sequence modeling because their self-attention mechanism allows modeling long-range dependencies across the entire input sequence.
@@ -264,6 +276,7 @@ BiLSTM & greedy & full\_session & 15.37 & 22.07 & 6.70 \\
 TDS-ConvNet (baseline) & greedy & full\_session & 19.45 & 22.48 & 3.03 \\
 CNN + BiGRU & greedy & full\_session & 21.59 & 23.32 & 1.73 \\
 \midrule
+Citrinet-CTC & greedy & full\_session & 46.21 & 47.83 & 1.62 \\
 Conformer-small & greedy & full\_session & 45.99 & 63.82 & 17.83 \\
 Large Transformer (sin.) & greedy & windowed & 14.51 & 82.02 & 67.51 \\
 BiGRU & greedy & full\_session & 17.27 & 83.27 & 66.00 \\
@@ -274,6 +287,20 @@ Whisper-CTC & greedy & full\_session & 19.30 & 100.0 & 80.70 \\
 \end{table}
 
 The CNN-BiLSTM family dominates the leaderboard. Our best result---a deep CNN-BiLSTM with 3-layer LSTM ($h{=}384$) and tuned beam search ($\lambda{=}3.0$, $\beta{=}3.0$, $B{=}100$)---achieves \textbf{7.22\%} test CER. Notably, all models with greedy decoding that achieve $<$25\% test CER use architectures with purely local or recurrent operations (CNN, BiLSTM), while transformer and GRU models with sinusoidal positional encoding suffer catastrophic test-time degradation.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\linewidth]{images/deep_lstm_3L_training_progress.png}
+\caption{Training curves for the deep CNN-BiLSTM (3-layer LSTM, $h{=}384$), our best model achieving \textbf{7.22\%} test CER with beam search. The model converges smoothly to 12.36\% greedy val CER by epoch 200.}
+\label{fig:deep-lstm-training}
+\end{figure}
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\linewidth]{images/cnn_bilstm_training_progress.png}
+\caption{Training curves for the standard CNN+BiLSTM (2-layer, $h{=}384$, 150 epochs), achieving 14.96\% greedy test CER and 7.63\% with tuned beam search.}
+\label{fig:cnn-bilstm-training}
+\end{figure}
 
 
 \subsection{Effect of Beam Search and Language Model}
@@ -333,6 +360,13 @@ Whisper-CTC & sinusoidal & 19.30 & 100.0 & +80.7 \\
 Architectures with purely local operations (TDS-ConvNet) or recurrent hidden states (BiLSTM) generalize naturally to arbitrary-length sequences with small gaps (${\leq}3\%$). Transformer models with sinusoidal positional encoding suffer catastrophic gaps ($67{-}81\%$) because self-attention patterns learned during training do not extrapolate to $17.5\times$ longer sequences. BiGRU suffers a similarly large gap (66\%), suggesting that its gated recurrent structure is less robust to length extrapolation than BiLSTM on this task.
 
 \textbf{ALiBi eliminates the length gap.} ALiBi~[8] replaces sinusoidal positional encodings with a linear distance-dependent bias added to attention scores. Because ALiBi encodes relative distance rather than absolute position, it extrapolates to sequence lengths far beyond those seen during training. Combined with windowed inference, ALiBi reduces the val/test gap from 67.5\% to just 0.18\%.
+
+\begin{figure}[t]
+\centering
+\includegraphics[width=0.75\linewidth]{images/alibi_transformer_training_progress.png}
+\caption{Training curves for the ALiBi Transformer (150 epochs). Achieves 17.41\% greedy val CER with a val/test gap of only 0.18\%, and 8.84\% test CER with beam search + KenLM.}
+\label{fig:alibi-training}
+\end{figure}
 
 
 \subsection{Windowed Inference}
@@ -453,6 +487,8 @@ We presented a systematic comparison of convolutional, recurrent, and transforme
 [8] Ofir Press, Noah A.\ Smith, and Mike Lewis. Train short, test long: Attention with linear biases enables input length extrapolation. \textit{ICLR}, 2022.
 
 [9] Anmol Gulati, James Qin, Chung-Cheng Chiu, et al. Conformer: Convolution-augmented Transformer for speech recognition. \textit{Interspeech}, 2020.
+
+[10] Somshubra Majumdar and Boris Ginsburg. Citrinet: Closing the gap between non-autoregressive and autoregressive end-to-end models for automatic speech recognition. \textit{arXiv:2104.01721}, 2021.
 
 }
 

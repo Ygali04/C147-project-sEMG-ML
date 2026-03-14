@@ -274,3 +274,139 @@ class TDSConvEncoder(nn.Module):
 
     def forward(self, inputs: torch.Tensor) -> torch.Tensor:
         return self.tds_conv_blocks(inputs)  # (T, N, num_features)
+
+
+class ConformerFeedForwardModule(nn.Module):
+    def __init__(self, d_model: int, d_ff: int, dropout: float) -> None:
+        super().__init__()
+        self.net = nn.Sequential(
+            nn.LayerNorm(d_model),
+            nn.Linear(d_model, d_ff),
+            nn.SiLU(),
+            nn.Dropout(dropout),
+            nn.Linear(d_ff, d_model),
+            nn.Dropout(dropout),
+        )
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        return self.net(inputs)
+
+
+class ConformerConvolutionModule(nn.Module):
+    def __init__(self, d_model: int, kernel_size: int, dropout: float) -> None:
+        super().__init__()
+        if kernel_size % 2 == 0:
+            raise ValueError("Conformer kernel_size must be odd for same-length padding.")
+
+        self.layer_norm = nn.LayerNorm(d_model)
+        self.pointwise_in = nn.Conv1d(d_model, 2 * d_model, kernel_size=1)
+        self.glu = nn.GLU(dim=1)
+        self.depthwise = nn.Conv1d(
+            d_model,
+            d_model,
+            kernel_size=kernel_size,
+            padding=kernel_size // 2,
+            groups=d_model,
+        )
+        self.batch_norm = nn.BatchNorm1d(d_model)
+        self.activation = nn.SiLU()
+        self.pointwise_out = nn.Conv1d(d_model, d_model, kernel_size=1)
+        self.dropout = nn.Dropout(dropout)
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        x = self.layer_norm(inputs)
+        x = x.permute(1, 2, 0)  # (T, N, C) -> (N, C, T)
+        x = self.pointwise_in(x)
+        x = self.glu(x)
+        x = self.depthwise(x)
+        x = self.batch_norm(x)
+        x = self.activation(x)
+        x = self.pointwise_out(x)
+        x = self.dropout(x)
+        return x.permute(2, 0, 1)  # (N, C, T) -> (T, N, C)
+
+
+class ConformerBlock(nn.Module):
+    def __init__(
+        self,
+        d_model: int,
+        d_ff: int,
+        num_heads: int,
+        conv_kernel_size: int,
+        dropout: float,
+    ) -> None:
+        super().__init__()
+        self.ffn1 = ConformerFeedForwardModule(d_model=d_model, d_ff=d_ff, dropout=dropout)
+        self.self_attn_norm = nn.LayerNorm(d_model)
+        self.self_attn = nn.MultiheadAttention(
+            embed_dim=d_model,
+            num_heads=num_heads,
+            dropout=dropout,
+            batch_first=False,
+        )
+        self.self_attn_dropout = nn.Dropout(dropout)
+        self.conv_module = ConformerConvolutionModule(
+            d_model=d_model,
+            kernel_size=conv_kernel_size,
+            dropout=dropout,
+        )
+        self.ffn2 = ConformerFeedForwardModule(d_model=d_model, d_ff=d_ff, dropout=dropout)
+        self.final_norm = nn.LayerNorm(d_model)
+
+    def forward(
+        self,
+        inputs: torch.Tensor,
+        attn_mask: torch.Tensor | None = None,
+        key_padding_mask: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        x = inputs + 0.5 * self.ffn1(inputs)
+
+        attn_inputs = self.self_attn_norm(x)
+        attn_outputs, _ = self.self_attn(
+            attn_inputs,
+            attn_inputs,
+            attn_inputs,
+            attn_mask=attn_mask,
+            key_padding_mask=key_padding_mask,
+            need_weights=False,
+        )
+        x = x + self.self_attn_dropout(attn_outputs)
+        x = x + self.conv_module(x)
+        x = x + 0.5 * self.ffn2(x)
+        return self.final_norm(x)
+
+
+class ConformerEncoder(nn.Module):
+    def __init__(
+        self,
+        d_model: int,
+        d_ff: int,
+        num_heads: int,
+        num_layers: int,
+        conv_kernel_size: int,
+        dropout: float,
+    ) -> None:
+        super().__init__()
+        self.layers = nn.ModuleList(
+            [
+                ConformerBlock(
+                    d_model=d_model,
+                    d_ff=d_ff,
+                    num_heads=num_heads,
+                    conv_kernel_size=conv_kernel_size,
+                    dropout=dropout,
+                )
+                for _ in range(num_layers)
+            ]
+        )
+
+    def forward(
+        self,
+        inputs: torch.Tensor,
+        attn_mask: torch.Tensor | None = None,
+        key_padding_mask: torch.Tensor | None = None,
+    ) -> torch.Tensor:
+        x = inputs
+        for layer in self.layers:
+            x = layer(x, attn_mask=attn_mask, key_padding_mask=key_padding_mask)
+        return x

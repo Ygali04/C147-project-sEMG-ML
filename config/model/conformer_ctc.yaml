@@ -1,0 +1,21 @@
+# @package _global_
+module:
+  _target_: emg2qwerty.lightning.ConformerCTCModule
+  in_features: 528
+  mlp_features: [384]
+  d_model: 128
+  num_layers: 4
+  num_heads: 4
+  d_ff: 512
+  conv_kernel_size: 15
+  positional_encoding: sinusoidal
+  temporal_stride: 1
+  blank_penalty_epochs: 40
+  blank_alpha_max: 50.0
+
+datamodule:
+  _target_: emg2qwerty.lightning.WindowedEMGDataModule
+  window_length: 8000
+  padding: [1800, 200]
+  train_window_lengths: null
+  train_window_weights: null

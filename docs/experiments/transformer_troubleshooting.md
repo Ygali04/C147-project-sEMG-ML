@@ -123,6 +123,12 @@ bash scripts/wave5_alibi_sweep.sh
 bash scripts/wave6_downsample_sweep.sh
 ```
 
+## Wave 8 Launch Template
+
+```bash
+bash scripts/wave8_conformer_sweep.sh
+```
+
 ## Architecture Comparison Template
 
 | Family | Frontend | Encoder | Downsample | Positional encoding | Decoder | Val CER | Test CER | Params | Status | Notes |

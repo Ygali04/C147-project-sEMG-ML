@@ -26,6 +26,7 @@ from emg2qwerty.data import LabelData, WindowedEMGDataset
 from emg2qwerty.inference import build_window_specs, merge_log_prob_chunks, resize_log_probs_to_input_length
 from emg2qwerty.metrics import CharacterErrorRates
 from emg2qwerty.modules import (
+    ConformerEncoder,
     MultiBandRotationInvariantMLP,
     SpectrogramNorm,
     TDSConvEncoder,
@@ -673,6 +674,178 @@ class T5CTCModule(CTCModuleBase):
         x = self.transformer_encoder(x, mask=attn_bias, src_key_padding_mask=key_padding_mask)
 
         return F.log_softmax(self.output_proj(x), dim=-1)  # (T, N, num_classes)
+
+
+class ConformerCTCModule(CTCModuleBase):
+    NUM_BANDS: ClassVar[int] = 2
+    ELECTRODE_CHANNELS: ClassVar[int] = 16
+
+    def __init__(
+        self,
+        in_features: int,
+        mlp_features: Sequence[int],
+        d_model: int,
+        num_layers: int,
+        num_heads: int,
+        d_ff: int,
+        conv_kernel_size: int,
+        optimizer: DictConfig,
+        lr_scheduler: DictConfig,
+        decoder: DictConfig,
+        inference: DictConfig | None = None,
+        positional_encoding: str = "sinusoidal",
+        temporal_stride: int = 1,
+        blank_penalty_epochs: int = 40,
+        blank_alpha_max: float = 50.0,
+    ) -> None:
+        super().__init__()
+        self.save_hyperparameters()
+        self._setup_inference(inference)
+
+        self._positional_encoding = positional_encoding
+        self._num_heads = num_heads
+        self._temporal_stride = temporal_stride
+        self._BLANK_PENALTY_EPOCHS = blank_penalty_epochs
+        self._BLANK_ALPHA_MAX = blank_alpha_max
+
+        num_features = self.NUM_BANDS * mlp_features[-1]
+
+        self.spec_norm = SpectrogramNorm(
+            channels=self.NUM_BANDS * self.ELECTRODE_CHANNELS,
+        )
+        self.mlp = MultiBandRotationInvariantMLP(
+            in_features=in_features,
+            mlp_features=mlp_features,
+            num_bands=self.NUM_BANDS,
+        )
+        self.flatten = nn.Flatten(start_dim=2)
+        self.input_proj = nn.Linear(num_features, d_model)
+        if temporal_stride > 1:
+            self.temporal_downsample = nn.Sequential(
+                nn.Conv1d(
+                    d_model,
+                    d_model,
+                    kernel_size=2 * temporal_stride + 1,
+                    stride=temporal_stride,
+                    padding=temporal_stride,
+                ),
+                nn.BatchNorm1d(d_model),
+                nn.GELU(),
+                nn.Dropout(0.1),
+            )
+        self.proj_norm = nn.LayerNorm(d_model)
+
+        max_len = 16000
+        pe = torch.zeros(max_len, d_model)
+        position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+        div_term = torch.exp(torch.arange(0, d_model, 2, dtype=torch.float) * (-math.log(10000.0) / d_model))
+        pe[:, 0::2] = torch.sin(position * div_term)
+        pe[:, 1::2] = torch.cos(position * div_term)
+        self.register_buffer("pos_encoding", pe.unsqueeze(1))
+        self.pe_dropout = nn.Dropout(0.1)
+
+        self.conformer_encoder = ConformerEncoder(
+            d_model=d_model,
+            d_ff=d_ff,
+            num_heads=num_heads,
+            num_layers=num_layers,
+            conv_kernel_size=conv_kernel_size,
+            dropout=0.1,
+        )
+        self.output_proj = nn.Linear(d_model, charset().num_classes)
+
+        with torch.no_grad():
+            nn.init.uniform_(self.output_proj.weight, -0.01, 0.01)
+            blank_idx = charset().null_class
+            num_chars = charset().num_classes - 1
+            self.output_proj.bias.fill_(math.log(1.0 / num_chars))
+            self.output_proj.bias[blank_idx] = -5.0
+
+        self._setup_ctc(decoder)
+
+    def _forward_for_ctc(self, inputs: torch.Tensor, input_lengths: torch.Tensor) -> torch.Tensor:
+        return self.forward(inputs, input_lengths)
+
+    def _build_positional_encoding(self, time_steps: int, device: torch.device) -> torch.Tensor:
+        if time_steps <= self.pos_encoding.shape[0]:
+            return self.pos_encoding[:time_steps]
+
+        d_model = self.pos_encoding.shape[2]
+        pe = torch.zeros(time_steps, 1, d_model, device=device)
+        position = torch.arange(0, time_steps, dtype=torch.float, device=device).unsqueeze(1)
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2, dtype=torch.float, device=device) * (-math.log(10000.0) / d_model)
+        )
+        pe[:, 0, 0::2] = torch.sin(position * div_term)
+        pe[:, 0, 1::2] = torch.cos(position * div_term)
+        return pe
+
+    def _build_attention_bias(
+        self,
+        time_steps: int,
+        batch_size: int,
+        device: torch.device,
+    ) -> torch.Tensor | None:
+        if self._positional_encoding != "alibi":
+            return None
+
+        positions = torch.arange(time_steps, device=device)
+        distances = (positions[:, None] - positions[None, :]).abs().float()
+        slopes = torch.tensor(
+            [2 ** (-(8 * (head + 1) / self._num_heads)) for head in range(self._num_heads)],
+            device=device,
+            dtype=torch.float,
+        )
+        per_head_bias = -slopes[:, None, None] * distances[None, :, :]
+        return per_head_bias.repeat(batch_size, 1, 1)
+
+    def _augment_loss(self, phase: str, loss: torch.Tensor, emissions: torch.Tensor) -> torch.Tensor:
+        if phase != "train":
+            return loss
+
+        blank_idx = charset().null_class
+        current_epoch = self.current_epoch
+        if current_epoch < self._BLANK_PENALTY_EPOCHS:
+            blank_prob = emissions[:, :, blank_idx].exp().mean()
+            alpha = self._BLANK_ALPHA_MAX * (1.0 - current_epoch / self._BLANK_PENALTY_EPOCHS)
+            loss = loss + alpha * blank_prob
+            self.log("train/blank_prob", blank_prob, prog_bar=True, sync_dist=True)
+            self.log("train/blank_alpha", alpha, prog_bar=False, sync_dist=True)
+        return loss
+
+    def forward(self, inputs: torch.Tensor, input_lengths: torch.Tensor) -> torch.Tensor:
+        x = self.spec_norm(inputs)
+        x = self.mlp(x)
+        x = self.flatten(x)
+        x = self.input_proj(x)
+
+        if self._temporal_stride > 1:
+            x = x.permute(1, 2, 0)
+            x = self.temporal_downsample(x)
+            x = x.permute(2, 0, 1)
+        x = self.proj_norm(x)
+
+        T_len = x.shape[0]
+        encoder_lengths = torch.div(
+            input_lengths + self._temporal_stride - 1,
+            self._temporal_stride,
+            rounding_mode="floor",
+        )
+        if self._positional_encoding == "sinusoidal":
+            pe = self._build_positional_encoding(T_len, x.device)
+            x = self.pe_dropout(x + pe)
+        elif self._positional_encoding == "alibi":
+            x = self.pe_dropout(x)
+        else:
+            raise ValueError(f"Unsupported positional encoding: {self._positional_encoding}")
+
+        padding_mask = torch.arange(T_len, device=x.device).unsqueeze(0) >= encoder_lengths.unsqueeze(1)
+        key_padding_mask = torch.zeros((x.shape[1], T_len), dtype=x.dtype, device=x.device)
+        key_padding_mask = key_padding_mask.masked_fill(padding_mask, float("-inf"))
+        attn_bias = self._build_attention_bias(T_len, x.shape[1], x.device)
+
+        x = self.conformer_encoder(x, attn_mask=attn_bias, key_padding_mask=key_padding_mask)
+        return F.log_softmax(self.output_proj(x), dim=-1)
 
 
 class BiLSTMCTCModule(CTCModuleBase):

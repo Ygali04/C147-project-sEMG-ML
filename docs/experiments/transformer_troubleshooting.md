@@ -107,6 +107,12 @@ bash scripts/wave3_variable_window_sweep.sh
 bash scripts/wave4_curriculum_sweep.sh
 ```
 
+## Wave 5 Launch Template
+
+```bash
+bash scripts/wave5_alibi_sweep.sh
+```
+
 ## Architecture Comparison Template
 
 | Family | Frontend | Encoder | Downsample | Positional encoding | Decoder | Val CER | Test CER | Params | Status | Notes |

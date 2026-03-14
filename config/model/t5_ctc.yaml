@@ -12,6 +12,7 @@ module:
   num_heads: 4              # 4 heads
   d_ff: 512                 # 4× d_model
   d_kv: 32                  # unused, kept for compat
+  positional_encoding: sinusoidal
   use_cnn: true             # toggle temporal CNN featurizer
   blank_penalty_epochs: 40  # 0 = disable anti-blank penalty
   blank_alpha_max: 50.0     # peak penalty weight

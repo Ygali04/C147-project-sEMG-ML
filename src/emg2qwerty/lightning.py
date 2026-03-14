@@ -471,6 +471,7 @@ class T5CTCModule(CTCModuleBase):
         lr_scheduler: DictConfig,
         decoder: DictConfig,
         inference: DictConfig | None = None,
+        positional_encoding: str = "sinusoidal",
         use_cnn: bool = True,
         blank_penalty_epochs: int = 40,
         blank_alpha_max: float = 50.0,
@@ -480,6 +481,8 @@ class T5CTCModule(CTCModuleBase):
         self._setup_inference(inference)
 
         self._use_cnn = use_cnn
+        self._positional_encoding = positional_encoding
+        self._num_heads = num_heads
         self._BLANK_PENALTY_EPOCHS = blank_penalty_epochs
         self._BLANK_ALPHA_MAX = blank_alpha_max
 
@@ -519,7 +522,7 @@ class T5CTCModule(CTCModuleBase):
             )
         self.proj_norm = nn.LayerNorm(d_model)
 
-        # --- Sinusoidal positional encoding ---
+        # --- Positional encoding state ---
         max_len = 16000
         pe = torch.zeros(max_len, d_model)
         position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
@@ -561,6 +564,39 @@ class T5CTCModule(CTCModuleBase):
     def _forward_for_ctc(self, inputs: torch.Tensor, input_lengths: torch.Tensor) -> torch.Tensor:
         return self.forward(inputs, input_lengths)
 
+    def _build_positional_encoding(self, time_steps: int, device: torch.device) -> torch.Tensor:
+        if time_steps <= self.pos_encoding.shape[0]:
+            return self.pos_encoding[:time_steps]
+
+        d_model = self.pos_encoding.shape[2]
+        pe = torch.zeros(time_steps, 1, d_model, device=device)
+        position = torch.arange(0, time_steps, dtype=torch.float, device=device).unsqueeze(1)
+        div_term = torch.exp(
+            torch.arange(0, d_model, 2, dtype=torch.float, device=device) * (-math.log(10000.0) / d_model)
+        )
+        pe[:, 0, 0::2] = torch.sin(position * div_term)
+        pe[:, 0, 1::2] = torch.cos(position * div_term)
+        return pe
+
+    def _build_attention_bias(
+        self,
+        time_steps: int,
+        batch_size: int,
+        device: torch.device,
+    ) -> torch.Tensor | None:
+        if self._positional_encoding != "alibi":
+            return None
+
+        positions = torch.arange(time_steps, device=device)
+        distances = (positions[:, None] - positions[None, :]).abs().float()
+        slopes = torch.tensor(
+            [2 ** (-(8 * (head + 1) / self._num_heads)) for head in range(self._num_heads)],
+            device=device,
+            dtype=torch.float,
+        )
+        per_head_bias = -slopes[:, None, None] * distances[None, :, :]
+        return per_head_bias.repeat(batch_size, 1, 1)
+
     def _augment_loss(self, phase: str, loss: torch.Tensor, emissions: torch.Tensor) -> torch.Tensor:
         if phase != "train":
             return loss
@@ -590,27 +626,19 @@ class T5CTCModule(CTCModuleBase):
         x = self.proj_norm(x)
 
         T_len = x.shape[0]
-
-        # Add sinusoidal positional encoding.
-        # At test time, full sessions can exceed the pre-computed buffer length,
-        # so we dynamically extend the encoding if necessary.
-        if T_len <= self.pos_encoding.shape[0]:
-            pe = self.pos_encoding[:T_len]
+        if self._positional_encoding == "sinusoidal":
+            pe = self._build_positional_encoding(T_len, x.device)
+            x = self.pe_dropout(x + pe)
+        elif self._positional_encoding == "alibi":
+            x = self.pe_dropout(x)
         else:
-            d_model = self.pos_encoding.shape[2]
-            pe = torch.zeros(T_len, 1, d_model, device=x.device)
-            position = torch.arange(0, T_len, dtype=torch.float, device=x.device).unsqueeze(1)
-            div_term = torch.exp(
-                torch.arange(0, d_model, 2, dtype=torch.float, device=x.device) * (-math.log(10000.0) / d_model)
-            )
-            pe[:, 0, 0::2] = torch.sin(position * div_term)
-            pe[:, 0, 1::2] = torch.cos(position * div_term)
-        x = self.pe_dropout(x + pe)
+            raise ValueError(f"Unsupported positional encoding: {self._positional_encoding}")
 
         # Build key_padding_mask: True = ignore (PyTorch convention)
         key_padding_mask = torch.arange(T_len, device=x.device).unsqueeze(0) >= input_lengths.unsqueeze(1)  # (N, T)
+        attn_bias = self._build_attention_bias(T_len, x.shape[1], x.device)
 
-        x = self.transformer_encoder(x, src_key_padding_mask=key_padding_mask)
+        x = self.transformer_encoder(x, mask=attn_bias, src_key_padding_mask=key_padding_mask)
 
         return F.log_softmax(self.output_proj(x), dim=-1)  # (T, N, num_classes)
 

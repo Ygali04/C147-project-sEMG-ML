@@ -3,22 +3,22 @@
 The primary evaluation metric is **Character Error Rate (CER)**:
 
 \[
-\text{CER} = \frac{\text{edit\_distance}(\text{prediction}, \text{reference})}{\text{len}(\text{reference})}
+\text{CER} = \frac{\text{edit_distance}(\text{prediction}, \text{reference})}{\text{len}(\text{reference})}
 \]
 
 The `CharacterErrorRates` module (`metrics.py`) also reports decomposed error types:
 
-| Metric | Meaning |
-|---|---|
+| Metric  | Meaning                      |
+| ------- | ---------------------------- |
 | **CER** | Overall character error rate |
-| **IER** | Insertion error rate |
-| **DER** | Deletion error rate |
-| **SER** | Substitution error rate |
+| **IER** | Insertion error rate         |
+| **DER** | Deletion error rate          |
+| **SER** | Substitution error rate      |
 
 These metrics satisfy:
 
 \[
-	\text{CER} = \text{IER} + \text{DER} + \text{SER}
+\text{CER} = \text{IER} + \text{DER} + \text{SER}
 \]
 
 when each term is normalized by the reference sequence length.
@@ -37,9 +37,9 @@ CER has improved.
 
 For the `cnn_bilstm_ctc` single-user run on user 89335547:
 
-| Split | CER (%) | DER (%) | IER (%) | SER (%) | Loss |
-|---|---|---|---|---|---|
-| Validation | 13.76 | 1.77 | 3.15 | 8.84 | 0.544 |
-| Test | 14.89 | 1.36 | 2.64 | 10.89 | 0.556 |
+| Split      | CER (%) | DER (%) | IER (%) | SER (%) | Loss  |
+| ---------- | ------- | ------- | ------- | ------- | ----- |
+| Validation | 13.76   | 1.77    | 3.15    | 8.84    | 0.544 |
+| Test       | 14.89   | 1.36    | 2.64    | 10.89   | 0.556 |
 
 The main remaining error source is substitution, not insertion or deletion.

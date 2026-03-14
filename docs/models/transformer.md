@@ -1,8 +1,7 @@
 # Transformer Encoder + CTC
 
 > **Status:** Whisper-based transfer model implemented. General Transformer architecture sweep ran on 8×H200 (Verda).
-> **Module:** `emg2qwerty.lightning.T5CTCModule`
-> **Config:** `config/model/t5_ctc.yaml`
+> **Module:** `emg2qwerty.lightning.T5CTCModule` > **Config:** `config/model/t5_ctc.yaml`
 
 ## Architecture
 
@@ -37,23 +36,23 @@ Linear → log_softmax → CTC Loss
 
 ### Key design choices
 
-| Choice | Detail |
-|--------|--------|
-| Pre-LayerNorm | `norm_first=True` for better gradient flow |
-| Activation | GELU (matches modern transformer practice) |
-| Positional encoding | Sinusoidal (no learned PE — avoids overfitting on small data) |
-| Temporal CNN | Optional 3-layer Conv1d block before transformer (kernel sizes 5, 5, 3) |
-| Anti-blank bias | Output layer initialized with `bias[blank] = -5.0` to discourage CTC blank collapse |
-| CTC variant | `zero_infinity=True` to handle edge cases |
-| Time format | Time-first `(T, N, D)` throughout, matching baseline convention |
+| Choice              | Detail                                                                              |
+| ------------------- | ----------------------------------------------------------------------------------- |
+| Pre-LayerNorm       | `norm_first=True` for better gradient flow                                          |
+| Activation          | GELU (matches modern transformer practice)                                          |
+| Positional encoding | Sinusoidal (no learned PE — avoids overfitting on small data)                       |
+| Temporal CNN        | Optional 3-layer Conv1d block before transformer (kernel sizes 5, 5, 3)             |
+| Anti-blank bias     | Output layer initialized with `bias[blank] = -5.0` to discourage CTC blank collapse |
+| CTC variant         | `zero_infinity=True` to handle edge cases                                           |
+| Time format         | Time-first `(T, N, D)` throughout, matching baseline convention                     |
 
 ### Available and planned models
 
-| Model | Key idea |
-|---|---|
+| Model                             | Key idea                                                                    |
+| --------------------------------- | --------------------------------------------------------------------------- |
 | Whisper-CTC (`model=whisper_ctc`) | Project EMG features into a pretrained Whisper encoder and train a CTC head |
-| Encoder-only Transformer | Self-attention over EMG spectrogram frames |
-| CNN + Transformer | TDS/Conv front-end → Transformer encoder |
+| Encoder-only Transformer          | Self-attention over EMG spectrogram frames                                  |
+| CNN + Transformer                 | TDS/Conv front-end → Transformer encoder                                    |
 
 ## Documented Whisper-CTC result
 
@@ -61,13 +60,13 @@ The current transformer-family result comes from the `whisper_ctc` experiment,
 which reuses the pretrained `openai/whisper-tiny` encoder with the top two
 encoder layers unfrozen.
 
-| Metric | Validation | Test |
-|---|---|---|
-| CER (%) | 17.72 | 99.91 |
-| DER (%) | 2.55 | 0.00 |
-| IER (%) | 4.10 | 99.91 |
-| SER (%) | 11.08 | 0.00 |
-| Loss | 0.615 | inf |
+| Metric  | Validation | Test  |
+| ------- | ---------- | ----- |
+| CER (%) | 17.72      | 99.91 |
+| DER (%) | 2.55       | 0.00  |
+| IER (%) | 4.10       | 99.91 |
+| SER (%) | 11.08      | 0.00  |
+| Loss    | 0.615      | inf   |
 
 The validation split looked promising, but the test split collapsed due to
 massive insertion errors. Right now that makes the Whisper transfer approach a
@@ -81,22 +80,22 @@ All controllable via Hydra overrides:
 
 ```yaml
 module:
-  d_model: 128        # hidden dimension
-  num_layers: 4        # transformer layers
-  num_heads: 4         # attention heads
-  d_ff: 512            # feedforward dimension
-  use_cnn: true        # toggle temporal CNN featurizer
-  blank_penalty_epochs: 40   # epochs of anti-blank penalty (0 = disable)
-  blank_alpha_max: 50.0      # peak penalty weight
+  d_model: 128 # hidden dimension
+  num_layers: 4 # transformer layers
+  num_heads: 4 # attention heads
+  d_ff: 512 # feedforward dimension
+  use_cnn: true # toggle temporal CNN featurizer
+  blank_penalty_epochs: 40 # epochs of anti-blank penalty (0 = disable)
+  blank_alpha_max: 50.0 # peak penalty weight
 ```
 
 ### Model size variants
 
 | Variant | d_model | Layers | Heads | d_ff | ~Params |
-|---------|---------|--------|-------|------|---------|
-| Tiny | 64 | 2 | 2 | 256 | ~300K |
-| Small | 128 | 4 | 4 | 512 | ~1.3M |
-| Large | 256 | 6 | 8 | 1024 | ~5M |
+| ------- | ------- | ------ | ----- | ---- | ------- |
+| Tiny    | 64      | 2      | 2     | 256  | ~300K   |
+| Small   | 128     | 4      | 4     | 512  | ~1.3M   |
+| Large   | 256     | 6      | 8     | 1024 | ~5M     |
 
 ## Architecture Sweep Results (March 2026)
 
@@ -110,16 +109,16 @@ module:
 
 ### CER Leaderboard (our experiments)
 
-| GPU | Architecture | Params | Val CER | Test CER | Epoch |
-|-----|-------------|--------|---------|----------|-------|
-| 0 | **TDS-ConvNet (baseline)** | 5.3M | 19.45% | **22.48%** | 124/150 ✅ |
-| 5 | **Large Transformer + CNN** (d=256, 6L, 8H) | ~5M | **16.79%** | 78.52% | 76/80 ✅ |
-| 2 | Transformer + CNN (Small, d=128, 4L) | ~1.3M | 28.71% | 67.54% | 77/80 ✅ |
-| 7 | Transformer + CNN, LR=5e-4 | ~1.3M | 39.52% | 58.81% | 78/80 ✅ |
-| 4 | Transformer + CNN + blank penalty | ~1.3M | 47.76% | 64.82% | 78/80 ✅ |
-| 1 | Pure Transformer (no CNN) | ~1.3M | 48.76% | 84.78% | 79/80 ✅ |
-| 3 | Transformer + blank penalty (no CNN) | ~1.3M | 94.84% | 98.92% | 74/80 ✅ |
-| 6 | Tiny Transformer (d=64, 2L) | ~300K | 96.37% | 100.0% | 1/80 ❌ |
+| GPU | Architecture                                | Params | Val CER    | Test CER   | Epoch      |
+| --- | ------------------------------------------- | ------ | ---------- | ---------- | ---------- |
+| 0   | **TDS-ConvNet (baseline)**                  | 5.3M   | 19.45%     | **22.48%** | 124/150 ✅ |
+| 5   | **Large Transformer + CNN** (d=256, 6L, 8H) | ~5M    | **16.79%** | 78.52%     | 76/80 ✅   |
+| 2   | Transformer + CNN (Small, d=128, 4L)        | ~1.3M  | 28.71%     | 67.54%     | 77/80 ✅   |
+| 7   | Transformer + CNN, LR=5e-4                  | ~1.3M  | 39.52%     | 58.81%     | 78/80 ✅   |
+| 4   | Transformer + CNN + blank penalty           | ~1.3M  | 47.76%     | 64.82%     | 78/80 ✅   |
+| 1   | Pure Transformer (no CNN)                   | ~1.3M  | 48.76%     | 84.78%     | 79/80 ✅   |
+| 3   | Transformer + blank penalty (no CNN)        | ~1.3M  | 94.84%     | 98.92%     | 74/80 ✅   |
+| 6   | Tiny Transformer (d=64, 2L)                 | ~300K  | 96.37%     | 100.0%     | 1/80 ❌    |
 
 > ⚠️ **Critical caveat:** Test CER is much higher than Val CER for all transformers
 > because test feeds the entire session (~140K timesteps) without windowing, while
@@ -174,6 +173,7 @@ Epoch 53: val/CER = 99.15   (barely moved after 53 epochs)
 ```
 
 This pattern repeated across **every architecture** we tried:
+
 - HuggingFace T5EncoderModel + CTC
 - Standard nn.TransformerEncoder + CTC
 - nn.TransformerEncoder + CNN + CTC
@@ -199,46 +199,46 @@ gradient accumulation rather than DDP, unless the per-GPU step count is high eno
 
 #### Things we tried that did NOT fix the DDP collapse
 
-| Attempt | Result |
-|---------|--------|
-| Anti-blank bias initialization (bias[blank] = -5.0) | ❌ Still collapsed |
-| Blank penalty loss (alpha * mean_blank_prob) | ❌ Made it worse |
-| Reduce num_layers from 6 → 1 | ❌ Still collapsed |
-| Add dropout 0.1 everywhere | ❌ Still collapsed |
-| Lower LR (3e-4 instead of 1e-3) | ❌ Still collapsed |
-| Gradient clipping (1.0) | ❌ Still collapsed |
-| Reduce warmup_epochs to 1 | ❌ Still collapsed |
-| Replace T5 with nn.TransformerEncoder | ❌ Still collapsed |
-| Add CNN featurizer | ❌ Still collapsed (with DDP) |
-| Mixed precision (fp16) | ❌ Still collapsed |
+| Attempt                                             | Result                        |
+| --------------------------------------------------- | ----------------------------- |
+| Anti-blank bias initialization (bias[blank] = -5.0) | ❌ Still collapsed            |
+| Blank penalty loss (alpha \* mean_blank_prob)       | ❌ Made it worse              |
+| Reduce num_layers from 6 → 1                        | ❌ Still collapsed            |
+| Add dropout 0.1 everywhere                          | ❌ Still collapsed            |
+| Lower LR (3e-4 instead of 1e-3)                     | ❌ Still collapsed            |
+| Gradient clipping (1.0)                             | ❌ Still collapsed            |
+| Reduce warmup_epochs to 1                           | ❌ Still collapsed            |
+| Replace T5 with nn.TransformerEncoder               | ❌ Still collapsed            |
+| Add CNN featurizer                                  | ❌ Still collapsed (with DDP) |
+| Mixed precision (fp16)                              | ❌ Still collapsed            |
 
 **The only thing that worked was switching to single GPU.**
 
 ### Other issues encountered
 
-| Issue | Fix |
-|-------|-----|
-| `pkill -f 'emg2qwerty'` kills the SSH session | The grep pattern matches the SSH command itself; use PID-based kill instead |
-| `uv: command not found` on remote | Add `export PATH=$HOME/.local/bin:$PATH` in every SSH block |
-| `Python.h: No such file` building kenlm | Install `python3-dev build-essential cmake zlib1g-dev libbz2-dev liblzma-dev` |
-| `pl_bolts` broken with PyTorch Lightning 2.x | Patch `__init__.py` with sed to bypass eager imports |
-| Hydra `+` prefix needed for new keys | Use `+optimizer.weight_decay=0.01` not `optimizer.weight_decay=0.01` |
-| Zombie DDP processes after crashes | `killall -9 python3` before relaunching |
-| Stale `__pycache__` bytecode | Always `find . -name __pycache__ -exec rm -rf {} +` after rsync |
+| Issue                                         | Fix                                                                           |
+| --------------------------------------------- | ----------------------------------------------------------------------------- |
+| `pkill -f 'emg2qwerty'` kills the SSH session | The grep pattern matches the SSH command itself; use PID-based kill instead   |
+| `uv: command not found` on remote             | Add `export PATH=$HOME/.local/bin:$PATH` in every SSH block                   |
+| `Python.h: No such file` building kenlm       | Install `python3-dev build-essential cmake zlib1g-dev libbz2-dev liblzma-dev` |
+| `pl_bolts` broken with PyTorch Lightning 2.x  | Patch `__init__.py` with sed to bypass eager imports                          |
+| Hydra `+` prefix needed for new keys          | Use `+optimizer.weight_decay=0.01` not `optimizer.weight_decay=0.01`          |
+| Zombie DDP processes after crashes            | `killall -9 python3` before relaunching                                       |
+| Stale `__pycache__` bytecode                  | Always `find . -name __pycache__ -exec rm -rf {} +` after rsync               |
 
 ## Verda 8×H200 Training Setup
 
 ### Instance specs
 
-| Spec | Value |
-|------|-------|
-| GPUs | 8× NVIDIA H200 |
+| Spec     | Value                       |
+| -------- | --------------------------- |
+| GPUs     | 8× NVIDIA H200              |
 | GPU VRAM | 1128 GB total (141 GB each) |
-| CPU | 176 vCPU |
-| RAM | 1450 GB |
-| OS | Ubuntu 24.04, CUDA 12.8 |
-| Location | FIN-03 |
-| Price | $11.42/hr |
+| CPU      | 176 vCPU                    |
+| RAM      | 1450 GB                     |
+| OS       | Ubuntu 24.04, CUDA 12.8     |
+| Location | FIN-03                      |
+| Price    | $11.42/hr                   |
 
 ### Deployment workflow
 
@@ -278,7 +278,7 @@ lr: 1e-3 (Adam)
 lr_schedule: LinearWarmupCosineAnnealing
 warmup_epochs: 10
 warmup_start_lr: 1e-8
-window_length: 8000  # 4 seconds at 2kHz
+window_length: 8000 # 4 seconds at 2kHz
 padding: [1800, 200] # 900ms past, 100ms future
 ```
 
@@ -286,15 +286,15 @@ padding: [1800, 200] # 900ms past, 100ms future
 
 Our results align with the findings from recent emg2qwerty papers:
 
-| Paper | Architecture | Zero-shot CER | Personalized CER |
-|-------|-------------|---------------|-----------------|
-| emg2qwerty Baseline (NeurIPS 2024) | TDS-ConvNet + CTC | 51.8% | 6.95% (+LM) |
-| **Ours (baseline repro)** | **TDS-ConvNet + CTC** | 19.45% val / **22.48% test*** | — |
-| SplashNet (NeurIPS 2025) | Split-Share TDS | 35.7% | 5.5% (+LM) |
-| FairEMG (TMLR 2025) | CNN + Transformer | ~30-40% | — |
-| **Ours (Large Transformer)** | **CNN + Transformer + CTC** | **16.79% val** / 78.52% test* | — |
-| Typing Reinvented (2025) | Transformer/Conformer | 20.34%** | 10.10%** |
-| MyoText (2026) | CNN-BiLSTM + T5 | — | 5.4% |
+| Paper                              | Architecture                | Zero-shot CER                  | Personalized CER |
+| ---------------------------------- | --------------------------- | ------------------------------ | ---------------- |
+| emg2qwerty Baseline (NeurIPS 2024) | TDS-ConvNet + CTC           | 51.8%                          | 6.95% (+LM)      |
+| **Ours (baseline repro)**          | **TDS-ConvNet + CTC**       | 19.45% val / **22.48% test\*** | —                |
+| SplashNet (NeurIPS 2025)           | Split-Share TDS             | 35.7%                          | 5.5% (+LM)       |
+| FairEMG (TMLR 2025)                | CNN + Transformer           | ~30-40%                        | —                |
+| **Ours (Large Transformer)**       | **CNN + Transformer + CTC** | **16.79% val** / 78.52% test\* | —                |
+| Typing Reinvented (2025)           | Transformer/Conformer       | 20.34%\*\*                     | 10.10%\*\*       |
+| MyoText (2026)                     | CNN-BiLSTM + T5             | —                              | 5.4%             |
 
 \* Single user (89335547), no LM. Not zero-shot — trained on that user's data.
 \*\* Causal/online setting — not directly comparable.
@@ -312,6 +312,7 @@ struggled to escape blank collapse during warmup.
 Based on the sweep results and literature analysis, prioritized by impact:
 
 1. **🔴 Fix sequence-length generalization** — This is the #1 blocker. Options:
+
    - **Sliding-window inference**: chunk the test session into overlapping 4-sec windows,
      run inference on each, merge predictions. Simple and effective.
    - **ALiBi / RoPE** positional encodings: these extrapolate to unseen lengths much

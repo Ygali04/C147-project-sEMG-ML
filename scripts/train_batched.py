@@ -136,9 +136,6 @@ def main(
     """Train models across user profiles stored in Backblaze B2."""
     load_dotenv()
 
-    # Keep backward compatibility with the common misspelling.
-    normalized_model = "whisper_ctc" if model == "whipser_ctc" else model
-
     if local_files:
         if mode != DownloadMode.BASELINE.value:
             click.echo(
@@ -162,7 +159,7 @@ def main(
             "-m",
             "emg2qwerty.train",
             "user=single_user",
-            f"model={normalized_model}",
+            f"model={model}",
         ]
         if checkpoint:
             cmd.append(f"checkpoint={checkpoint}")

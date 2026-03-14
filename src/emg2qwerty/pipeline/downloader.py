@@ -337,7 +337,7 @@ class EMGDownloader:
                 reservoir: list[tuple[float, str]] = []
 
                 log.info(
-                    "TEST mode (no metadata.csv yet) — reservoir-sampling %d users from the stream (seed=%d)",
+                    "TEST mode (no metadata.csv yet) — reservoir-sampling %d users " "from the stream (seed=%d)",
                     n_users,
                     self.config.seed,
                 )

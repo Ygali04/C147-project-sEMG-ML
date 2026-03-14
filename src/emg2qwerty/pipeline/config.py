@@ -186,5 +186,5 @@ class TrainBatchConfig(BaseModel):
     )
     model: str = Field(
         default="tds_conv_ctc",
-        description="Hydra model config name (e.g. tds_conv_ctc, t5_ctc).",
+        description="Hydra model config name (e.g. tds_conv_ctc, tds_conv_ctc, bilstm_ctc, t5_ctc).",
     )

@@ -19,6 +19,13 @@ from omegaconf import DictConfig, ListConfig, OmegaConf
 
 from emg2qwerty import transforms, utils
 from emg2qwerty.transforms import Transform
+import torch
+import omegaconf.listconfig
+import omegaconf.dictconfig
+torch.serialization.add_safe_globals([
+    omegaconf.listconfig.ListConfig,
+    omegaconf.dictconfig.DictConfig,
+])
 
 # PyTorch ≥2.6 defaults torch.load to weights_only=True, which breaks
 # Lightning checkpoint loading (checkpoints contain OmegaConf objects).
@@ -32,6 +39,7 @@ def _patched_torch_load(*args, **kwargs):
 
 
 torch.load = _patched_torch_load
+
 
 
 log = logging.getLogger(__name__)

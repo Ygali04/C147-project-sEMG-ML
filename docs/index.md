@@ -33,41 +33,41 @@ HDF5 session files (308 GB tar.gz from Meta S3)
 
 ## Loss & Metric
 
-| | |
-|---|---|
-| **Loss** | CTC (Connectionist Temporal Classification) — handles alignment without frame-level labels |
-| **Selection metric** | CER (Character Error Rate) = edit distance / reference length |
-| **Diagnostic metrics** | DER, IER, SER to separate deletion, insertion, and substitution errors |
+|                        |                                                                                            |
+| ---------------------- | ------------------------------------------------------------------------------------------ |
+| **Loss**               | CTC (Connectionist Temporal Classification) — handles alignment without frame-level labels |
+| **Selection metric**   | CER (Character Error Rate) = edit distance / reference length                              |
+| **Diagnostic metrics** | DER, IER, SER to separate deletion, insertion, and substitution errors                     |
 
 ## Architectures
 
-| Architecture | Status | Description |
-|---|---|---|
-| **TDS-CNN** | ✅ Baseline | Time-Depth Separable CNN (Meta baseline) |
-| **BiLSTM / CNN+BiLSTM** | ✅ Implemented | Recurrent CTC encoders with bidirectional context |
-| **Whisper-CTC** | ✅ Implemented | Transfer-learning variant using a pretrained Whisper encoder with a CTC head |
-| **Transformer** | 🔬 In progress | Generic self-attention encoder over EMG frames |
-| **Hybrid** | 🔬 Planned | CNN front-end + Transformer/RNN encoder |
+| Architecture            | Status         | Description                                                                  |
+| ----------------------- | -------------- | ---------------------------------------------------------------------------- |
+| **TDS-CNN**             | ✅ Baseline    | Time-Depth Separable CNN (Meta baseline)                                     |
+| **BiLSTM / CNN+BiLSTM** | ✅ Implemented | Recurrent CTC encoders with bidirectional context                            |
+| **Whisper-CTC**         | ✅ Implemented | Transfer-learning variant using a pretrained Whisper encoder with a CTC head |
+| **Transformer**         | 🔬 In progress | Generic self-attention encoder over EMG frames                               |
+| **Hybrid**              | 🔬 Planned     | CNN front-end + Transformer/RNN encoder                                      |
 
 ## Current Best Documented Result
 
 The strongest documented run so far is the CNN + BiLSTM model on the
 single-user split for user 89335547 with greedy decoding.
 
-| Split | CER (%) | DER (%) | IER (%) | SER (%) | Loss |
-|---|---|---|---|---|---|
-| Validation | 13.76 | 1.77 | 3.15 | 8.84 | 0.544 |
-| Test | 14.89 | 1.36 | 2.64 | 10.89 | 0.556 |
+| Split      | CER (%) | DER (%) | IER (%) | SER (%) | Loss  |
+| ---------- | ------- | ------- | ------- | ------- | ----- |
+| Validation | 13.76   | 1.77    | 3.15    | 8.84    | 0.544 |
+| Test       | 14.89   | 1.36    | 2.64    | 10.89   | 0.556 |
 
 Compared with the documented TDS-CNN baseline, this reduces CER on both
 validation and test for the same baseline user split.
 
 ## Additional Evaluated Runs
 
-| Model | Val CER (%) | Test CER (%) | Takeaway |
-|---|---|---|---|
-| BiLSTM | 15.37 | 22.07 | Better than the TDS-CNN baseline on validation, but behind CNN + BiLSTM on both splits |
-| Whisper-CTC | 17.72 | 99.91 | Validation looked reasonable, but test performance collapsed due to insertion-heavy decoding |
+| Model       | Val CER (%) | Test CER (%) | Takeaway                                                                                     |
+| ----------- | ----------- | ------------ | -------------------------------------------------------------------------------------------- |
+| BiLSTM      | 15.37       | 22.07        | Better than the TDS-CNN baseline on validation, but behind CNN + BiLSTM on both splits       |
+| Whisper-CTC | 17.72       | 99.91        | Validation looked reasonable, but test performance collapsed due to insertion-heavy decoding |
 
 ## Quick Start
 

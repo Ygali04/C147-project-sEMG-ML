@@ -14,6 +14,7 @@ from Meta, extending it with new model architectures, training configurations, a
 systematic experiments.
 
 Each session is an HDF5 file containing:
+
 - **Left + right wrist EMG** — 16 electrode channels per wrist, sampled at 2 kHz
 - **Keystroke ground-truth** — key-press timestamps recorded by a keylogger
 
@@ -36,13 +37,13 @@ HDF5 session files (308 GB tar.gz from Meta S3)
 
 ## Architectures
 
-| Architecture | Status | Description |
-|---|---|---|
-| **TDS-CNN** | ✅ Baseline | Time-Depth Separable CNN (Meta baseline) |
-| **RNN / LSTM / GRU** | 🔬 In progress | Recurrent sequential encoder |
-| **BiLSTM / CNN+BiLSTM** | ✅ Implemented | Bidirectional recurrent CTC encoders |
-| **Transformer** | 🔬 In progress | Self-attention over EMG frames |
-| **Hybrid** | 🔬 Planned | CNN front-end + Transformer/RNN encoder |
+| Architecture            | Status         | Description                              |
+| ----------------------- | -------------- | ---------------------------------------- |
+| **TDS-CNN**             | ✅ Baseline    | Time-Depth Separable CNN (Meta baseline) |
+| **BiLSTM / CNN+BiLSTM** | ✅ Implemented | Bidirectional recurrent CTC encoders     |
+| **BiGRU / CNN+BiGRU**   | ✅ Implemented | Recurrent sequential encoder             |
+| **Transformer**         | 🔬 In progress | Self-attention over EMG frames           |
+| **Hybrid**              | 🔬 Planned     | CNN front-end + Transformer/RNN encoder  |
 
 ---
 

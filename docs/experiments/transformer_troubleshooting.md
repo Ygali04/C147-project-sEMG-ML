@@ -65,6 +65,7 @@ in the result columns when runs complete.
 ```bash
 uv run python scripts/sync_baseline_from_b2.py
 bash scripts/wave0_control_training.sh
+bash scripts/link_wave0_checkpoints.sh
 
 export TDS_CKPT=/root/checkpoints/tds_best.ckpt
 export LARGE_TRANSFORMER_CKPT=/root/checkpoints/transformer_large_best.ckpt

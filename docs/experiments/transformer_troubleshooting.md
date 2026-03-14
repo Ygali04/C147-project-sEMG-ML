@@ -101,6 +101,12 @@ bash scripts/wave2_logit_merge_grid.sh
 bash scripts/wave3_variable_window_sweep.sh
 ```
 
+## Wave 4 Launch Template
+
+```bash
+bash scripts/wave4_curriculum_sweep.sh
+```
+
 ## Architecture Comparison Template
 
 | Family | Frontend | Encoder | Downsample | Positional encoding | Decoder | Val CER | Test CER | Params | Status | Notes |

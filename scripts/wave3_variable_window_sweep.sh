@@ -21,6 +21,7 @@ run_train() {
     echo "[GPU ${gpu}] ${name}"
     CUDA_VISIBLE_DEVICES="${gpu}" nohup uv run python -m emg2qwerty.train \
         ${COMMON} \
+        "hydra.run.dir=logs/${name}" \
         "${extra[@]}" \
         > "/root/${name}.log" 2>&1 &
     echo "  PID=$!"

@@ -41,13 +41,14 @@ run_phase() {
     echo "--- ${RUN_NAME} / ${phase_name} ---"
     uv run python -m emg2qwerty.train \
         "${COMMON[@]}" \
+        "hydra.run.dir=logs/${RUN_NAME}/${phase_name}" \
         "trainer.max_epochs=${max_epochs}" \
         "datamodule.train_window_lengths=${lengths}" \
         "datamodule.train_window_weights=${weights}" \
         "${checkpoint_arg[@]}" \
         > "${PHASE_DIR}/${phase_name}.log" 2>&1
 
-    latest_ckpt="$(find "${ROOT_DIR}/logs" -path '*/checkpoints/last*.ckpt' -type f | sort | tail -1)"
+    latest_ckpt="$(find "${ROOT_DIR}/logs/${RUN_NAME}/${phase_name}" -path '*/checkpoints/last*.ckpt' -type f | sort | tail -1)"
     if [[ -z "${latest_ckpt}" ]]; then
         echo "No checkpoint produced for ${phase_name}"
         exit 1

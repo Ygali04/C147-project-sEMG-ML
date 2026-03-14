@@ -39,6 +39,7 @@ run_eval() {
         ${COMMON} \
         model="${model}" \
         inference="${inference_cfg}" \
+        "hydra.run.dir=logs/${name}" \
         "checkpoint=${checkpoint_link}" \
         "${extra[@]}" \
         > "/root/${name}.log" 2>&1 &

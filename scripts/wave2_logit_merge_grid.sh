@@ -28,6 +28,7 @@ run_eval() {
     echo "[GPU ${gpu}] ${name}"
     CUDA_VISIBLE_DEVICES="${gpu}" nohup uv run python -m emg2qwerty.train \
         ${COMMON} \
+        "hydra.run.dir=logs/${name}" \
         "checkpoint=${checkpoint_link}" \
         "${extra[@]}" \
         > "/root/${name}.log" 2>&1 &

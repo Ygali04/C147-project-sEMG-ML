@@ -734,6 +734,24 @@
         
       
       
+        <label class="md-nav__link md-nav__link--active" for="__toc">
+          
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Metrics
+  
+
+    
+  </span>
+  
+  
+
+          <span class="md-nav__icon md-icon"></span>
+        </label>
+      
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
@@ -750,6 +768,47 @@
   
 
       </a>
+      
+        
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+    
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-interpret-them" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to interpret them
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-current-best-documented-recurrent-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: current best documented recurrent run
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
       
     </li>
   
@@ -1108,7 +1167,7 @@
   <span class="md-ellipsis">
     
   
-    RNN / LSTM / GRU
+    RNN / LSTM
   
 
     
@@ -1235,6 +1294,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experiments/transformer_troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1261,6 +1348,36 @@
   
     
   
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#how-to-interpret-them" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        How to interpret them
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#example-current-best-documented-recurrent-run" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Example: current best documented recurrent run
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
   
 </nav>
                   </div>
@@ -1312,6 +1429,53 @@
 </tr>
 </tbody>
 </table>
+<p>These metrics satisfy:</p>
+<div class="arithmatex">\[
+    \text{CER} = \text{IER} + \text{DER} + \text{SER}
+\]</div>
+<p>when each term is normalized by the reference sequence length.</p>
+<h2 id="how-to-interpret-them">How to interpret them<a class="headerlink" href="#how-to-interpret-them" title="Permanent link">&para;</a></h2>
+<ul>
+<li>High <strong>IER</strong> means the decoder is emitting extra characters.</li>
+<li>High <strong>DER</strong> means the model is missing characters that should be present.</li>
+<li>High <strong>SER</strong> means alignments are mostly correct, but the predicted character is often wrong.</li>
+</ul>
+<p>In this project, checkpoints are selected with <code>val/CER</code>, while DER, IER, and
+SER are most useful for diagnosing what kind of mistakes remain after overall
+CER has improved.</p>
+<h2 id="example-current-best-documented-recurrent-run">Example: current best documented recurrent run<a class="headerlink" href="#example-current-best-documented-recurrent-run" title="Permanent link">&para;</a></h2>
+<p>For the <code>cnn_bilstm_ctc</code> single-user run on user 89335547:</p>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>CER (%)</th>
+<th>DER (%)</th>
+<th>IER (%)</th>
+<th>SER (%)</th>
+<th>Loss</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Validation</td>
+<td>13.76</td>
+<td>1.77</td>
+<td>3.15</td>
+<td>8.84</td>
+<td>0.544</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>14.89</td>
+<td>1.36</td>
+<td>2.64</td>
+<td>10.89</td>
+<td>0.556</td>
+</tr>
+</tbody>
+</table>
+<p>The main remaining error source is substitution, not insertion or deletion.</p>
 
 
 

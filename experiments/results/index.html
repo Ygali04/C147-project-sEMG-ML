@@ -14,6 +14,8 @@
         <link rel="prev" href="../../models/transformer/">
       
       
+        <link rel="next" href="../transformer_troubleshooting/">
+      
       
         
       
@@ -1091,7 +1093,7 @@
   <span class="md-ellipsis">
     
   
-    RNN / LSTM / GRU
+    RNN / LSTM
   
 
     
@@ -1284,11 +1286,116 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#detailed-metrics-val-test" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rtx-pro-6000-campaign" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Detailed Metrics (Val / Test)
+        RTX PRO 6000 Campaign
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RTX PRO 6000 Campaign">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#active-wave-ledger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Active Wave Ledger
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#final-leaderboard-all-waves-best-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Final Leaderboard (All Waves — Best Results)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wave-11-cer-push-training-results-greedy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 11: CER Push Training Results (Greedy)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wave-11-beam-search-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 11: Beam Search Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Findings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inference-policy-comparison-wave-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference Policy Comparison (Wave 10)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#position-encoding-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Position Encoding Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-length-window-sweep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable-Length Window Sweep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-sweep-wave-9-150-epochs-single-gpu-no-ddp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Sweep (Wave 9 — 150 epochs, single GPU, no DDP)
       
     </span>
   </a>
@@ -1297,6 +1404,306 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-curves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training Curves
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Curves">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#top-performers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top Performers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Top Performers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-150-epochs-wave-9-best-test-cer-795-beam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM — 150 epochs (Wave 9) — Best Test CER: 7.95% (beam)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-300-epochs-wave-11-best-test-cer-847-beam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM — 300 epochs (Wave 11) — Best Test CER: 8.47% (beam)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alibi-transformer-150-epochs-wave-10-best-test-cer-884-beam-windowed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ALiBi Transformer — 150 epochs (Wave 10) — Best Test CER: 8.84% (beam + windowed)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#baseline-controls-wave-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline Controls (Wave 0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Baseline Controls (Wave 0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tds-convnet-150-epochs-val-1945-test-2248" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TDS-ConvNet — 150 epochs — Val: 19.45% / Test: 22.48%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#large-transformer-cnn-80-epochs-val-5795-test-6806" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Transformer + CNN — 80 epochs — Val: 57.95% / Test: 68.06%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#small-transformer-cnn-80-epochs-val-2847" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Small Transformer + CNN — 80 epochs — Val: 28.47%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whisper-ctc-150-epochs-val-1930-test-100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Whisper-CTC — 150 epochs — Val: 19.30% / Test: 100%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-sweep-wave-9-150-epochs-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Sweep (Wave 9 — 150 epochs each)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Sweep (Wave 9 — 150 epochs each)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-transformer-hybrid-val-1349-test-3834" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM-Transformer Hybrid — Val: 13.49% / Test: 38.34%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#small-transformer-sinusoidal-pe-val-1515-test-8721" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Small Transformer (sinusoidal PE) — Val: 15.15% / Test: 87.21%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conformer-small-d128-4l-val-4599-test-6382" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conformer-small (d=128, 4L) — Val: 45.99% / Test: 63.82%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conformer-large-d256-6l-val-9160-test-9598" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conformer-large (d=256, 6L) — Val: 91.60% / Test: 95.98%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformer-fixes-wave-10-150-epochs-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformer Fixes (Wave 10 — 150 epochs each)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transformer Fixes (Wave 10 — 150 epochs each)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#large-transformer-sinusoidal-pe-retrained-val-1451-test-8202" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Transformer (sinusoidal PE, retrained) — Val: 14.51% / Test: 82.02%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cer-push-wave-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CER Push (Wave 11)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CER Push (Wave 11)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-wide-h512-200-epochs-val-1462-test-1608" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM Wide (h=512) — 200 epochs — Val: 14.62% / Test: 16.08%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-deep-cnn-3-layers-200-epochs-val-1458-test-1480" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM Deep-CNN (3 layers) — 200 epochs — Val: 14.58% / Test: 14.80%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bilstm-only-200-epochs-val-1511-test-1831" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BiLSTM-only — 200 epochs — Val: 15.11% / Test: 18.31%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hybrid-300-epochs-val-1303-test-4949" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid 300 epochs — Val: 13.03% / Test: 49.49%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hybrid-large-lstm-h384-3l-lstm-small-trans-200-epochs-val-1896" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid Large-LSTM (h=384, 3L LSTM + small Trans) — 200 epochs — Val: 18.96%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline Results
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1383,10 +1790,60 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#cnn-bilstm-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN + BiLSTM Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whisper-ctc-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Whisper-CTC Results
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
       
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../transformer_troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
     </li>
   
 
@@ -1448,11 +1905,116 @@
   
 </li>
         
-          <li class="md-nav__item">
-  <a href="#detailed-metrics-val-test" class="md-nav__link">
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rtx-pro-6000-campaign" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Detailed Metrics (Val / Test)
+        RTX PRO 6000 Campaign
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RTX PRO 6000 Campaign">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#active-wave-ledger" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Active Wave Ledger
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#final-leaderboard-all-waves-best-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Final Leaderboard (All Waves — Best Results)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wave-11-cer-push-training-results-greedy" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 11: CER Push Training Results (Greedy)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#wave-11-beam-search-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 11: Beam Search Results
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#key-findings" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Key Findings
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#inference-policy-comparison-wave-10" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Inference Policy Comparison (Wave 10)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#position-encoding-comparison" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Position Encoding Comparison
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#variable-length-window-sweep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Variable-Length Window Sweep
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-sweep-wave-9-150-epochs-single-gpu-no-ddp" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Sweep (Wave 9 — 150 epochs, single GPU, no DDP)
       
     </span>
   </a>
@@ -1461,6 +2023,306 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#training-curves" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Training Curves
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Training Curves">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#top-performers" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Top Performers
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Top Performers">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-150-epochs-wave-9-best-test-cer-795-beam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM — 150 epochs (Wave 9) — Best Test CER: 7.95% (beam)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-300-epochs-wave-11-best-test-cer-847-beam" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM — 300 epochs (Wave 11) — Best Test CER: 8.47% (beam)
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#alibi-transformer-150-epochs-wave-10-best-test-cer-884-beam-windowed" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        ALiBi Transformer — 150 epochs (Wave 10) — Best Test CER: 8.84% (beam + windowed)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#baseline-controls-wave-0" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline Controls (Wave 0)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Baseline Controls (Wave 0)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#tds-convnet-150-epochs-val-1945-test-2248" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        TDS-ConvNet — 150 epochs — Val: 19.45% / Test: 22.48%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#large-transformer-cnn-80-epochs-val-5795-test-6806" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Transformer + CNN — 80 epochs — Val: 57.95% / Test: 68.06%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#small-transformer-cnn-80-epochs-val-2847" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Small Transformer + CNN — 80 epochs — Val: 28.47%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#whisper-ctc-150-epochs-val-1930-test-100" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Whisper-CTC — 150 epochs — Val: 19.30% / Test: 100%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#architecture-sweep-wave-9-150-epochs-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Architecture Sweep (Wave 9 — 150 epochs each)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Architecture Sweep (Wave 9 — 150 epochs each)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-transformer-hybrid-val-1349-test-3834" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM-Transformer Hybrid — Val: 13.49% / Test: 38.34%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#small-transformer-sinusoidal-pe-val-1515-test-8721" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Small Transformer (sinusoidal PE) — Val: 15.15% / Test: 87.21%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conformer-small-d128-4l-val-4599-test-6382" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conformer-small (d=128, 4L) — Val: 45.99% / Test: 63.82%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#conformer-large-d256-6l-val-9160-test-9598" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Conformer-large (d=256, 6L) — Val: 91.60% / Test: 95.98%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#transformer-fixes-wave-10-150-epochs-each" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Transformer Fixes (Wave 10 — 150 epochs each)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Transformer Fixes (Wave 10 — 150 epochs each)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#large-transformer-sinusoidal-pe-retrained-val-1451-test-8202" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Large Transformer (sinusoidal PE, retrained) — Val: 14.51% / Test: 82.02%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cer-push-wave-11" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CER Push (Wave 11)
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="CER Push (Wave 11)">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-wide-h512-200-epochs-val-1462-test-1608" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM Wide (h=512) — 200 epochs — Val: 14.62% / Test: 16.08%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#cnn-bilstm-deep-cnn-3-layers-200-epochs-val-1458-test-1480" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN-BiLSTM Deep-CNN (3 layers) — 200 epochs — Val: 14.58% / Test: 14.80%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#bilstm-only-200-epochs-val-1511-test-1831" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        BiLSTM-only — 200 epochs — Val: 15.11% / Test: 18.31%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hybrid-300-epochs-val-1303-test-4949" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid 300 epochs — Val: 13.03% / Test: 49.49%
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#hybrid-large-lstm-h384-3l-lstm-small-trans-200-epochs-val-1896" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Hybrid Large-LSTM (h=384, 3L LSTM + small Trans) — 200 epochs — Val: 18.96%
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#baseline-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Baseline Results
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1547,6 +2409,28 @@
   
 </li>
       
+        <li class="md-nav__item">
+  <a href="#cnn-bilstm-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        CNN + BiLSTM Results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#whisper-ctc-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Whisper-CTC Results
+      
+    </span>
+  </a>
+  
+</li>
+      
     </ul>
   
 </nav>
@@ -1575,100 +2459,1123 @@ on an 8×H200 Verda instance with one experiment per GPU.</p>
 <table>
 <thead>
 <tr>
-<th>#</th>
 <th>Architecture</th>
 <th>Params</th>
-<th>Val CER</th>
-<th>Test CER</th>
+<th>Val CER (%)</th>
+<th>Test CER (%)</th>
 <th>Val Loss</th>
 <th>Test Loss</th>
 <th>Best Epoch</th>
+<th>Notes</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>0</td>
 <td><strong>TDS-ConvNet (baseline)</strong></td>
 <td>5.3M</td>
-<td><strong>19.45%</strong></td>
-<td><strong>22.48%</strong></td>
+<td><strong>19.45</strong></td>
+<td><strong>22.48</strong></td>
 <td>1.017</td>
 <td>1.184</td>
 <td>124/150</td>
+<td>Branch 2 results used (lower CER on both splits)</td>
 </tr>
 <tr>
-<td>5</td>
+<td><strong>CNN + BiLSTM</strong></td>
+<td>—</td>
+<td><strong>13.76</strong></td>
+<td><strong>14.89</strong></td>
+<td>—</td>
+<td>—</td>
+<td>132</td>
+<td>Best overall; greedy decoder</td>
+</tr>
+<tr>
+<td>BiLSTM (bidir)</td>
+<td>—</td>
+<td>15.37</td>
+<td>22.07</td>
+<td>—</td>
+<td>—</td>
+<td>132</td>
+<td>Plain recurrent encoder</td>
+</tr>
+<tr>
+<td>Whisper-CTC</td>
+<td>—</td>
+<td>17.72</td>
+<td>99.91</td>
+<td>—</td>
+<td>—</td>
+<td>—</td>
+<td>Whisper-tiny transfer; val improved, test generalization collapsed</td>
+</tr>
+<tr>
 <td><strong>Large Transformer + CNN</strong></td>
 <td>~5M</td>
-<td><strong>16.79%</strong></td>
-<td>78.52%</td>
+<td><strong>16.79</strong></td>
+<td>78.52</td>
 <td>0.532</td>
 <td>4.910</td>
 <td>76/80</td>
+<td>Strong val CER but significant train/test gap</td>
 </tr>
 <tr>
-<td>2</td>
 <td>Small Transformer + CNN</td>
 <td>~1.3M</td>
-<td>28.71%</td>
-<td>67.54%</td>
+<td>28.71</td>
+<td>67.54</td>
 <td>0.862</td>
 <td>3.030</td>
 <td>77/80</td>
+<td></td>
 </tr>
 <tr>
-<td>7</td>
 <td>Trans + CNN, LR=5e-4</td>
 <td>~1.3M</td>
-<td>39.52%</td>
-<td>58.81%</td>
+<td>39.52</td>
+<td>58.81</td>
 <td>1.219</td>
 <td>2.049</td>
 <td>78/80</td>
+<td>Higher LR hurts val</td>
 </tr>
 <tr>
-<td>4</td>
 <td>Trans + CNN + blank penalty</td>
 <td>~1.3M</td>
-<td>47.76%</td>
-<td>64.82%</td>
+<td>47.76</td>
+<td>64.82</td>
 <td>49.57</td>
 <td>50.89</td>
 <td>78/80</td>
+<td>Blank penalty destabilizes loss</td>
 </tr>
 <tr>
-<td>1</td>
 <td>Pure Transformer (no CNN)</td>
 <td>~1.3M</td>
-<td>48.76%</td>
-<td>84.78%</td>
+<td>48.76</td>
+<td>84.78</td>
 <td>1.265</td>
 <td>5.218</td>
 <td>79/80</td>
+<td></td>
 </tr>
 <tr>
-<td>3</td>
 <td>Trans + blank penalty (no CNN)</td>
 <td>~1.3M</td>
-<td>94.84%</td>
-<td>98.92%</td>
+<td>94.84</td>
+<td>98.92</td>
 <td>50.25</td>
 <td>52.87</td>
 <td>74/80</td>
+<td>Blank penalty + no CNN: collapsed</td>
 </tr>
 <tr>
-<td>6</td>
 <td>Tiny Transformer (d=64)</td>
 <td>~300K</td>
-<td>96.37%</td>
-<td>100.0%</td>
+<td>96.37</td>
+<td>100.0</td>
 <td>77.73</td>
 <td>66.26</td>
 <td>1/80</td>
+<td>Undertrained / too small</td>
 </tr>
 </tbody>
 </table>
-<h3 id="detailed-metrics-val-test">Detailed Metrics (Val / Test)<a class="headerlink" href="#detailed-metrics-val-test" title="Permanent link">&para;</a></h3>
+<h2 id="rtx-pro-6000-campaign">RTX PRO 6000 Campaign<a class="headerlink" href="#rtx-pro-6000-campaign" title="Permanent link">&para;</a></h2>
+<p>The active troubleshooting campaign runs on an on-demand Verda instance with
+<code>8x RTX PRO 6000</code> GPUs and treats the machine as an 8-lane experiment cluster.
+The governing rule is <code>1 GPU = 1 independent run</code>; the campaign does not use
+standard DDP for core CTC training because earlier 8-GPU DDP experiments caused
+blank-collapse by reducing each GPU to too few warmup steps.</p>
+<h3 id="active-wave-ledger">Active Wave Ledger<a class="headerlink" href="#active-wave-ledger" title="Permanent link">&para;</a></h3>
+<p>Use this table to track live and recently completed runs for the
+<code>yahvin/transformer-troubleshoot</code> branch.</p>
+<table>
+<thead>
+<tr>
+<th>Wave</th>
+<th style="text-align: right;">GPU slot</th>
+<th>Model</th>
+<th>Commit SHA</th>
+<th>Inference mode</th>
+<th>Train windows</th>
+<th>Positional encoding</th>
+<th>Frontend</th>
+<th>Decoder</th>
+<th>Status</th>
+<th>Checkpoint</th>
+<th style="text-align: right;">Train CER</th>
+<th style="text-align: right;">Val CER</th>
+<th style="text-align: right;">Test CER</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>wave-0-docs</td>
+<td style="text-align: right;">0</td>
+<td>docs foundation</td>
+<td>pending</td>
+<td>n/a</td>
+<td>n/a</td>
+<td>n/a</td>
+<td>n/a</td>
+<td>n/a</td>
+<td>completed</td>
+<td>—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>initial ledger scaffold</td>
+</tr>
+<tr>
+<td>wave-1-inference</td>
+<td style="text-align: right;">0</td>
+<td>Large CNN + Transformer</td>
+<td>pending</td>
+<td><code>full_session</code></td>
+<td><code>4s</code></td>
+<td>sinusoidal</td>
+<td>spectrogram</td>
+<td>greedy</td>
+<td>completed</td>
+<td><code>wave0_gpu1_transformer_large_control</code></td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">57.95</td>
+<td style="text-align: right;">68.06</td>
+<td>clean best checkpoint</td>
+</tr>
+<tr>
+<td>wave-1-inference</td>
+<td style="text-align: right;">1</td>
+<td>Large CNN + Transformer</td>
+<td>pending</td>
+<td><code>windowed_chunk_decode</code></td>
+<td><code>4s</code></td>
+<td>sinusoidal</td>
+<td>spectrogram</td>
+<td>greedy</td>
+<td>planned</td>
+<td>—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>chunk decode</td>
+</tr>
+<tr>
+<td>wave-1-inference</td>
+<td style="text-align: right;">2</td>
+<td>Large CNN + Transformer</td>
+<td>pending</td>
+<td><code>windowed_logits_merge</code></td>
+<td><code>4s</code></td>
+<td>sinusoidal</td>
+<td>spectrogram</td>
+<td>greedy</td>
+<td>completed</td>
+<td><code>wave0_gpu1_transformer_large_control</code></td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">57.95</td>
+<td style="text-align: right;">66.76</td>
+<td>improves test CER over full session</td>
+</tr>
+<tr>
+<td>wave-1-inference</td>
+<td style="text-align: right;">3</td>
+<td>Small CNN + Transformer</td>
+<td>pending</td>
+<td><code>windowed_logits_merge</code></td>
+<td><code>4s</code></td>
+<td>sinusoidal</td>
+<td>spectrogram</td>
+<td>greedy</td>
+<td>completed</td>
+<td><code>wave0_gpu2_transformer_small_control</code></td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">28.47</td>
+<td style="text-align: right;">59.84</td>
+<td>current best transformer</td>
+</tr>
+<tr>
+<td>wave-1-inference</td>
+<td style="text-align: right;">4</td>
+<td>Whisper-CTC</td>
+<td>pending</td>
+<td><code>windowed_logits_merge</code></td>
+<td><code>4s</code></td>
+<td>n/a</td>
+<td>spectrogram</td>
+<td>greedy</td>
+<td>planned</td>
+<td>—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>transfer control</td>
+</tr>
+<tr>
+<td>wave-1-inference</td>
+<td style="text-align: right;">5</td>
+<td>TDS-ConvNet</td>
+<td>pending</td>
+<td><code>windowed_logits_merge</code></td>
+<td><code>4s</code></td>
+<td>n/a</td>
+<td>spectrogram</td>
+<td>greedy</td>
+<td>planned</td>
+<td>—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>local control</td>
+</tr>
+<tr>
+<td>wave-1-inference</td>
+<td style="text-align: right;">6</td>
+<td>Large CNN + Transformer</td>
+<td>pending</td>
+<td><code>windowed_logits_merge</code></td>
+<td><code>4s</code></td>
+<td>sinusoidal</td>
+<td>spectrogram</td>
+<td>greedy</td>
+<td>planned</td>
+<td>—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>alt stride</td>
+</tr>
+<tr>
+<td>wave-1-inference</td>
+<td style="text-align: right;">7</td>
+<td>Large CNN + Transformer</td>
+<td>pending</td>
+<td><code>windowed_logits_merge</code></td>
+<td><code>4s</code></td>
+<td>sinusoidal</td>
+<td>spectrogram</td>
+<td>greedy</td>
+<td>planned</td>
+<td>—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>alt trim</td>
+</tr>
+</tbody>
+</table>
+<h3 id="final-leaderboard-all-waves-best-results">Final Leaderboard (All Waves — Best Results)<a class="headerlink" href="#final-leaderboard-all-waves-best-results" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">Rank</th>
+<th>Model</th>
+<th style="text-align: right;">Epochs</th>
+<th>Decoder</th>
+<th>Inference</th>
+<th style="text-align: right;">Val CER</th>
+<th style="text-align: right;">Test CER</th>
+<th style="text-align: right;">Gap</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;"><strong>1</strong></td>
+<td><strong>CNN-BiLSTM (150ep)</strong></td>
+<td style="text-align: right;">150</td>
+<td><strong>beam+LM</strong></td>
+<td>full_session</td>
+<td style="text-align: right;"><strong>9.39</strong></td>
+<td style="text-align: right;"><strong>7.95</strong></td>
+<td style="text-align: right;"><strong>−1.44</strong></td>
+<td><strong>🏆 Overall best</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>2</strong></td>
+<td><strong>CNN-BiLSTM (300ep)</strong></td>
+<td style="text-align: right;">300</td>
+<td><strong>beam+LM</strong></td>
+<td>full_session</td>
+<td style="text-align: right;"><strong>9.11</strong></td>
+<td style="text-align: right;"><strong>8.47</strong></td>
+<td style="text-align: right;"><strong>−0.64</strong></td>
+<td>Longer training, slightly worse test</td>
+</tr>
+<tr>
+<td style="text-align: right;"><strong>3</strong></td>
+<td><strong>ALiBi Transformer</strong></td>
+<td style="text-align: right;">150</td>
+<td><strong>beam+LM</strong></td>
+<td>windowed</td>
+<td style="text-align: right;"><strong>10.97</strong></td>
+<td style="text-align: right;"><strong>8.84</strong></td>
+<td style="text-align: right;"><strong>−2.13</strong></td>
+<td><strong>🏆 Best transformer</strong></td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>CNN-BiLSTM deep-CNN</td>
+<td style="text-align: right;">200</td>
+<td>beam+LM</td>
+<td>full_session</td>
+<td style="text-align: right;">11.72</td>
+<td style="text-align: right;">9.55</td>
+<td style="text-align: right;">−2.17</td>
+<td>3-layer CNN, tight gap</td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>ALiBi Transformer</td>
+<td style="text-align: right;">150</td>
+<td>beam+LM</td>
+<td>windowed</td>
+<td style="text-align: right;">10.97</td>
+<td style="text-align: right;">9.88</td>
+<td style="text-align: right;">−1.09</td>
+<td>replicated eval</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>BiLSTM-only</td>
+<td style="text-align: right;">200</td>
+<td>beam+LM</td>
+<td>full_session</td>
+<td style="text-align: right;">9.97</td>
+<td style="text-align: right;">10.72</td>
+<td style="text-align: right;">0.75</td>
+<td>no CNN, still competitive</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>CNN-BiLSTM (300ep)</td>
+<td style="text-align: right;">300</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">12.36</td>
+<td style="text-align: right;">13.81</td>
+<td style="text-align: right;">1.45</td>
+<td>best greedy</td>
+</tr>
+<tr>
+<td style="text-align: right;">8</td>
+<td>CNN-BiLSTM (150ep)</td>
+<td style="text-align: right;">150</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">13.00</td>
+<td style="text-align: right;">14.96</td>
+<td style="text-align: right;">1.96</td>
+<td>strong greedy baseline</td>
+</tr>
+<tr>
+<td style="text-align: right;">9</td>
+<td>CNN-BiLSTM-Transformer</td>
+<td style="text-align: right;">150</td>
+<td>beam+LM</td>
+<td>windowed</td>
+<td style="text-align: right;">9.64</td>
+<td style="text-align: right;">14.11</td>
+<td style="text-align: right;">4.47</td>
+<td>hybrid, beam helps</td>
+</tr>
+<tr>
+<td style="text-align: right;">10</td>
+<td>CNN-BiLSTM deep-CNN</td>
+<td style="text-align: right;">200</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">14.58</td>
+<td style="text-align: right;">14.80</td>
+<td style="text-align: right;">0.22</td>
+<td>tightest greedy gap</td>
+</tr>
+<tr>
+<td style="text-align: right;">11</td>
+<td>CNN-BiLSTM wide</td>
+<td style="text-align: right;">200</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">14.62</td>
+<td style="text-align: right;">16.08</td>
+<td style="text-align: right;">1.46</td>
+<td>wider LSTM</td>
+</tr>
+<tr>
+<td style="text-align: right;">12</td>
+<td>ALiBi Transformer</td>
+<td style="text-align: right;">150</td>
+<td>greedy</td>
+<td>windowed</td>
+<td style="text-align: right;">17.41</td>
+<td style="text-align: right;">17.59</td>
+<td style="text-align: right;">0.18</td>
+<td>ALiBi fixes length gap</td>
+</tr>
+<tr>
+<td style="text-align: right;">13</td>
+<td>BiLSTM-only</td>
+<td style="text-align: right;">200</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">15.11</td>
+<td style="text-align: right;">18.31</td>
+<td style="text-align: right;">3.20</td>
+<td>no CNN</td>
+</tr>
+<tr>
+<td style="text-align: right;">14</td>
+<td>TDS-ConvNet</td>
+<td style="text-align: right;">150</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">19.45</td>
+<td style="text-align: right;">22.48</td>
+<td style="text-align: right;">3.03</td>
+<td>original baseline</td>
+</tr>
+<tr>
+<td style="text-align: right;">15</td>
+<td>CNN-BiLSTM-Transformer</td>
+<td style="text-align: right;">150</td>
+<td>greedy</td>
+<td>windowed</td>
+<td style="text-align: right;">13.49</td>
+<td style="text-align: right;">22.97</td>
+<td style="text-align: right;">9.48</td>
+<td>hybrid windowed</td>
+</tr>
+<tr>
+<td style="text-align: right;">16</td>
+<td>CNN-BiLSTM-Transformer</td>
+<td style="text-align: right;">150</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">13.49</td>
+<td style="text-align: right;">38.34</td>
+<td style="text-align: right;">24.85</td>
+<td>transformer adds gap</td>
+</tr>
+<tr>
+<td style="text-align: right;">17</td>
+<td>Hybrid 300ep</td>
+<td style="text-align: right;">300</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">13.03</td>
+<td style="text-align: right;">49.49</td>
+<td style="text-align: right;">36.46</td>
+<td>longer doesn't help gap</td>
+</tr>
+<tr>
+<td style="text-align: right;">18</td>
+<td>Large Transformer</td>
+<td style="text-align: right;">150</td>
+<td>beam+LM</td>
+<td>windowed</td>
+<td style="text-align: right;">9.37</td>
+<td style="text-align: right;">81.07</td>
+<td style="text-align: right;">71.70</td>
+<td>sinusoidal PE broken</td>
+</tr>
+<tr>
+<td style="text-align: right;">19</td>
+<td>Large Transformer</td>
+<td style="text-align: right;">150</td>
+<td>greedy</td>
+<td>windowed</td>
+<td style="text-align: right;">14.51</td>
+<td style="text-align: right;">82.02</td>
+<td style="text-align: right;">67.51</td>
+<td>windowing barely helps</td>
+</tr>
+<tr>
+<td style="text-align: right;">20</td>
+<td>Small Transformer</td>
+<td style="text-align: right;">150</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">15.15</td>
+<td style="text-align: right;">87.21</td>
+<td style="text-align: right;">72.06</td>
+<td>severe length gap</td>
+</tr>
+<tr>
+<td style="text-align: right;">21</td>
+<td>Whisper-CTC</td>
+<td style="text-align: right;">150</td>
+<td>greedy</td>
+<td>full_session</td>
+<td style="text-align: right;">19.30</td>
+<td style="text-align: right;">100.0</td>
+<td style="text-align: right;">80.70</td>
+<td>complete test failure</td>
+</tr>
+</tbody>
+</table>
+<h3 id="wave-11-cer-push-training-results-greedy">Wave 11: CER Push Training Results (Greedy)<a class="headerlink" href="#wave-11-cer-push-training-results-greedy" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>Config</th>
+<th style="text-align: right;">Epochs</th>
+<th style="text-align: right;">Val CER</th>
+<th style="text-align: right;">Test CER</th>
+<th style="text-align: right;">Gap</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CNN-BiLSTM 300ep</strong></td>
+<td>h=384, 2L, [512,512]</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;"><strong>12.36</strong></td>
+<td style="text-align: right;"><strong>13.81</strong></td>
+<td style="text-align: right;">1.45</td>
+<td>Improved greedy from 13.00→12.36</td>
+</tr>
+<tr>
+<td>CNN-BiLSTM wide</td>
+<td>h=512, 2L, [512,512]</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">14.62</td>
+<td style="text-align: right;">16.08</td>
+<td style="text-align: right;">1.46</td>
+<td>Wider LSTM didn't help</td>
+</tr>
+<tr>
+<td>CNN-BiLSTM deep-CNN</td>
+<td>h=384, 2L, [528,512,512]</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">14.58</td>
+<td style="text-align: right;">14.80</td>
+<td style="text-align: right;"><strong>0.22</strong></td>
+<td><strong>Tightest val/test gap</strong></td>
+</tr>
+<tr>
+<td>BiLSTM-only</td>
+<td>h=512, 3L</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">15.11</td>
+<td style="text-align: right;">18.31</td>
+<td style="text-align: right;">3.20</td>
+<td>No CNN, still reasonable</td>
+</tr>
+<tr>
+<td>Hybrid 300ep</td>
+<td>LSTM+Trans</td>
+<td style="text-align: right;">300</td>
+<td style="text-align: right;">13.03</td>
+<td style="text-align: right;">49.49</td>
+<td style="text-align: right;">36.46</td>
+<td>Longer training worsens test</td>
+</tr>
+<tr>
+<td>Hybrid large-LSTM</td>
+<td>h=384, 3L LSTM + small Trans</td>
+<td style="text-align: right;">200</td>
+<td style="text-align: right;">18.96</td>
+<td style="text-align: right;">37.93</td>
+<td style="text-align: right;">18.97</td>
+<td>Larger LSTM didn't help</td>
+</tr>
+</tbody>
+</table>
+<h3 id="wave-11-beam-search-results">Wave 11: Beam Search Results<a class="headerlink" href="#wave-11-beam-search-results" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Architecture</th>
+<th>Decoder</th>
+<th>Inference</th>
+<th style="text-align: right;">Val CER</th>
+<th style="text-align: right;">Test CER</th>
+<th style="text-align: right;">IER</th>
+<th style="text-align: right;">DER</th>
+<th style="text-align: right;">SER</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>CNN-BiLSTM 300ep</strong></td>
+<td>beam+LM</td>
+<td>full_session</td>
+<td style="text-align: right;"><strong>9.11</strong></td>
+<td style="text-align: right;"><strong>8.47</strong></td>
+<td style="text-align: right;">2.38</td>
+<td style="text-align: right;">0.67</td>
+<td style="text-align: right;">5.42</td>
+<td>Close to #1 (7.95)</td>
+</tr>
+<tr>
+<td>CNN-BiLSTM deep-CNN</td>
+<td>beam+LM</td>
+<td>full_session</td>
+<td style="text-align: right;">11.72</td>
+<td style="text-align: right;">9.55</td>
+<td style="text-align: right;">2.31</td>
+<td style="text-align: right;">0.78</td>
+<td style="text-align: right;">6.46</td>
+<td>Sub-10% with 3-layer CNN</td>
+</tr>
+<tr>
+<td>ALiBi Transformer</td>
+<td>beam+LM</td>
+<td>windowed</td>
+<td style="text-align: right;">10.97</td>
+<td style="text-align: right;">9.88</td>
+<td style="text-align: right;">4.28</td>
+<td style="text-align: right;">0.76</td>
+<td style="text-align: right;">4.84</td>
+<td>Transformer sub-10%</td>
+</tr>
+<tr>
+<td>BiLSTM-only</td>
+<td>beam+LM</td>
+<td>full_session</td>
+<td style="text-align: right;">9.97</td>
+<td style="text-align: right;">10.72</td>
+<td style="text-align: right;">2.18</td>
+<td style="text-align: right;">1.56</td>
+<td style="text-align: right;">6.98</td>
+<td>No CNN, still sub-11%</td>
+</tr>
+</tbody>
+</table>
+<h3 id="key-findings">Key Findings<a class="headerlink" href="#key-findings" title="Permanent link">&para;</a></h3>
+<ol>
+<li><strong>KenLM beam search</strong> cuts CER roughly in half vs. greedy decoding (CNN-BiLSTM: 14.96→7.95, ALiBi: 17.59→8.84)</li>
+<li><strong>ALiBi positional encoding</strong> dramatically improves transformer length generalization: val/test gap goes from 72% (sinusoidal) to 0.18% (ALiBi) with windowed inference</li>
+<li><strong>Windowed logits merge</strong> is essential for transformer architectures at test time but slightly hurts models without length issues (CNN-BiLSTM)</li>
+<li><strong>CNN-BiLSTM</strong> remains the strongest single architecture, while <strong>ALiBi Transformer + beam search</strong> brings transformers to competitive test-time performance</li>
+<li><strong>Longer training (300ep)</strong> marginally improves greedy CER (13.00→12.36) but the 150ep model with beam search (7.95%) still beats the 300ep beam result (8.47%)</li>
+<li><strong>Deep CNN (3-layer)</strong> achieves the tightest val/test gap of only 0.22% with greedy decoding</li>
+<li><strong>Sinusoidal PE transformers</strong> cannot be rescued even with beam search + windowed inference (81.07% test CER)</li>
+</ol>
+<h3 id="inference-policy-comparison-wave-10">Inference Policy Comparison (Wave 10)<a class="headerlink" href="#inference-policy-comparison-wave-10" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Policy</th>
+<th>Model</th>
+<th style="text-align: right;">Val CER</th>
+<th style="text-align: right;">Test CER (full)</th>
+<th style="text-align: right;">Test CER (windowed)</th>
+<th style="text-align: right;">Improvement</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>full_session</code></td>
+<td>CNN-BiLSTM</td>
+<td style="text-align: right;">13.00</td>
+<td style="text-align: right;">14.96</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>no length gap</td>
+</tr>
+<tr>
+<td><code>windowed_logits_merge</code></td>
+<td>CNN-BiLSTM</td>
+<td style="text-align: right;">13.00</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">16.21</td>
+<td style="text-align: right;">−1.25</td>
+<td>windowing slightly hurts</td>
+</tr>
+<tr>
+<td><code>full_session</code></td>
+<td>CNN-BiLSTM-Transformer</td>
+<td style="text-align: right;">13.49</td>
+<td style="text-align: right;">38.34</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>transformer causes gap</td>
+</tr>
+<tr>
+<td><code>windowed_logits_merge</code></td>
+<td>CNN-BiLSTM-Transformer</td>
+<td style="text-align: right;">13.49</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">22.97</td>
+<td style="text-align: right;">+15.37</td>
+<td>windowing helps transformer</td>
+</tr>
+<tr>
+<td><code>full_session</code></td>
+<td>ALiBi Transformer</td>
+<td style="text-align: right;">17.41</td>
+<td style="text-align: right;">OOM</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>OOM on full test session</td>
+</tr>
+<tr>
+<td><code>windowed_logits_merge</code></td>
+<td><strong>ALiBi Transformer</strong></td>
+<td style="text-align: right;">17.41</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;"><strong>17.59</strong></td>
+<td style="text-align: right;"><strong>solved</strong></td>
+<td><strong>ALiBi + windowing = no gap</strong></td>
+</tr>
+<tr>
+<td><code>full_session</code></td>
+<td>Large Transformer</td>
+<td style="text-align: right;">14.51</td>
+<td style="text-align: right;">85.95</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>severe length gap</td>
+</tr>
+<tr>
+<td><code>windowed_logits_merge</code></td>
+<td>Large Transformer</td>
+<td style="text-align: right;">14.51</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">82.02</td>
+<td style="text-align: right;">+3.93</td>
+<td>slight improvement</td>
+</tr>
+</tbody>
+</table>
+<h3 id="position-encoding-comparison">Position Encoding Comparison<a class="headerlink" href="#position-encoding-comparison" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Train windows</th>
+<th>Inference mode</th>
+<th>Sinusoidal Val/Test</th>
+<th>ALiBi Val/Test</th>
+<th>RoPE Val/Test</th>
+<th>Winner</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Large CNN + Transformer</td>
+<td>pending</td>
+<td>pending</td>
+<td>pending</td>
+<td>pending</td>
+<td>pending</td>
+<td>pending</td>
+<td>wave not yet run</td>
+</tr>
+</tbody>
+</table>
+<h3 id="variable-length-window-sweep">Variable-Length Window Sweep<a class="headerlink" href="#variable-length-window-sweep" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Train window lengths</th>
+<th>Sampling weights</th>
+<th>Inference mode</th>
+<th style="text-align: right;">Val CER</th>
+<th style="text-align: right;">Test CER</th>
+<th style="text-align: right;">Gap</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Large CNN + Transformer</td>
+<td><code>[8000]</code></td>
+<td><code>[1.0]</code></td>
+<td>pending</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>planned</td>
+<td>fixed-length control</td>
+</tr>
+<tr>
+<td>Large CNN + Transformer</td>
+<td><code>[8000,16000]</code></td>
+<td><code>[1.0,1.0]</code></td>
+<td>pending</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>planned</td>
+<td>first multi-length regime</td>
+</tr>
+<tr>
+<td>Large CNN + Transformer</td>
+<td><code>[8000,16000,24000]</code></td>
+<td><code>[1.0,1.0,1.0]</code></td>
+<td>pending</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>planned</td>
+<td>broader range</td>
+</tr>
+<tr>
+<td>Large CNN + Transformer</td>
+<td><code>[8000,16000,24000,32000]</code></td>
+<td><code>[1.0,1.0,1.0,1.0]</code></td>
+<td>pending</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td style="text-align: right;">—</td>
+<td>planned</td>
+<td>max planned regime</td>
+</tr>
+</tbody>
+</table>
+<h3 id="architecture-sweep-wave-9-150-epochs-single-gpu-no-ddp">Architecture Sweep (Wave 9 — 150 epochs, single GPU, no DDP)<a class="headerlink" href="#architecture-sweep-wave-9-150-epochs-single-gpu-no-ddp" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Family</th>
+<th>Frontend</th>
+<th>Encoder</th>
+<th style="text-align: right;">Params</th>
+<th>Positional encoding</th>
+<th>Decoder</th>
+<th style="text-align: right;">Val CER</th>
+<th style="text-align: right;">Test CER</th>
+<th style="text-align: right;">Gap</th>
+<th>Status</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>recurrent</td>
+<td>spectrogram</td>
+<td>CNN + BiLSTM</td>
+<td style="text-align: right;">10.1M</td>
+<td>n/a</td>
+<td>greedy</td>
+<td style="text-align: right;"><strong>13.00</strong></td>
+<td style="text-align: right;"><strong>14.96</strong></td>
+<td style="text-align: right;">1.96</td>
+<td>completed</td>
+<td><strong>best overall</strong> — minimal val/test gap</td>
+</tr>
+<tr>
+<td>hybrid</td>
+<td>spectrogram</td>
+<td>CNN + BiLSTM + Transformer</td>
+<td style="text-align: right;">8.1M</td>
+<td>sinusoidal</td>
+<td>greedy</td>
+<td style="text-align: right;">13.49</td>
+<td style="text-align: right;">38.34</td>
+<td style="text-align: right;">24.85</td>
+<td>completed</td>
+<td>transformer adds test-time gap</td>
+</tr>
+<tr>
+<td>transformer</td>
+<td>spectrogram</td>
+<td>Small Transformer (d=128, 4L)</td>
+<td style="text-align: right;">1.6M</td>
+<td>sinusoidal</td>
+<td>greedy</td>
+<td style="text-align: right;">15.15</td>
+<td style="text-align: right;">87.21</td>
+<td style="text-align: right;">72.06</td>
+<td>completed</td>
+<td>severe length generalization gap</td>
+</tr>
+<tr>
+<td>transfer</td>
+<td>spectrogram</td>
+<td>Whisper-tiny (frozen)</td>
+<td style="text-align: right;">—</td>
+<td>sinusoidal</td>
+<td>greedy</td>
+<td style="text-align: right;">19.30</td>
+<td style="text-align: right;">100.0</td>
+<td style="text-align: right;">80.70</td>
+<td>completed</td>
+<td>complete test failure</td>
+</tr>
+<tr>
+<td>conformer</td>
+<td>spectrogram</td>
+<td>Conformer (d=128, 4L)</td>
+<td style="text-align: right;">2.0M</td>
+<td>sinusoidal</td>
+<td>greedy</td>
+<td style="text-align: right;">45.99</td>
+<td style="text-align: right;">63.82</td>
+<td style="text-align: right;">17.83</td>
+<td>completed</td>
+<td>underfitting, needs tuning</td>
+</tr>
+<tr>
+<td>conformer</td>
+<td>spectrogram</td>
+<td>Conformer (d=256, 6L)</td>
+<td style="text-align: right;">9.8M</td>
+<td>sinusoidal</td>
+<td>greedy</td>
+<td style="text-align: right;">91.60</td>
+<td style="text-align: right;">95.98</td>
+<td style="text-align: right;">4.38</td>
+<td>completed</td>
+<td>collapsed</td>
+</tr>
+<tr>
+<td>transformer</td>
+<td>spectrogram</td>
+<td>Small Transformer + ALiBi</td>
+<td style="text-align: right;">1.6M</td>
+<td>ALiBi</td>
+<td>greedy</td>
+<td style="text-align: right;">17.41</td>
+<td style="text-align: right;">17.59 (windowed)</td>
+<td style="text-align: right;">0.18</td>
+<td>completed</td>
+<td><strong>ALiBi solves length gap</strong></td>
+</tr>
+<tr>
+<td>transformer</td>
+<td>spectrogram</td>
+<td>Large Transformer (d=256, 6L)</td>
+<td style="text-align: right;">6.6M</td>
+<td>sinusoidal</td>
+<td>greedy</td>
+<td style="text-align: right;">14.51</td>
+<td style="text-align: right;">82.02 (windowed)</td>
+<td style="text-align: right;">67.51</td>
+<td>completed</td>
+<td>sinusoidal PE fails to generalize</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="training-curves">Training Curves<a class="headerlink" href="#training-curves" title="Permanent link">&para;</a></h2>
+<p>Each training run auto-generates a <code>training_progress.png</code> showing loss and CER
+over epochs. Below are the curves for every architecture in the leaderboard,
+organized by experiment wave.</p>
+<h3 id="top-performers">Top Performers<a class="headerlink" href="#top-performers" title="Permanent link">&para;</a></h3>
+<h4 id="cnn-bilstm-150-epochs-wave-9-best-test-cer-795-beam">CNN-BiLSTM — 150 epochs (Wave 9) — Best Test CER: 7.95% (beam)<a class="headerlink" href="#cnn-bilstm-150-epochs-wave-9-best-test-cer-795-beam" title="Permanent link">&para;</a></h4>
+<p>The overall champion. Loss and CER both converge smoothly by epoch 60, with
+train CER continuing to decrease while val CER plateaus around 13%. The tight
+train/val gap indicates excellent generalization. With beam search + LM
+decoding, test CER drops to <strong>7.95%</strong>.</p>
+<p><img alt="CNN-BiLSTM 150ep training curves" src="../../images/waves/wave9_cnn_bilstm.png" /></p>
+<h4 id="cnn-bilstm-300-epochs-wave-11-best-test-cer-847-beam">CNN-BiLSTM — 300 epochs (Wave 11) — Best Test CER: 8.47% (beam)<a class="headerlink" href="#cnn-bilstm-300-epochs-wave-11-best-test-cer-847-beam" title="Permanent link">&para;</a></h4>
+<p>Extended training pushes val CER from 13.00% to 12.36%, though returns
+diminish after epoch 150. The growing train/val loss gap after epoch 100 shows
+mild overfitting, but the model still generalizes well. Beam search brings test
+CER to <strong>8.47%</strong>.</p>
+<p><img alt="CNN-BiLSTM 300ep training curves" src="../../images/waves/wave11_cnn_bilstm_300ep.png" /></p>
+<h4 id="alibi-transformer-150-epochs-wave-10-best-test-cer-884-beam-windowed">ALiBi Transformer — 150 epochs (Wave 10) — Best Test CER: 8.84% (beam + windowed)<a class="headerlink" href="#alibi-transformer-150-epochs-wave-10-best-test-cer-884-beam-windowed" title="Permanent link">&para;</a></h4>
+<p>The breakthrough transformer result. Unlike sinusoidal-PE transformers that
+plateau early with noisy loss curves, the ALiBi variant converges smoothly to
+17.41% val CER. Combined with windowed logits merge and beam search, test CER
+reaches <strong>8.84%</strong> — proving transformers can match recurrent models when the
+positional encoding supports length extrapolation.</p>
+<p><img alt="ALiBi Transformer training curves" src="../../images/waves/wave10_alibi_transformer.png" /></p>
+<hr />
+<h3 id="baseline-controls-wave-0">Baseline Controls (Wave 0)<a class="headerlink" href="#baseline-controls-wave-0" title="Permanent link">&para;</a></h3>
+<h4 id="tds-convnet-150-epochs-val-1945-test-2248">TDS-ConvNet — 150 epochs — Val: 19.45% / Test: 22.48%<a class="headerlink" href="#tds-convnet-150-epochs-val-1945-test-2248" title="Permanent link">&para;</a></h4>
+<p>The original baseline. Convolution-only architecture with local receptive fields.
+Converges quickly (escapes blank collapse by epoch 10) and generalizes well
+(only 3% val/test gap). Val CER plateaus around 20% after epoch 80.</p>
+<p><img alt="TDS-ConvNet training curves" src="../../images/waves/wave0_tds_control.png" /></p>
+<h4 id="large-transformer-cnn-80-epochs-val-5795-test-6806">Large Transformer + CNN — 80 epochs — Val: 57.95% / Test: 68.06%<a class="headerlink" href="#large-transformer-cnn-80-epochs-val-5795-test-6806" title="Permanent link">&para;</a></h4>
+<p>Early transformer experiment (d=256, 6 layers). Learning is very slow — CER
+stays at 100% through epoch 45, then drops rapidly once attention patterns
+stabilize. Only reaches ~60% val CER in 80 epochs. The gap between train and
+val CER is small, but both are unacceptably high.</p>
+<p><img alt="Large Transformer 80ep training curves" src="../../images/waves/wave0_transformer_large.png" /></p>
+<h4 id="small-transformer-cnn-80-epochs-val-2847">Small Transformer + CNN — 80 epochs — Val: 28.47%<a class="headerlink" href="#small-transformer-cnn-80-epochs-val-2847" title="Permanent link">&para;</a></h4>
+<p>Smaller transformer (d=128, 4 layers) with the same slow start but converges
+faster relative to the large variant. Val CER reaches ~28% by epoch 80.
+Still significantly worse than TDS or recurrent baselines.</p>
+<p><img alt="Small Transformer 80ep training curves" src="../../images/waves/wave0_transformer_small.png" /></p>
+<h4 id="whisper-ctc-150-epochs-val-1930-test-100">Whisper-CTC — 150 epochs — Val: 19.30% / Test: 100%<a class="headerlink" href="#whisper-ctc-150-epochs-val-1930-test-100" title="Permanent link">&para;</a></h4>
+<p>Whisper-tiny encoder frozen with a trainable CTC head. Achieves a respectable
+19.30% val CER (competitive with TDS), but <strong>test CER is 100%</strong> — a complete
+generalization failure caused by the same sequence-length issue as pure
+transformers. The curves look deceptively healthy because validation uses
+windowed data.</p>
+<p><img alt="Whisper-CTC training curves" src="../../images/waves/wave0_whisper.png" /></p>
+<hr />
+<h3 id="architecture-sweep-wave-9-150-epochs-each">Architecture Sweep (Wave 9 — 150 epochs each)<a class="headerlink" href="#architecture-sweep-wave-9-150-epochs-each" title="Permanent link">&para;</a></h3>
+<h4 id="cnn-bilstm-transformer-hybrid-val-1349-test-3834">CNN-BiLSTM-Transformer Hybrid — Val: 13.49% / Test: 38.34%<a class="headerlink" href="#cnn-bilstm-transformer-hybrid-val-1349-test-3834" title="Permanent link">&para;</a></h4>
+<p>The BiLSTM provides rich sequential context, allowing the transformer to learn
+well on validation windows (13.49%). However, the transformer component still
+causes a ~25% test generalization gap. The curves show smooth convergence
+similar to the pure CNN-BiLSTM but with slightly higher val CER plateau.</p>
+<p><img alt="Hybrid training curves" src="../../images/waves/wave9_hybrid.png" /></p>
+<h4 id="small-transformer-sinusoidal-pe-val-1515-test-8721">Small Transformer (sinusoidal PE) — Val: 15.15% / Test: 87.21%<a class="headerlink" href="#small-transformer-sinusoidal-pe-val-1515-test-8721" title="Permanent link">&para;</a></h4>
+<p>Isolated transformer with sinusoidal PE, 150 epochs. Converges much better than
+the 80-epoch Wave-0 runs — val CER reaches 15.15%. But the 72% val/test gap
+confirms that sinusoidal positional encoding fundamentally cannot extrapolate
+from 4-second training windows to full test sessions.</p>
+<p><img alt="Small Transformer 150ep training curves" src="../../images/waves/wave9_small_transformer.png" /></p>
+<h4 id="conformer-small-d128-4l-val-4599-test-6382">Conformer-small (d=128, 4L) — Val: 45.99% / Test: 63.82%<a class="headerlink" href="#conformer-small-d128-4l-val-4599-test-6382" title="Permanent link">&para;</a></h4>
+<p>The Conformer combines convolution with self-attention. The training curve
+reveals a distinctive pattern: CER stays near 100% for ~60 epochs during the
+anti-blank penalty phase, then drops rapidly once the penalty fades. However, it
+plateaus at ~46% val CER, suggesting the architecture needs more tuning or
+longer training to match its speech recognition performance.</p>
+<p><img alt="Conformer-small training curves" src="../../images/waves/wave9_conformer_small.png" /></p>
+<h4 id="conformer-large-d256-6l-val-9160-test-9598">Conformer-large (d=256, 6L) — Val: 91.60% / Test: 95.98%<a class="headerlink" href="#conformer-large-d256-6l-val-9160-test-9598" title="Permanent link">&para;</a></h4>
+<p>The larger Conformer effectively collapses. The CER curve shows it never escapes
+the ~95% region despite loss eventually decreasing. The anti-blank penalty
+causes extreme loss spikes (&gt;100) in early training. This configuration is too
+large for the available data and training budget.</p>
+<p><img alt="Conformer-large training curves" src="../../images/waves/wave9_conformer_large.png" /></p>
+<hr />
+<h3 id="transformer-fixes-wave-10-150-epochs-each">Transformer Fixes (Wave 10 — 150 epochs each)<a class="headerlink" href="#transformer-fixes-wave-10-150-epochs-each" title="Permanent link">&para;</a></h3>
+<h4 id="large-transformer-sinusoidal-pe-retrained-val-1451-test-8202">Large Transformer (sinusoidal PE, retrained) — Val: 14.51% / Test: 82.02%<a class="headerlink" href="#large-transformer-sinusoidal-pe-retrained-val-1451-test-8202" title="Permanent link">&para;</a></h4>
+<p>Retrained with 150 epochs (vs. 80 in Wave 0). Val CER improves substantially
+from 57.95% to 14.51%, showing the large transformer was simply undertrained
+before. However, the sinusoidal PE still causes an enormous 67.5% val/test gap
+that windowed inference can only marginally reduce.</p>
+<p><img alt="Large Transformer retrained curves" src="../../images/waves/wave10_large_transformer.png" /></p>
+<hr />
+<h3 id="cer-push-wave-11">CER Push (Wave 11)<a class="headerlink" href="#cer-push-wave-11" title="Permanent link">&para;</a></h3>
+<h4 id="cnn-bilstm-wide-h512-200-epochs-val-1462-test-1608">CNN-BiLSTM Wide (h=512) — 200 epochs — Val: 14.62% / Test: 16.08%<a class="headerlink" href="#cnn-bilstm-wide-h512-200-epochs-val-1462-test-1608" title="Permanent link">&para;</a></h4>
+<p>Wider BiLSTM (512 vs. 384 hidden). The extra capacity doesn't help — val CER
+is slightly worse than the standard width model. The curves show a similar
+convergence pattern but with a higher val CER floor.</p>
+<p><img alt="CNN-BiLSTM wide training curves" src="../../images/waves/wave11_cnn_bilstm_wide.png" /></p>
+<h4 id="cnn-bilstm-deep-cnn-3-layers-200-epochs-val-1458-test-1480">CNN-BiLSTM Deep-CNN (3 layers) — 200 epochs — Val: 14.58% / Test: 14.80%<a class="headerlink" href="#cnn-bilstm-deep-cnn-3-layers-200-epochs-val-1458-test-1480" title="Permanent link">&para;</a></h4>
+<p>Three-layer CNN ([528, 512, 512]) before the BiLSTM. Notable for the <strong>tightest
+val/test gap of any model: only 0.22%</strong>. The deeper CNN provides better local
+feature extraction, though absolute CER is slightly worse than the standard
+2-layer CNN variant.</p>
+<p><img alt="CNN-BiLSTM deep-CNN training curves" src="../../images/waves/wave11_cnn_bilstm_deep_cnn.png" /></p>
+<h4 id="bilstm-only-200-epochs-val-1511-test-1831">BiLSTM-only — 200 epochs — Val: 15.11% / Test: 18.31%<a class="headerlink" href="#bilstm-only-200-epochs-val-1511-test-1831" title="Permanent link">&para;</a></h4>
+<p>Pure BiLSTM without any CNN front-end. Still reaches a respectable 15.11% val
+CER, proving the BiLSTM alone is a strong encoder. The 3.2% val/test gap is
+reasonable. With beam search, test CER drops to 10.72%.</p>
+<p><img alt="BiLSTM-only training curves" src="../../images/waves/wave11_bilstm_only.png" /></p>
+<h4 id="hybrid-300-epochs-val-1303-test-4949">Hybrid 300 epochs — Val: 13.03% / Test: 49.49%<a class="headerlink" href="#hybrid-300-epochs-val-1303-test-4949" title="Permanent link">&para;</a></h4>
+<p>Extended training of the CNN-BiLSTM-Transformer hybrid. Val CER marginally
+improves to 13.03%, but test CER <strong>worsens</strong> from 38.34% to 49.49% — the extra
+training amplifies the transformer's length-dependent overfitting. The
+increasing train/val loss divergence after epoch 100 is clearly visible.</p>
+<p><img alt="Hybrid 300ep training curves" src="../../images/waves/wave11_hybrid_300ep.png" /></p>
+<h4 id="hybrid-large-lstm-h384-3l-lstm-small-trans-200-epochs-val-1896">Hybrid Large-LSTM (h=384, 3L LSTM + small Trans) — 200 epochs — Val: 18.96%<a class="headerlink" href="#hybrid-large-lstm-h384-3l-lstm-small-trans-200-epochs-val-1896" title="Permanent link">&para;</a></h4>
+<p>Larger LSTM (3 layers, h=384) feeding a smaller transformer (d=128, 2 layers).
+The hypothesis was that a stronger LSTM could compensate for a smaller
+transformer. Instead, val CER is worse (18.96%) and the test gap remains large.
+The learning curve is notably slower, with CER still above 100% until epoch 30.</p>
+<p><img alt="Hybrid large-LSTM training curves" src="../../images/waves/wave11_hybrid_large_lstm.png" /></p>
+<hr />
+<h2 id="baseline-results">Baseline Results<a class="headerlink" href="#baseline-results" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
@@ -1903,6 +3810,120 @@ on the CTC blank collapse phenomenon when training with DDP across 8 GPUs. In su
 <tr>
 <td><strong>Total session cost</strong></td>
 <td><strong>~$15</strong></td>
+</tr>
+<tr>
+<td>Metric</td>
+<td>Validation</td>
+</tr>
+<tr>
+<td>--------</td>
+<td>-----------</td>
+</tr>
+<tr>
+<td>CER (%)</td>
+<td>20.18</td>
+</tr>
+<tr>
+<td>DER (%)</td>
+<td>2.22</td>
+</tr>
+<tr>
+<td>IER (%)</td>
+<td>4.94</td>
+</tr>
+<tr>
+<td>SER (%)</td>
+<td>13.03</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>1.126</td>
+</tr>
+</tbody>
+</table>
+<h2 id="cnn-bilstm-results">CNN + BiLSTM Results<a class="headerlink" href="#cnn-bilstm-results" title="Permanent link">&para;</a></h2>
+<p>After 150 epochs of training on user 89335547 with <code>model=cnn_bilstm_ctc</code>
+and greedy decoding, the best checkpoint was saved at epoch 132.</p>
+<p><img alt="CNN + BiLSTM Training Progress" src="../../images/waves/wave9_cnn_bilstm.png" /></p>
+<p>This run improves validation CER from 20.18% to 13.76% and test CER from
+23.56% to 14.89% relative to the TDS-CNN baseline on the same single-user split.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Validation</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CER (%)</td>
+<td>13.76</td>
+<td>14.89</td>
+</tr>
+<tr>
+<td>DER (%)</td>
+<td>1.77</td>
+<td>1.36</td>
+</tr>
+<tr>
+<td>IER (%)</td>
+<td>3.15</td>
+<td>2.64</td>
+</tr>
+<tr>
+<td>SER (%)</td>
+<td>8.84</td>
+<td>10.89</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>0.544</td>
+<td>0.556</td>
+</tr>
+</tbody>
+</table>
+<h2 id="whisper-ctc-results">Whisper-CTC Results<a class="headerlink" href="#whisper-ctc-results" title="Permanent link">&para;</a></h2>
+<p>After 150 epochs of training on user 89335547 with <code>model=whisper_ctc</code>
+and greedy decoding, the best checkpoint was saved at epoch 143.</p>
+<p><img alt="Whisper-CTC Training Progress" src="../../images/waves/wave0_whisper.png" /></p>
+<p>This transfer-learning run reached a respectable validation CER, but it does
+not generalize to the test split. The failure mode is almost entirely
+insertions, which pushes test CER to nearly 100% even though validation loss
+and validation CER looked competitive.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Validation</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CER (%)</td>
+<td>17.72</td>
+<td>99.91</td>
+</tr>
+<tr>
+<td>DER (%)</td>
+<td>2.55</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>IER (%)</td>
+<td>4.10</td>
+<td>99.91</td>
+</tr>
+<tr>
+<td>SER (%)</td>
+<td>11.08</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>0.615</td>
+<td>inf</td>
 </tr>
 </tbody>
 </table>

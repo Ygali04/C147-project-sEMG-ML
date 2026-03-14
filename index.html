@@ -492,6 +492,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#active-troubleshooting-campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Active Troubleshooting Campaign
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-best-documented-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Best Documented Result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-evaluated-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Evaluated Runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1204,7 +1237,7 @@
   <span class="md-ellipsis">
     
   
-    RNN / LSTM / GRU
+    RNN / LSTM
   
 
     
@@ -1331,6 +1364,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="experiments/transformer_troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1409,6 +1470,39 @@
 </li>
       
         <li class="md-nav__item">
+  <a href="#active-troubleshooting-campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Active Troubleshooting Campaign
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#current-best-documented-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Current Best Documented Result
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#additional-evaluated-runs" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Additional Evaluated Runs
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
   <a href="#quick-start" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1472,7 +1566,7 @@ extending it with new model architectures and experiments.</p>
 <a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>  → Model encoder (modules.py / lightning.py)
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>  → CTC Loss (nn.CTCLoss)
 <a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>  → Greedy / Beam decoder (decoder.py)
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  → CER metric (metrics.py)
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>  → CER / DER / IER / SER metrics (metrics.py)
 </code></pre></div>
 <h2 id="loss-metric">Loss &amp; Metric<a class="headerlink" href="#loss-metric" title="Permanent link">&para;</a></h2>
 <table>
@@ -1488,8 +1582,12 @@ extending it with new model architectures and experiments.</p>
 <td>CTC (Connectionist Temporal Classification) — handles alignment without frame-level labels</td>
 </tr>
 <tr>
-<td><strong>Metric</strong></td>
+<td><strong>Selection metric</strong></td>
 <td>CER (Character Error Rate) = edit distance / reference length</td>
+</tr>
+<tr>
+<td><strong>Diagnostic metrics</strong></td>
+<td>DER, IER, SER to separate deletion, insertion, and substitution errors</td>
 </tr>
 </tbody>
 </table>
@@ -1509,19 +1607,95 @@ extending it with new model architectures and experiments.</p>
 <td>Time-Depth Separable CNN (Meta baseline)</td>
 </tr>
 <tr>
-<td><strong>RNN / LSTM / GRU</strong></td>
-<td>🔬 In progress</td>
-<td>Recurrent sequential decoder</td>
+<td><strong>BiLSTM / CNN+BiLSTM</strong></td>
+<td>✅ Implemented</td>
+<td>Recurrent CTC encoders with bidirectional context</td>
+</tr>
+<tr>
+<td><strong>Whisper-CTC</strong></td>
+<td>✅ Implemented</td>
+<td>Transfer-learning variant using a pretrained Whisper encoder with a CTC head</td>
 </tr>
 <tr>
 <td><strong>Transformer</strong></td>
 <td>🔬 In progress</td>
-<td>Self-attention over EMG frames</td>
+<td>Generic self-attention encoder over EMG frames</td>
 </tr>
 <tr>
 <td><strong>Hybrid</strong></td>
 <td>🔬 Planned</td>
 <td>CNN front-end + Transformer/RNN encoder</td>
+</tr>
+</tbody>
+</table>
+<h2 id="active-troubleshooting-campaign">Active Troubleshooting Campaign<a class="headerlink" href="#active-troubleshooting-campaign" title="Permanent link">&para;</a></h2>
+<p>The current development focus is the <code>yahvin/transformer-troubleshoot</code> branch,
+which is using an <code>8x RTX PRO 6000</code> Verda instance as an 8-lane experiment
+cluster. The central problem is not transformer optimization in isolation, but
+the large jump from windowed training to full-session test inference.</p>
+<p>Current campaign pages:</p>
+<ul>
+<li><a href="experiments/results/"><code>experiments/results.md</code></a> for the global leaderboard</li>
+<li><a href="models/transformer/"><code>models/transformer.md</code></a> for transformer-family findings</li>
+<li><a href="experiments/transformer_troubleshooting/"><code>experiments/transformer_troubleshooting.md</code></a> for the active wave ledger and branch roadmap</li>
+</ul>
+<h2 id="current-best-documented-result">Current Best Documented Result<a class="headerlink" href="#current-best-documented-result" title="Permanent link">&para;</a></h2>
+<p>The strongest documented run so far is the CNN + BiLSTM model on the
+single-user split for user 89335547 with greedy decoding.</p>
+<table>
+<thead>
+<tr>
+<th>Split</th>
+<th>CER (%)</th>
+<th>DER (%)</th>
+<th>IER (%)</th>
+<th>SER (%)</th>
+<th>Loss</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Validation</td>
+<td>13.76</td>
+<td>1.77</td>
+<td>3.15</td>
+<td>8.84</td>
+<td>0.544</td>
+</tr>
+<tr>
+<td>Test</td>
+<td>14.89</td>
+<td>1.36</td>
+<td>2.64</td>
+<td>10.89</td>
+<td>0.556</td>
+</tr>
+</tbody>
+</table>
+<p>Compared with the documented TDS-CNN baseline, this reduces CER on both
+validation and test for the same baseline user split.</p>
+<h2 id="additional-evaluated-runs">Additional Evaluated Runs<a class="headerlink" href="#additional-evaluated-runs" title="Permanent link">&para;</a></h2>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Val CER (%)</th>
+<th>Test CER (%)</th>
+<th>Takeaway</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BiLSTM</td>
+<td>15.37</td>
+<td>22.07</td>
+<td>Better than the TDS-CNN baseline on validation, but behind CNN + BiLSTM on both splits</td>
+</tr>
+<tr>
+<td>Whisper-CTC</td>
+<td>17.72</td>
+<td>99.91</td>
+<td>Validation looked reasonable, but test performance collapsed due to insertion-heavy decoding</td>
 </tr>
 </tbody>
 </table>

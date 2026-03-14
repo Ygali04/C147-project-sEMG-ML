@@ -1189,7 +1189,7 @@
   <span class="md-ellipsis">
     
   
-    RNN / LSTM / GRU
+    RNN / LSTM
   
 
     
@@ -1303,6 +1303,34 @@
     
   
     Experiment Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experiments/transformer_troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer Troubleshooting
   
 
     
@@ -1444,7 +1472,8 @@
 <p>This:</p>
 <ol>
 <li>Loads the composed Hydra config</li>
-<li>Instantiates the <code>WindowedEMGDataModule</code> and <code>TDSConvCTCModule</code></li>
+<li>Instantiates the <code>WindowedEMGDataModule</code> and the configured model module
+  (<code>TDSConvCTCModule</code>, <code>BiLSTMCTCModule</code>, or <code>CNNBiLSTMCTCModule</code>)</li>
 <li>Creates a <code>pl.Trainer</code> with configured callbacks (LR monitor, checkpointing)</li>
 <li>Calls <code>trainer.fit()</code> if <code>train=True</code>, then <code>trainer.test()</code></li>
 </ol>

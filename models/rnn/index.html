@@ -25,7 +25,7 @@
     
     
       
-        <title>RNN / LSTM / GRU - EMG2QWERTY — ECE C147/C247 Final Project</title>
+        <title>RNN / LSTM - EMG2QWERTY — ECE C147/C247 Final Project</title>
       
     
     
@@ -76,7 +76,7 @@
     <div data-md-component="skip">
       
         
-        <a href="#rnn-lstm-gru" class="md-skip">
+        <a href="#rnn-lstm" class="md-skip">
           Skip to content
         </a>
       
@@ -110,7 +110,7 @@
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              RNN / LSTM / GRU
+              RNN / LSTM
             
           </span>
         </div>
@@ -1107,7 +1107,7 @@
   <span class="md-ellipsis">
     
   
-    RNN / LSTM / GRU
+    RNN / LSTM
   
 
     
@@ -1125,7 +1125,7 @@
   <span class="md-ellipsis">
     
   
-    RNN / LSTM / GRU
+    RNN / LSTM
   
 
     
@@ -1151,33 +1151,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#planned-approach" class="md-nav__link">
+  <a href="#implemented-approach" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned approach
+        Implemented approach
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Planned approach">
+    <nav class="md-nav" aria-label="Implemented approach">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#planned-models" class="md-nav__link">
+  <a href="#available-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned models
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#minimal-example-skeleton" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimal example skeleton
+        Available models
       
     </span>
   </a>
@@ -1186,6 +1175,39 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documented-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documented results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimal-architecture-sketch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal architecture sketch
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1322,6 +1344,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experiments/transformer_troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1356,33 +1406,22 @@
     <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
       
         <li class="md-nav__item">
-  <a href="#planned-approach" class="md-nav__link">
+  <a href="#implemented-approach" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned approach
+        Implemented approach
       
     </span>
   </a>
   
-    <nav class="md-nav" aria-label="Planned approach">
+    <nav class="md-nav" aria-label="Implemented approach">
       <ul class="md-nav__list">
         
           <li class="md-nav__item">
-  <a href="#planned-models" class="md-nav__link">
+  <a href="#available-models" class="md-nav__link">
     <span class="md-ellipsis">
       
-        Planned models
-      
-    </span>
-  </a>
-  
-</li>
-        
-          <li class="md-nav__item">
-  <a href="#minimal-example-skeleton" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Minimal example skeleton
+        Available models
       
     </span>
   </a>
@@ -1391,6 +1430,39 @@
         
       </ul>
     </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documented-results" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documented results
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#usage" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Usage
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#minimal-architecture-sketch" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal architecture sketch
+      
+    </span>
+  </a>
   
 </li>
       
@@ -1425,15 +1497,15 @@
   
 
 
-<h1 id="rnn-lstm-gru">RNN / LSTM / GRU<a class="headerlink" href="#rnn-lstm-gru" title="Permanent link">&para;</a></h1>
+<h1 id="rnn-lstm">RNN / LSTM<a class="headerlink" href="#rnn-lstm" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Status:</strong> In progress — this page will be updated as models are implemented.</p>
+<p><strong>Status:</strong> Implemented (BiLSTM + CNN-BiLSTM)</p>
 </blockquote>
-<h2 id="planned-approach">Planned approach<a class="headerlink" href="#planned-approach" title="Permanent link">&para;</a></h2>
-<p>New recurrent architectures are added as new <code>pl.LightningModule</code> subclasses
-in <code>src/emg2qwerty/lightning.py</code>, following the same interface as
-<code>TDSConvCTCModule</code>.</p>
-<h3 id="planned-models">Planned models<a class="headerlink" href="#planned-models" title="Permanent link">&para;</a></h3>
+<h2 id="implemented-approach">Implemented approach<a class="headerlink" href="#implemented-approach" title="Permanent link">&para;</a></h2>
+<p>Recurrent CTC architectures are implemented as <code>pl.LightningModule</code>
+subclasses in <code>src/emg2qwerty/lightning.py</code> and share the same training
+loop, optimizer/scheduler wiring, and decoder metrics as the baseline model.</p>
+<h3 id="available-models">Available models<a class="headerlink" href="#available-models" title="Permanent link">&para;</a></h3>
 <table>
 <thead>
 <tr>
@@ -1443,37 +1515,124 @@ in <code>src/emg2qwerty/lightning.py</code>, following the same interface as
 </thead>
 <tbody>
 <tr>
-<td>Bidirectional LSTM</td>
-<td>Full-sequence context; larger receptive field than TDS</td>
+<td>BiLSTM (<code>model=bilstm_ctc</code>)</td>
+<td>Full-sequence bidirectional context after spectral front-end</td>
 </tr>
 <tr>
-<td>GRU</td>
-<td>Lighter alternative to LSTM, fewer parameters</td>
-</tr>
-<tr>
-<td>CNN + BiLSTM</td>
-<td>TDS-style front-end → bidirectional LSTM encoder</td>
+<td>CNN + BiLSTM (<code>model=cnn_bilstm_ctc</code>)</td>
+<td>Temporal Conv1D stack before BiLSTM encoder</td>
 </tr>
 </tbody>
 </table>
-<h3 id="minimal-example-skeleton">Minimal example skeleton<a class="headerlink" href="#minimal-example-skeleton" title="Permanent link">&para;</a></h3>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">BiLSTMCTCModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
-<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>    <span class="n">NUM_BANDS</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">2</span>
-<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>    <span class="n">ELECTRODE_CHANNELS</span><span class="p">:</span> <span class="n">ClassVar</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="mi">16</span>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">in_features</span><span class="p">,</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_layers</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
-<a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">()</span>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">model</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>            <span class="n">SpectrogramNorm</span><span class="p">(</span><span class="n">channels</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">NUM_BANDS</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">ELECTRODE_CHANNELS</span><span class="p">),</span>
-<a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>            <span class="n">MultiBandRotationInvariantMLP</span><span class="p">(</span><span class="n">in_features</span><span class="o">=</span><span class="n">in_features</span><span class="p">,</span> <span class="o">...</span><span class="p">),</span>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a>            <span class="n">nn</span><span class="o">.</span><span class="n">Flatten</span><span class="p">(</span><span class="n">start_dim</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>            <span class="c1"># Replace TDSConvEncoder with BiLSTM:</span>
-<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>            <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span><span class="n">input_size</span><span class="o">=...</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=</span><span class="n">hidden_size</span><span class="p">,</span>
-<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a>                    <span class="n">num_layers</span><span class="o">=</span><span class="n">num_layers</span><span class="p">,</span> <span class="n">bidirectional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">False</span><span class="p">),</span>
-<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>            <span class="c1"># Extract output, project to classes</span>
-<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>            <span class="o">...</span>
-<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a>            <span class="n">nn</span><span class="o">.</span><span class="n">LogSoftmax</span><span class="p">(</span><span class="n">dim</span><span class="o">=-</span><span class="mi">1</span><span class="p">),</span>
-<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>        <span class="p">)</span>
+<p>Both variants keep the existing front-end:</p>
+<ol>
+<li><code>SpectrogramNorm</code></li>
+<li><code>MultiBandRotationInvariantMLP</code></li>
+<li>Feature flattening across bands</li>
+</ol>
+<p>and then replace the temporal encoder with recurrent layers.</p>
+<h2 id="documented-results">Documented results<a class="headerlink" href="#documented-results" title="Permanent link">&para;</a></h2>
+<p>The strongest documented recurrent result so far is the
+<code>cnn_bilstm_ctc</code> run on the <code>single_user</code> split for user 89335547.
+That run used greedy decoding, batch size 32, and trained for 150 epochs,
+with the best checkpoint saved at epoch 132.</p>
+<p><img alt="CNN + BiLSTM Training Progress" src="../../images/cnn_bilstm_training_progress.png" /></p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Validation</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CER (%)</td>
+<td>13.76</td>
+<td>14.89</td>
+</tr>
+<tr>
+<td>DER (%)</td>
+<td>1.77</td>
+<td>1.36</td>
+</tr>
+<tr>
+<td>IER (%)</td>
+<td>3.15</td>
+<td>2.64</td>
+</tr>
+<tr>
+<td>SER (%)</td>
+<td>8.84</td>
+<td>10.89</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>0.544</td>
+<td>0.556</td>
+</tr>
+</tbody>
+</table>
+<p>The remaining error is dominated by substitutions rather than insertions or
+deletions, which suggests the recurrent encoder is aligning sequences well but
+still confuses some characters at decode time.</p>
+<p>For comparison, the plain <code>bilstm_ctc</code> checkpoint evaluated on the same split
+reached weaker but still competitive numbers:</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Validation</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CER (%)</td>
+<td>15.37</td>
+<td>22.07</td>
+</tr>
+<tr>
+<td>DER (%)</td>
+<td>1.51</td>
+<td>4.91</td>
+</tr>
+<tr>
+<td>IER (%)</td>
+<td>3.35</td>
+<td>1.73</td>
+</tr>
+<tr>
+<td>SER (%)</td>
+<td>10.52</td>
+<td>15.43</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>0.537</td>
+<td>0.814</td>
+</tr>
+</tbody>
+</table>
+<p>That comparison suggests the convolutional front-end is doing meaningful work
+before the recurrent encoder: it improves both validation and test CER, while
+also keeping deletion and substitution errors lower than the pure BiLSTM.</p>
+<h2 id="usage">Usage<a class="headerlink" href="#usage" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Pure BiLSTM encoder</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">model</span><span class="o">=</span>bilstm_ctc<span class="w"> </span><span class="nv">user</span><span class="o">=</span>single_user
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># CNN + BiLSTM hybrid</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.train<span class="w"> </span><span class="nv">model</span><span class="o">=</span>cnn_bilstm_ctc<span class="w"> </span><span class="nv">user</span><span class="o">=</span>single_user
+</code></pre></div>
+<h2 id="minimal-architecture-sketch">Minimal architecture sketch<a class="headerlink" href="#minimal-architecture-sketch" title="Permanent link">&para;</a></h2>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="k">class</span><span class="w"> </span><span class="nc">BiLSTMCTCModule</span><span class="p">(</span><span class="n">pl</span><span class="o">.</span><span class="n">LightningModule</span><span class="p">):</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a>    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">...</span><span class="p">):</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">frontend</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Sequential</span><span class="p">(</span><span class="o">...</span><span class="p">)</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">encoder</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">LSTM</span><span class="p">(</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a>            <span class="n">input_size</span><span class="o">=...</span><span class="p">,</span> <span class="n">hidden_size</span><span class="o">=...</span><span class="p">,</span> <span class="n">num_layers</span><span class="o">=...</span><span class="p">,</span>
+<a id="__codelineno-1-6" name="__codelineno-1-6" href="#__codelineno-1-6"></a>            <span class="n">bidirectional</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span> <span class="n">batch_first</span><span class="o">=</span><span class="kc">False</span>
+<a id="__codelineno-1-7" name="__codelineno-1-7" href="#__codelineno-1-7"></a>        <span class="p">)</span>
+<a id="__codelineno-1-8" name="__codelineno-1-8" href="#__codelineno-1-8"></a>        <span class="bp">self</span><span class="o">.</span><span class="n">classifier</span> <span class="o">=</span> <span class="n">nn</span><span class="o">.</span><span class="n">Linear</span><span class="p">(</span><span class="mi">2</span> <span class="o">*</span> <span class="n">hidden_size</span><span class="p">,</span> <span class="n">num_classes</span><span class="p">)</span>
 </code></pre></div>
 <h2 id="expected-trade-offs-vs-tds-cnn">Expected trade-offs vs TDS-CNN<a class="headerlink" href="#expected-trade-offs-vs-tds-cnn" title="Permanent link">&para;</a></h2>
 <table>
@@ -1507,6 +1666,10 @@ in <code>src/emg2qwerty/lightning.py</code>, following the same interface as
 </tr>
 </tbody>
 </table>
+<p>In practice, the CNN + BiLSTM hybrid has been a better fit than the plain
+baseline CNN for the documented single-user experiment, likely because the
+convolutional front-end reduces local noise before the recurrent stack models
+longer-range temporal structure.</p>
 
 
 

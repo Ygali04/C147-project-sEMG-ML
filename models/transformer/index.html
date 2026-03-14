@@ -1098,7 +1098,7 @@
   <span class="md-ellipsis">
     
   
-    RNN / LSTM / GRU
+    RNN / LSTM
   
 
     
@@ -1202,6 +1202,45 @@
 </li>
         
           <li class="md-nav__item">
+  <a href="#available-and-planned-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available and planned models
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documented-whisper-ctc-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documented Whisper-CTC result
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Documented Whisper-CTC result">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimal-example-skeleton" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal example skeleton
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
   <a href="#configurable-parameters" class="md-nav__link">
     <span class="md-ellipsis">
       
@@ -1256,6 +1295,34 @@
     <span class="md-ellipsis">
       
         CER Leaderboard (our experiments)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rtx-pro-6000-troubleshooting-campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RTX PRO 6000 Troubleshooting Campaign
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RTX PRO 6000 Troubleshooting Campaign">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wave-1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 1 Objective
       
     </span>
   </a>
@@ -1550,6 +1617,34 @@
 
               
             
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experiments/transformer_troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer Troubleshooting
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
           </ul>
         </nav>
       
@@ -1600,6 +1695,45 @@
     <span class="md-ellipsis">
       
         Key design choices
+      
+    </span>
+  </a>
+  
+</li>
+        
+          <li class="md-nav__item">
+  <a href="#available-and-planned-models" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Available and planned models
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#documented-whisper-ctc-result" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Documented Whisper-CTC result
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="Documented Whisper-CTC result">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#minimal-example-skeleton" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Minimal example skeleton
       
     </span>
   </a>
@@ -1661,6 +1795,34 @@
     <span class="md-ellipsis">
       
         CER Leaderboard (our experiments)
+      
+    </span>
+  </a>
+  
+</li>
+        
+      </ul>
+    </nav>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#rtx-pro-6000-troubleshooting-campaign" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        RTX PRO 6000 Troubleshooting Campaign
+      
+    </span>
+  </a>
+  
+    <nav class="md-nav" aria-label="RTX PRO 6000 Troubleshooting Campaign">
+      <ul class="md-nav__list">
+        
+          <li class="md-nav__item">
+  <a href="#wave-1-objective" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        Wave 1 Objective
       
     </span>
   </a>
@@ -1883,9 +2045,12 @@
 
 <h1 id="transformer-encoder-ctc">Transformer Encoder + CTC<a class="headerlink" href="#transformer-encoder-ctc" title="Permanent link">&para;</a></h1>
 <blockquote>
-<p><strong>Status:</strong> Active — architecture sweep running on 8×H200 (Verda).
+<p><strong>Status:</strong> Whisper-based transfer model implemented. General Transformer architecture sweep ran on 8×H200 (Verda).
 <strong>Module:</strong> <code>emg2qwerty.lightning.T5CTCModule</code>
 <strong>Config:</strong> <code>config/model/t5_ctc.yaml</code></p>
+<p>The active remediation campaign now targets the <code>yahvin/transformer-troubleshoot</code>
+branch on an <code>8x RTX PRO 6000</code> Verda instance and tracks every transformer-family
+wave in <a href="../../experiments/transformer_troubleshooting/"><code>docs/experiments/transformer_troubleshooting.md</code></a>.</p>
 </blockquote>
 <h2 id="architecture">Architecture<a class="headerlink" href="#architecture" title="Permanent link">&para;</a></h2>
 <p>The Transformer-CTC model reuses the same EMG front-end as the TDS-ConvNet baseline
@@ -1953,6 +2118,85 @@ convolutional encoder with a standard PyTorch <code>nn.TransformerEncoder</code>
 </tr>
 </tbody>
 </table>
+<h3 id="available-and-planned-models">Available and planned models<a class="headerlink" href="#available-and-planned-models" title="Permanent link">&para;</a></h3>
+<table>
+<thead>
+<tr>
+<th>Model</th>
+<th>Key idea</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Whisper-CTC (<code>model=whisper_ctc</code>)</td>
+<td>Project EMG features into a pretrained Whisper encoder and train a CTC head</td>
+</tr>
+<tr>
+<td>Encoder-only Transformer</td>
+<td>Self-attention over EMG spectrogram frames</td>
+</tr>
+<tr>
+<td>CNN + Transformer</td>
+<td>TDS/Conv front-end → Transformer encoder</td>
+</tr>
+<tr>
+<td>Conformer-CTC (planned)</td>
+<td>Convolution-augmented attention encoder for better local/global balance</td>
+</tr>
+<tr>
+<td>Raw-CNN + Transformer (planned)</td>
+<td>FairEMG-style raw sEMG frontend before attention</td>
+</tr>
+<tr>
+<td>MyoText-style Refiner (planned)</td>
+<td>Stage-A motor model plus transformer text correction</td>
+</tr>
+</tbody>
+</table>
+<h2 id="documented-whisper-ctc-result">Documented Whisper-CTC result<a class="headerlink" href="#documented-whisper-ctc-result" title="Permanent link">&para;</a></h2>
+<p>The current transformer-family result comes from the <code>whisper_ctc</code> experiment,
+which reuses the pretrained <code>openai/whisper-tiny</code> encoder with the top two
+encoder layers unfrozen.</p>
+<table>
+<thead>
+<tr>
+<th>Metric</th>
+<th>Validation</th>
+<th>Test</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>CER (%)</td>
+<td>17.72</td>
+<td>99.91</td>
+</tr>
+<tr>
+<td>DER (%)</td>
+<td>2.55</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>IER (%)</td>
+<td>4.10</td>
+<td>99.91</td>
+</tr>
+<tr>
+<td>SER (%)</td>
+<td>11.08</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Loss</td>
+<td>0.615</td>
+<td>inf</td>
+</tr>
+</tbody>
+</table>
+<p>The validation split looked promising, but the test split collapsed due to
+massive insertion errors. Right now that makes the Whisper transfer approach a
+useful experiment, not a competitive model for this task.</p>
+<h3 id="minimal-example-skeleton">Minimal example skeleton<a class="headerlink" href="#minimal-example-skeleton" title="Permanent link">&para;</a></h3>
 <h3 id="configurable-parameters">Configurable parameters<a class="headerlink" href="#configurable-parameters" title="Permanent link">&para;</a></h3>
 <p>All controllable via Hydra overrides:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="nt">module</span><span class="p">:</span>
@@ -2097,6 +2341,86 @@ because test feeds the entire session (~140K timesteps) without windowing, while
 training/val use 4-sec windows (8K timesteps). See
 <a href="../../experiments/results/#critical-finding-sequence-length-generalization-gap">Sequence-Length Generalization Gap</a>.</p>
 </blockquote>
+<h2 id="rtx-pro-6000-troubleshooting-campaign">RTX PRO 6000 Troubleshooting Campaign<a class="headerlink" href="#rtx-pro-6000-troubleshooting-campaign" title="Permanent link">&para;</a></h2>
+<p>The active campaign treats the new Verda machine as an 8-lane experiment cluster.
+Each GPU runs one independent job rather than participating in standard DDP.</p>
+<table>
+<thead>
+<tr>
+<th>Resource</th>
+<th>Value</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>GPUs</td>
+<td>8x RTX PRO 6000</td>
+</tr>
+<tr>
+<td>Per-GPU VRAM</td>
+<td>~96 GB</td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>240 vCPU</td>
+</tr>
+<tr>
+<td>RAM</td>
+<td>720 GB</td>
+</tr>
+<tr>
+<td>Planning mode</td>
+<td>one GPU per run, rolling 8-lane waves</td>
+</tr>
+</tbody>
+</table>
+<h3 id="wave-1-objective">Wave 1 Objective<a class="headerlink" href="#wave-1-objective" title="Permanent link">&para;</a></h3>
+<p>The first RTX PRO 6000 wave focuses exclusively on inference policy:</p>
+<table>
+<thead>
+<tr>
+<th style="text-align: right;">GPU</th>
+<th>Planned run</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td style="text-align: right;">0</td>
+<td>Large CNN + Transformer, <code>full_session</code> control</td>
+</tr>
+<tr>
+<td style="text-align: right;">1</td>
+<td>Large CNN + Transformer, <code>windowed_chunk_decode</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">2</td>
+<td>Large CNN + Transformer, <code>windowed_logits_merge</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">3</td>
+<td>Small CNN + Transformer, <code>windowed_logits_merge</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">4</td>
+<td>Whisper-CTC, <code>windowed_logits_merge</code></td>
+</tr>
+<tr>
+<td style="text-align: right;">5</td>
+<td>TDS-ConvNet, <code>windowed_logits_merge</code> control</td>
+</tr>
+<tr>
+<td style="text-align: right;">6</td>
+<td>Large CNN + Transformer, alternate stride</td>
+</tr>
+<tr>
+<td style="text-align: right;">7</td>
+<td>Large CNN + Transformer, alternate trim</td>
+</tr>
+</tbody>
+</table>
+<p>This wave is designed to answer one question before any retraining starts:
+how much of the transformer test collapse is caused by full-session inference
+rather than by the encoder itself?</p>
 <h3 id="key-findings">Key findings<a class="headerlink" href="#key-findings" title="Permanent link">&para;</a></h3>
 <ol>
 <li>

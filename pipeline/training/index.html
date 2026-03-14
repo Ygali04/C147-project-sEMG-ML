@@ -1261,7 +1261,7 @@
   <span class="md-ellipsis">
     
   
-    RNN / LSTM / GRU
+    RNN / LSTM
   
 
     
@@ -1375,6 +1375,34 @@
     
   
     Experiment Results
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../experiments/transformer_troubleshooting/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Transformer Troubleshooting
   
 
     
@@ -1564,14 +1592,20 @@ across multiple user profiles stored in Backblaze B2.</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="c1"># Train on baseline profile (user 89335547)</span>
 <a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline
 <a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a>
-<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Train on 10 random profiles from the registry</span>
-<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--test
+<a id="__codelineno-0-4" name="__codelineno-0-4" href="#__codelineno-0-4"></a><span class="c1"># Train baseline with BiLSTM CTC</span>
+<a id="__codelineno-0-5" name="__codelineno-0-5" href="#__codelineno-0-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--model<span class="w"> </span>bilstm_ctc
 <a id="__codelineno-0-6" name="__codelineno-0-6" href="#__codelineno-0-6"></a>
-<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Train on ALL profiles in the registry</span>
-<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--all
+<a id="__codelineno-0-7" name="__codelineno-0-7" href="#__codelineno-0-7"></a><span class="c1"># Train baseline with CNN + BiLSTM CTC</span>
+<a id="__codelineno-0-8" name="__codelineno-0-8" href="#__codelineno-0-8"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--model<span class="w"> </span>cnn_bilstm_ctc
 <a id="__codelineno-0-9" name="__codelineno-0-9" href="#__codelineno-0-9"></a>
-<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Resume from a checkpoint</span>
-<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--checkpoint<span class="w"> </span>logs/2026-03-11/best.ckpt
+<a id="__codelineno-0-10" name="__codelineno-0-10" href="#__codelineno-0-10"></a><span class="c1"># Train on 10 random profiles from the registry</span>
+<a id="__codelineno-0-11" name="__codelineno-0-11" href="#__codelineno-0-11"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--test
+<a id="__codelineno-0-12" name="__codelineno-0-12" href="#__codelineno-0-12"></a>
+<a id="__codelineno-0-13" name="__codelineno-0-13" href="#__codelineno-0-13"></a><span class="c1"># Train on ALL profiles in the registry</span>
+<a id="__codelineno-0-14" name="__codelineno-0-14" href="#__codelineno-0-14"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--all
+<a id="__codelineno-0-15" name="__codelineno-0-15" href="#__codelineno-0-15"></a>
+<a id="__codelineno-0-16" name="__codelineno-0-16" href="#__codelineno-0-16"></a><span class="c1"># Resume from a checkpoint</span>
+<a id="__codelineno-0-17" name="__codelineno-0-17" href="#__codelineno-0-17"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--checkpoint<span class="w"> </span>logs/2026-03-11/best.ckpt
 </code></pre></div>
 <p>Or use the Makefile shortcuts:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a>make<span class="w"> </span>train-baseline
@@ -1632,6 +1666,18 @@ and <code>OmegaConf.from_dotlist</code> to compose the final config.</p>
 <td>TDS-CNN architecture</td>
 </tr>
 <tr>
+<td><code>config/model/bilstm_ctc.yaml</code></td>
+<td>Bidirectional LSTM encoder</td>
+</tr>
+<tr>
+<td><code>config/model/cnn_bilstm_ctc.yaml</code></td>
+<td>Temporal CNN front-end + BiLSTM encoder</td>
+</tr>
+<tr>
+<td><code>config/model/whisper_ctc.yaml</code></td>
+<td>Whisper encoder transfer model with CTC head</td>
+</tr>
+<tr>
 <td><code>config/optimizer/adam.yaml</code></td>
 <td>Adam optimizer (lr=1e-3)</td>
 </tr>
@@ -1652,7 +1698,15 @@ and <code>OmegaConf.from_dotlist</code> to compose the final config.</p>
 <p>The batched trainer passes user-specific overrides to Hydra automatically:</p>
 <div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="c1"># These are injected per-profile:</span>
 <a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="nt">dataset.root</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">data/&lt;user_id&gt;</span>
-<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">single_user</span><span class="w">       </span><span class="c1"># or the appropriate user config</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="nt">user</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">single_user</span><span class="w">       </span><span class="c1"># or the appropriate user config, &lt;user_id&gt;</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="nt">model</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;model_name&gt;</span>
+<a id="__codelineno-2-5" name="__codelineno-2-5" href="#__codelineno-2-5"></a><span class="nt">checkpoint</span><span class="p">:</span><span class="w"> </span><span class="l l-Scalar l-Scalar-Plain">&lt;checkpoint_path&gt;</span><span class="w">   </span><span class="c1"># optional</span>
+</code></pre></div>
+<p>You can select the model from CLI:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--model<span class="w"> </span>tds_conv_ctc
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--model<span class="w"> </span>bilstm_ctc
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--model<span class="w"> </span>cnn_bilstm_ctc
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>scripts/train_batched.py<span class="w"> </span>--baseline<span class="w"> </span>--model<span class="w"> </span>whisper_ctc
 </code></pre></div>
 <h2 id="checkpoint-management">Checkpoint Management<a class="headerlink" href="#checkpoint-management" title="Permanent link">&para;</a></h2>
 <ul>
@@ -1665,16 +1719,30 @@ and <code>OmegaConf.from_dotlist</code> to compose the final config.</p>
 </li>
 </ul>
 <h2 id="output-structure">Output Structure<a class="headerlink" href="#output-structure" title="Permanent link">&para;</a></h2>
-<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a>logs/
-<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a>  2026-03-11/
-<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a>    14-30-00/
-<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a>      checkpoints/
-<a id="__codelineno-3-5" name="__codelineno-3-5" href="#__codelineno-3-5"></a>        epoch=42-step=1234.ckpt
-<a id="__codelineno-3-6" name="__codelineno-3-6" href="#__codelineno-3-6"></a>        last.ckpt
-<a id="__codelineno-3-7" name="__codelineno-3-7" href="#__codelineno-3-7"></a>      hydra_configs/
-<a id="__codelineno-3-8" name="__codelineno-3-8" href="#__codelineno-3-8"></a>        base.yaml
-<a id="__codelineno-3-9" name="__codelineno-3-9" href="#__codelineno-3-9"></a>        overrides.yaml
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a>logs/
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a>  2026-03-11/
+<a id="__codelineno-4-3" name="__codelineno-4-3" href="#__codelineno-4-3"></a>    14-30-00/
+<a id="__codelineno-4-4" name="__codelineno-4-4" href="#__codelineno-4-4"></a>      checkpoints/
+<a id="__codelineno-4-5" name="__codelineno-4-5" href="#__codelineno-4-5"></a>        epoch=42-step=1234.ckpt
+<a id="__codelineno-4-6" name="__codelineno-4-6" href="#__codelineno-4-6"></a>        last.ckpt
+<a id="__codelineno-4-7" name="__codelineno-4-7" href="#__codelineno-4-7"></a>      hydra_configs/
+<a id="__codelineno-4-8" name="__codelineno-4-8" href="#__codelineno-4-8"></a>        base.yaml
+<a id="__codelineno-4-9" name="__codelineno-4-9" href="#__codelineno-4-9"></a>        overrides.yaml
+<a id="__codelineno-4-10" name="__codelineno-4-10" href="#__codelineno-4-10"></a>      training_progress.png
 </code></pre></div>
+<p><code>training_progress.png</code> is generated automatically at the end of training for
+all model choices (<code>tds_conv_ctc</code>, <code>bilstm_ctc</code>, <code>cnn_bilstm_ctc</code>, <code>whisper_ctc</code>).</p>
+<p>If you change the plotting code or want to backfill older runs, regenerate the
+images directly from the saved metrics CSV files:</p>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="c1"># Rebuild all plots for one training day</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.plot_training_curves<span class="w"> </span>logs/2026-03-12/*
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a>
+<a id="__codelineno-5-4" name="__codelineno-5-4" href="#__codelineno-5-4"></a><span class="c1"># Rebuild a single run</span>
+<a id="__codelineno-5-5" name="__codelineno-5-5" href="#__codelineno-5-5"></a>uv<span class="w"> </span>run<span class="w"> </span>python<span class="w"> </span>-m<span class="w"> </span>emg2qwerty.plot_training_curves<span class="w"> </span>logs/2026-03-12/09-20-04
+</code></pre></div>
+<p>This command scans each run directory for <code>lightning_logs/version_*/metrics.csv</code>
+and writes a fresh <code>training_progress.png</code> next to the run's checkpoints and
+Hydra config outputs.</p>
 <h2 id="monitoring">Monitoring<a class="headerlink" href="#monitoring" title="Permanent link">&para;</a></h2>
 <p>Training progress is logged to the console with:</p>
 <ul>

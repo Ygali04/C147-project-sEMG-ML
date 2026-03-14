@@ -23,6 +23,7 @@ from torchmetrics import MetricCollection
 from emg2qwerty import utils
 from emg2qwerty.charset import charset
 from emg2qwerty.data import LabelData, WindowedEMGDataset
+from emg2qwerty.inference import build_window_specs, merge_log_prob_chunks, resize_log_probs_to_input_length
 from emg2qwerty.metrics import CharacterErrorRates
 from emg2qwerty.modules import (
     MultiBandRotationInvariantMLP,
@@ -141,17 +142,124 @@ class WindowedEMGDataModule(pl.LightningDataModule):
 
 
 class CTCModuleBase(pl.LightningModule):
+    def _setup_inference(self, inference: DictConfig | None) -> None:
+        inference = inference or {}
+        self._inference_policy = str(inference.get("policy", "full_session"))
+        self._inference_window_length = inference.get("window_length")
+        self._inference_stride = inference.get("stride")
+        self._inference_trim_margin = int(inference.get("trim_margin", 0))
+        self._inference_apply_on = str(inference.get("apply_on", "test"))
+
     def _setup_ctc(self, decoder: DictConfig) -> None:
         self.ctc_loss = nn.CTCLoss(blank=charset().null_class)
         self.decoder = instantiate(decoder)
 
         metrics = MetricCollection([CharacterErrorRates()])
         self.metrics = nn.ModuleDict(
-            {
-                f"{phase}_metrics": metrics.clone(prefix=f"{phase}/")
-                for phase in ["train", "val", "test"]
-            }
+            {f"{phase}_metrics": metrics.clone(prefix=f"{phase}/") for phase in ["train", "val", "test"]}
         )
+
+    def _forward_for_ctc(self, inputs: torch.Tensor, input_lengths: torch.Tensor) -> torch.Tensor:
+        del input_lengths
+        return self.forward(inputs)
+
+    def _augment_loss(self, phase: str, loss: torch.Tensor, emissions: torch.Tensor) -> torch.Tensor:
+        del phase, emissions
+        return loss
+
+    def _use_windowed_inference(self, phase: str, batch_size: int) -> bool:
+        return (
+            phase == self._inference_apply_on
+            and self._inference_policy != "full_session"
+            and batch_size == 1
+            and self._inference_window_length is not None
+        )
+
+    def _build_test_window_specs(self, full_length: int) -> list:
+        window_length = int(self._inference_window_length)
+        stride = int(self._inference_stride or window_length)
+        return build_window_specs(
+            total_length=full_length,
+            window_length=window_length,
+            stride=stride,
+            trim_margin=self._inference_trim_margin,
+        )
+
+    def _run_windowed_chunk_decode(
+        self,
+        inputs: torch.Tensor,
+        input_lengths: torch.Tensor,
+    ) -> list[LabelData]:
+        full_length = int(input_lengths[0].item())
+        window_specs = self._build_test_window_specs(full_length)
+        predictions: list[LabelData] = []
+
+        for spec in window_specs:
+            chunk_inputs = inputs[spec.start : spec.end]
+            chunk_input_lengths = torch.tensor([spec.length], dtype=input_lengths.dtype, device=input_lengths.device)
+            chunk_emissions = self._forward_for_ctc(chunk_inputs, chunk_input_lengths)
+            resized = resize_log_probs_to_input_length(chunk_emissions, spec.length)
+            kept = resized[spec.keep_start : spec.keep_end]
+
+            self.decoder.reset()
+            chunk_prediction = self.decoder.decode(
+                emissions=kept[:, 0].detach().cpu().numpy(),
+                timestamps=np.arange(spec.start + spec.keep_start, spec.start + spec.keep_end),
+                finish=True,
+            )
+            predictions.append(chunk_prediction)
+
+        if not predictions:
+            return [LabelData.from_labels([])]
+
+        merged_prediction = predictions[0]
+        for prediction in predictions[1:]:
+            merged_prediction = merged_prediction + prediction
+        return [merged_prediction]
+
+    def _run_windowed_logit_merge(
+        self,
+        inputs: torch.Tensor,
+        input_lengths: torch.Tensor,
+    ) -> tuple[torch.Tensor, torch.Tensor]:
+        full_length = int(input_lengths[0].item())
+        window_specs = self._build_test_window_specs(full_length)
+        chunk_log_probs: list[torch.Tensor] = []
+
+        for spec in window_specs:
+            chunk_inputs = inputs[spec.start : spec.end]
+            chunk_input_lengths = torch.tensor([spec.length], dtype=input_lengths.dtype, device=input_lengths.device)
+            chunk_emissions = self._forward_for_ctc(chunk_inputs, chunk_input_lengths)
+            chunk_log_probs.append(chunk_emissions)
+
+        merged = merge_log_prob_chunks(chunk_log_probs, window_specs, full_length)
+        merged_lengths = torch.tensor([merged.shape[0]], dtype=input_lengths.dtype, device=input_lengths.device)
+        return merged, merged_lengths
+
+    def _run_inference_policy(
+        self,
+        phase: str,
+        inputs: torch.Tensor,
+        input_lengths: torch.Tensor,
+    ) -> tuple[torch.Tensor | None, torch.Tensor | None, list[LabelData] | None]:
+        batch_size = len(input_lengths)
+        if not self._use_windowed_inference(phase, batch_size):
+            emissions = self._forward_for_ctc(inputs, input_lengths)
+            emission_lengths = self._compute_emission_lengths(
+                input_lengths=input_lengths,
+                input_timesteps=inputs.shape[0],
+                emission_timesteps=emissions.shape[0],
+            )
+            return emissions, emission_lengths, None
+
+        if self._inference_policy == "windowed_chunk_decode":
+            predictions = self._run_windowed_chunk_decode(inputs, input_lengths)
+            return None, None, predictions
+        if self._inference_policy == "windowed_logits_merge":
+            emissions, emission_lengths = self._run_windowed_logit_merge(inputs, input_lengths)
+            return emissions, emission_lengths, None
+
+        raise ValueError(f"Unsupported inference policy: {self._inference_policy}")
 
     def _step(self, phase: str, batch: dict[str, torch.Tensor], *args, **kwargs) -> torch.Tensor:
         inputs = batch["inputs"]
@@ -160,25 +268,24 @@ class CTCModuleBase(pl.LightningModule):
         target_lengths = batch["target_lengths"]
         N = len(input_lengths)  # batch_size
 
-        emissions = self.forward(inputs)
+        emissions, emission_lengths, predictions = self._run_inference_policy(phase, inputs, input_lengths)
 
-        emission_lengths = self._compute_emission_lengths(
-            input_lengths=input_lengths,
-            input_timesteps=inputs.shape[0],
-            emission_timesteps=emissions.shape[0],
-        )
+        loss: torch.Tensor | None = None
+        if emissions is not None and emission_lengths is not None:
+            loss = self.ctc_loss(
+                log_probs=emissions,  # (T, N, num_classes)
+                targets=targets.transpose(0, 1),  # (T, N) -> (N, T)
+                input_lengths=emission_lengths,  # (N,)
+                target_lengths=target_lengths,  # (N,)
+            )
+            loss = self._augment_loss(phase, loss, emissions)
 
-        loss = self.ctc_loss(
-            log_probs=emissions,  # (T, N, num_classes)
-            targets=targets.transpose(0, 1),  # (T, N) -> (N, T)
-            input_lengths=emission_lengths,  # (N,)
-            target_lengths=target_lengths,  # (N,)
-        )
-
-        predictions = self.decoder.decode_batch(
-            emissions=emissions.detach().cpu().numpy(),
-            emission_lengths=emission_lengths.detach().cpu().numpy(),
-        )
+        if predictions is None:
+            assert emissions is not None and emission_lengths is not None
+            predictions = self.decoder.decode_batch(
+                emissions=emissions.detach().cpu().numpy(),
+                emission_lengths=emission_lengths.detach().cpu().numpy(),
+            )
 
         metrics = self.metrics[f"{phase}_metrics"]
         targets = targets.detach().cpu().numpy()
@@ -187,8 +294,12 @@ class CTCModuleBase(pl.LightningModule):
             target = LabelData.from_labels(targets[: target_lengths[i], i])
             metrics.update(prediction=predictions[i], target=target)
 
-        self.log(f"{phase}/loss", loss, batch_size=N, sync_dist=True)
-        return loss
+        if loss is not None:
+            self.log(f"{phase}/loss", loss, batch_size=N, sync_dist=True)
+            return loss
+
+        fallback_loss = torch.zeros((), device=inputs.device)
+        return fallback_loss
 
     def _compute_emission_lengths(
         self,
@@ -261,9 +372,11 @@ class TDSConvCTCModule(CTCModuleBase):
         optimizer: DictConfig,
         lr_scheduler: DictConfig,
         decoder: DictConfig,
+        inference: DictConfig | None = None,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
+        self._setup_inference(inference)
 
         num_features = self.NUM_BANDS * mlp_features[-1]
 
@@ -296,7 +409,7 @@ class TDSConvCTCModule(CTCModuleBase):
         return self.model(inputs)
 
 
-class T5CTCModule(pl.LightningModule):
+class T5CTCModule(CTCModuleBase):
     """Transformer encoder + CTC head for EMG-to-text prediction.
 
     Reuses the same EMG front-end as :class:`TDSConvCTCModule`
@@ -320,12 +433,14 @@ class T5CTCModule(pl.LightningModule):
         optimizer: DictConfig,
         lr_scheduler: DictConfig,
         decoder: DictConfig,
+        inference: DictConfig | None = None,
         use_cnn: bool = True,
         blank_penalty_epochs: int = 40,
         blank_alpha_max: float = 50.0,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
+        self._setup_inference(inference)
 
         self._use_cnn = use_cnn
         self._BLANK_PENALTY_EPOCHS = blank_penalty_epochs
@@ -404,17 +519,24 @@ class T5CTCModule(pl.LightningModule):
             self.output_proj.bias.fill_(math.log(1.0 / num_chars))
             self.output_proj.bias[blank_idx] = -5.0
 
-        # Criterion
-        self.ctc_loss = nn.CTCLoss(blank=charset().null_class, zero_infinity=True)
+        self._setup_ctc(decoder)
 
-        # Decoder
-        self.decoder = instantiate(decoder)
+    def _forward_for_ctc(self, inputs: torch.Tensor, input_lengths: torch.Tensor) -> torch.Tensor:
+        return self.forward(inputs, input_lengths)
 
-        # Metrics
-        metrics = MetricCollection([CharacterErrorRates()])
-        self.metrics = nn.ModuleDict(
-            {f"{phase}_metrics": metrics.clone(prefix=f"{phase}/") for phase in ["train", "val", "test"]}
-        )
+    def _augment_loss(self, phase: str, loss: torch.Tensor, emissions: torch.Tensor) -> torch.Tensor:
+        if phase != "train":
+            return loss
+
+        blank_idx = charset().null_class
+        current_epoch = self.current_epoch
+        if current_epoch < self._BLANK_PENALTY_EPOCHS:
+            blank_prob = emissions[:, :, blank_idx].exp().mean()
+            alpha = self._BLANK_ALPHA_MAX * (1.0 - current_epoch / self._BLANK_PENALTY_EPOCHS)
+            loss = loss + alpha * blank_prob
+            self.log("train/blank_prob", blank_prob, prog_bar=True, sync_dist=True)
+            self.log("train/blank_alpha", alpha, prog_bar=False, sync_dist=True)
+        return loss
 
     def forward(self, inputs: torch.Tensor, input_lengths: torch.Tensor) -> torch.Tensor:
         # inputs: (T, N, bands=2, C=16, freq)
@@ -455,83 +577,6 @@ class T5CTCModule(pl.LightningModule):
 
         return F.log_softmax(self.output_proj(x), dim=-1)  # (T, N, num_classes)
 
-    def _step(self, phase: str, batch: dict[str, torch.Tensor], *args, **kwargs) -> torch.Tensor:
-        inputs = batch["inputs"]
-        targets = batch["targets"]
-        input_lengths = batch["input_lengths"]
-        target_lengths = batch["target_lengths"]
-        N = len(input_lengths)
-
-        emissions = self.forward(inputs, input_lengths)
-        emission_lengths = input_lengths
-
-        loss = self.ctc_loss(
-            log_probs=emissions,
-            targets=targets.transpose(0, 1),
-            input_lengths=emission_lengths,
-            target_lengths=target_lengths,
-        )
-
-        # --- Anti-blank-collapse regularisation ---
-        # The CTC loss is O(10-100), so the penalty must be on the same scale.
-        # We penalise mean blank probability with a coefficient that decays
-        # linearly from _BLANK_ALPHA_MAX to 0 over _BLANK_PENALTY_EPOCHS.
-        blank_idx = charset().null_class
-        current_epoch = self.current_epoch
-        if current_epoch < self._BLANK_PENALTY_EPOCHS:
-            blank_prob = emissions[:, :, blank_idx].exp().mean()
-            alpha = self._BLANK_ALPHA_MAX * (1.0 - current_epoch / self._BLANK_PENALTY_EPOCHS)
-            loss = loss + alpha * blank_prob
-            self.log("train/blank_prob", blank_prob, prog_bar=True, sync_dist=True)
-            self.log("train/blank_alpha", alpha, prog_bar=False, sync_dist=True)
-
-        # Decode emissions
-        predictions = self.decoder.decode_batch(
-            emissions=emissions.detach().cpu().numpy(),
-            emission_lengths=emission_lengths.detach().cpu().numpy(),
-        )
-
-        # Update metrics
-        metrics = self.metrics[f"{phase}_metrics"]
-        targets_np = targets.detach().cpu().numpy()
-        target_lengths_np = target_lengths.detach().cpu().numpy()
-        for i in range(N):
-            target = LabelData.from_labels(targets_np[: target_lengths_np[i], i])
-            metrics.update(prediction=predictions[i], target=target)
-
-        self.log(f"{phase}/loss", loss, batch_size=N, sync_dist=True)
-        return loss
-
-    def _epoch_end(self, phase: str) -> None:
-        metrics = self.metrics[f"{phase}_metrics"]
-        self.log_dict(metrics.compute(), sync_dist=True)
-        metrics.reset()
-
-    def training_step(self, *args, **kwargs) -> torch.Tensor:
-        return self._step("train", *args, **kwargs)
-
-    def validation_step(self, *args, **kwargs) -> torch.Tensor:
-        return self._step("val", *args, **kwargs)
-
-    def test_step(self, *args, **kwargs) -> torch.Tensor:
-        return self._step("test", *args, **kwargs)
-
-    def on_train_epoch_end(self) -> None:
-        self._epoch_end("train")
-
-    def on_validation_epoch_end(self) -> None:
-        self._epoch_end("val")
-
-    def on_test_epoch_end(self) -> None:
-        self._epoch_end("test")
-
-    def configure_optimizers(self) -> dict[str, Any]:
-        return utils.instantiate_optimizer_and_scheduler(
-            self.parameters(),
-            optimizer_config=self.hparams.optimizer,
-            lr_scheduler_config=self.hparams.lr_scheduler,
-        )
-
 
 class BiLSTMCTCModule(CTCModuleBase):
     NUM_BANDS: ClassVar[int] = 2
@@ -547,9 +592,11 @@ class BiLSTMCTCModule(CTCModuleBase):
         optimizer: DictConfig,
         lr_scheduler: DictConfig,
         decoder: DictConfig,
+        inference: DictConfig | None = None,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
+        self._setup_inference(inference)
 
         num_features = self.NUM_BANDS * mlp_features[-1]
 
@@ -600,9 +647,11 @@ class CNNBiLSTMCTCModule(CTCModuleBase):
         optimizer: DictConfig,
         lr_scheduler: DictConfig,
         decoder: DictConfig,
+        inference: DictConfig | None = None,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
+        self._setup_inference(inference)
 
         if conv_kernel_size % 2 == 0:
             raise ValueError("conv_kernel_size must be odd to preserve sequence length.")
@@ -675,9 +724,11 @@ class WhisperCTCModule(CTCModuleBase):
         optimizer: DictConfig,
         lr_scheduler: DictConfig,
         decoder: DictConfig,
+        inference: DictConfig | None = None,
     ) -> None:
         super().__init__()
         self.save_hyperparameters()
+        self._setup_inference(inference)
 
         try:
             whisper_model_cls = import_module("transformers").WhisperModel

@@ -71,6 +71,7 @@ def main(config: DictConfig):
         optimizer=config.optimizer,
         lr_scheduler=config.lr_scheduler,
         decoder=config.decoder,
+        inference=config.get("inference"),
         _recursive_=False,
     )
     if config.checkpoint is not None:
@@ -80,6 +81,7 @@ def main(config: DictConfig):
             optimizer=config.optimizer,
             lr_scheduler=config.lr_scheduler,
             decoder=config.decoder,
+            inference=config.get("inference"),
             weights_only=False,
         )
 
@@ -121,7 +123,14 @@ def main(config: DictConfig):
         # Load best checkpoint when available (fast_dev_run can skip checkpointing).
         best_checkpoint = trainer.checkpoint_callback.best_model_path
         if best_checkpoint and Path(best_checkpoint).is_file():
-            module = type(module).load_from_checkpoint(best_checkpoint)
+            module = type(module).load_from_checkpoint(
+                best_checkpoint,
+                optimizer=config.optimizer,
+                lr_scheduler=config.lr_scheduler,
+                decoder=config.decoder,
+                inference=config.get("inference"),
+                weights_only=False,
+            )
         else:
             log.warning("No best checkpoint available; continuing with in-memory model weights.")
 

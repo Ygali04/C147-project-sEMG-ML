@@ -60,6 +60,17 @@ in the result columns when runs complete.
 |---|---:|---|---|---|---|---|---|---|---|---|---:|---:|---:|---|
 | wave-0-template | 0 | example | pending | pending | pending | pending | pending | pending | planned | — | — | — | — | template row |
 
+## Wave 1 Launch Template
+
+```bash
+export TDS_CKPT=/root/checkpoints/tds_best.ckpt
+export LARGE_TRANSFORMER_CKPT=/root/checkpoints/transformer_large_best.ckpt
+export SMALL_TRANSFORMER_CKPT=/root/checkpoints/transformer_small_best.ckpt
+export WHISPER_CKPT=/root/checkpoints/whisper_best.ckpt
+
+bash scripts/wave1_inference_sweep.sh
+```
+
 ## Inference Policy Comparison Template
 
 | Policy | Window length | Stride | Trim margin | Merge strategy | Model | Val CER | Test CER | IER | DER | SER | Notes |

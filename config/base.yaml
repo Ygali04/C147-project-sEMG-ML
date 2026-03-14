@@ -5,6 +5,7 @@ defaults:
   - optimizer: adam
   - lr_scheduler: cosine_annealing
   - decoder: ctc_greedy
+  - inference: full_session
   - cluster: local
   - _self_
 
@@ -52,4 +53,5 @@ hydra:
         exclude_keys:
           - checkpoint
           - cluster
+          - inference
           - trainer.accelerator

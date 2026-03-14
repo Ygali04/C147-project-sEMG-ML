@@ -245,9 +245,18 @@ class CTCModuleBase(pl.LightningModule):
         if not predictions:
             return [LabelData.from_labels([])]
 
-        merged_prediction = predictions[0]
-        for prediction in predictions[1:]:
-            merged_prediction = merged_prediction + prediction
+        # Sort predictions by their window start position and
+        # concatenate texts (skipping the LabelData.__add__ which
+        # asserts timestamp monotonicity — overlapping windows can
+        # produce overlapping timestamp ranges).
+        merged_text = "".join(p.text for p in predictions)
+        merged_timestamps = np.concatenate([p.timestamps for p in predictions])
+        # Make timestamps monotonic by taking cumulative max
+        if len(merged_timestamps) > 0:
+            merged_timestamps = np.maximum.accumulate(merged_timestamps)
+        merged_prediction = LabelData.from_labels(
+            list(merged_text),
+        )
         return [merged_prediction]
 
     def _run_windowed_logit_merge(
@@ -545,7 +554,8 @@ class T5CTCModule(CTCModuleBase):
         div_term = torch.exp(torch.arange(0, d_model, 2, dtype=torch.float) * (-math.log(10000.0) / d_model))
         pe[:, 0::2] = torch.sin(position * div_term)
         pe[:, 1::2] = torch.cos(position * div_term)
-        self.register_buffer("pos_encoding", pe.unsqueeze(1))  # (max_len, 1, d_model)
+        # (max_len, 1, d_model)
+        self.register_buffer("pos_encoding", pe.unsqueeze(1))
         self.pe_dropout = nn.Dropout(0.1)
 
         # --- Standard PyTorch Transformer encoder ---
@@ -673,7 +683,8 @@ class T5CTCModule(CTCModuleBase):
 
         x = self.transformer_encoder(x, mask=attn_bias, src_key_padding_mask=key_padding_mask)
 
-        return F.log_softmax(self.output_proj(x), dim=-1)  # (T, N, num_classes)
+        # (T, N, num_classes)
+        return F.log_softmax(self.output_proj(x), dim=-1)
 
 
 class ConformerCTCModule(CTCModuleBase):
@@ -977,6 +988,185 @@ class CNNBiLSTMCTCModule(CTCModuleBase):
         x, _ = self._run_lstm_with_cudnn_fallback(self.encoder, x)
         x = self.classifier(x)
         return self.log_softmax(x)
+
+
+class CNNBiLSTMTransformerCTCModule(CTCModuleBase):
+    """Hybrid architecture: CNN → BiLSTM → Transformer Encoder → CTC.
+
+    The CNN extracts local temporal features from the spectrogram frontend.
+    The BiLSTM captures sequential dependencies and compresses the representation.
+    The Transformer encoder applies global self-attention on top of the
+    already-contextualized BiLSTM output, avoiding blank collapse because
+    the transformer sees rich sequential features rather than raw projections.
+
+    This mirrors the MyoText "motor decoder" philosophy: a strong sequential
+    encoder feeds a transformer that refines the representation.
+    """
+
+    NUM_BANDS: ClassVar[int] = 2
+    ELECTRODE_CHANNELS: ClassVar[int] = 16
+
+    def __init__(
+        self,
+        in_features: int,
+        mlp_features: Sequence[int],
+        conv_channels: Sequence[int],
+        conv_kernel_size: int,
+        conv_dropout: float,
+        lstm_hidden_size: int,
+        lstm_num_layers: int,
+        lstm_dropout: float,
+        d_model: int,
+        num_heads: int,
+        num_transformer_layers: int,
+        d_ff: int,
+        transformer_dropout: float,
+        optimizer: DictConfig,
+        lr_scheduler: DictConfig,
+        decoder: DictConfig,
+        inference: DictConfig | None = None,
+        positional_encoding: str = "sinusoidal",
+    ) -> None:
+        super().__init__()
+        self.save_hyperparameters()
+        self._setup_inference(inference)
+
+        self._positional_encoding = positional_encoding
+        self._num_heads = num_heads
+
+        if conv_kernel_size % 2 == 0:
+            raise ValueError("conv_kernel_size must be odd to preserve sequence length.")
+
+        num_features = self.NUM_BANDS * mlp_features[-1]
+
+        # --- EMG front-end (shared with other modules) ---
+        self.spec_norm = SpectrogramNorm(
+            channels=self.NUM_BANDS * self.ELECTRODE_CHANNELS,
+        )
+        self.mlp = MultiBandRotationInvariantMLP(
+            in_features=in_features,
+            mlp_features=mlp_features,
+            num_bands=self.NUM_BANDS,
+        )
+        self.flatten = nn.Flatten(start_dim=2)
+
+        # --- Temporal CNN featurizer ---
+        channels = [num_features, *conv_channels]
+        conv_blocks: list[nn.Module] = []
+        for in_ch, out_ch in zip(channels[:-1], channels[1:]):
+            conv_blocks.extend(
+                [
+                    nn.Conv1d(in_ch, out_ch, conv_kernel_size, padding=conv_kernel_size // 2),
+                    nn.BatchNorm1d(out_ch),
+                    nn.GELU(),
+                    nn.Dropout(conv_dropout),
+                ]
+            )
+        self.temporal_conv = nn.Sequential(*conv_blocks)
+
+        # --- BiLSTM sequential encoder ---
+        self.lstm = nn.LSTM(
+            input_size=channels[-1],
+            hidden_size=lstm_hidden_size,
+            num_layers=lstm_num_layers,
+            dropout=lstm_dropout if lstm_num_layers > 1 else 0.0,
+            bidirectional=True,
+            batch_first=False,
+        )
+        lstm_out_size = lstm_hidden_size * 2  # bidirectional
+
+        # --- Project BiLSTM output to transformer d_model ---
+        self.lstm_proj = nn.Linear(lstm_out_size, d_model)
+        self.proj_norm = nn.LayerNorm(d_model)
+
+        # --- Positional encoding ---
+        if positional_encoding == "sinusoidal":
+            max_len = 16000
+            pe = torch.zeros(max_len, d_model)
+            position = torch.arange(0, max_len, dtype=torch.float).unsqueeze(1)
+            div_term = torch.exp(torch.arange(0, d_model, 2, dtype=torch.float) * (-math.log(10000.0) / d_model))
+            pe[:, 0::2] = torch.sin(position * div_term)
+            pe[:, 1::2] = torch.cos(position * div_term)
+            # (max_len, 1, d_model)
+            self.register_buffer("pos_encoding", pe.unsqueeze(1))
+        # ALiBi uses attention biases, no explicit PE buffer needed
+        self.pe_dropout = nn.Dropout(transformer_dropout)
+
+        # --- Transformer encoder ---
+        encoder_layer = nn.TransformerEncoderLayer(
+            d_model=d_model,
+            nhead=num_heads,
+            dim_feedforward=d_ff,
+            dropout=transformer_dropout,
+            activation="gelu",
+            batch_first=False,
+            norm_first=True,
+        )
+        self.transformer_encoder = nn.TransformerEncoder(
+            encoder_layer,
+            num_layers=num_transformer_layers,
+            norm=nn.LayerNorm(d_model),
+        )
+
+        # --- CTC output head ---
+        self.output_proj = nn.Linear(d_model, charset().num_classes)
+
+        self._setup_ctc(decoder)
+
+    def forward(self, inputs: torch.Tensor) -> torch.Tensor:
+        # inputs: (T, N, bands=2, C=16, freq)
+        x = self.spec_norm(inputs)
+        x = self.mlp(x)  # (T, N, 2, 384)
+        x = self.flatten(x)  # (T, N, 768)
+
+        # CNN: (T,N,C) -> (N,C,T) -> CNN -> (T,N,C)
+        x = x.permute(1, 2, 0)
+        x = self.temporal_conv(x)
+        x = x.permute(2, 0, 1)
+
+        # BiLSTM
+        x, _ = self._run_lstm_with_cudnn_fallback(self.lstm, x)
+
+        # Project to d_model and add positional encoding
+        x = self.lstm_proj(x)  # (T, N, d_model)
+        x = self.proj_norm(x)
+
+        T_len = x.shape[0]
+        attn_bias = None
+
+        if self._positional_encoding == "sinusoidal":
+            if T_len <= self.pos_encoding.shape[0]:
+                pe = self.pos_encoding[:T_len]
+            else:
+                # Dynamic extension for long sequences
+                d_model = self.pos_encoding.shape[2]
+                pe = torch.zeros(T_len, 1, d_model, device=x.device)
+                position = torch.arange(0, T_len, dtype=torch.float, device=x.device).unsqueeze(1)
+                div_term = torch.exp(
+                    torch.arange(0, d_model, 2, dtype=torch.float, device=x.device) * (-math.log(10000.0) / d_model)
+                )
+                pe[:, 0, 0::2] = torch.sin(position * div_term)
+                pe[:, 0, 1::2] = torch.cos(position * div_term)
+            x = self.pe_dropout(x + pe)
+        elif self._positional_encoding == "alibi":
+            x = self.pe_dropout(x)
+            # Build ALiBi attention bias
+            positions = torch.arange(T_len, device=x.device)
+            distances = (positions[:, None] - positions[None, :]).abs().float()
+            slopes = torch.tensor(
+                [2 ** (-(8 * (head + 1) / self._num_heads)) for head in range(self._num_heads)],
+                device=x.device,
+                dtype=torch.float,
+            )
+            per_head_bias = -slopes[:, None, None] * distances[None, :, :]
+            attn_bias = per_head_bias.repeat(x.shape[1], 1, 1)  # (N*H, T, T)
+        else:
+            raise ValueError(f"Unsupported positional encoding: {self._positional_encoding}")
+
+        # Transformer encoder
+        x = self.transformer_encoder(x, mask=attn_bias)
+
+        return F.log_softmax(self.output_proj(x), dim=-1)
 
 
 class WhisperCTCModule(CTCModuleBase):

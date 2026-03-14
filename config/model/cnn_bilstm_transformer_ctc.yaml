@@ -1,0 +1,33 @@
+# @package _global_
+#
+# CNN-BiLSTM-Transformer hybrid + CTC head.
+#
+# Architecture: EMG frontend → CNN → BiLSTM → Transformer Encoder → CTC
+#
+# The BiLSTM provides rich sequential context to the transformer,
+# avoiding the blank collapse that pure transformers suffer from.
+# The transformer adds global attention on top of the BiLSTM output.
+#
+module:
+  _target_: emg2qwerty.lightning.CNNBiLSTMTransformerCTCModule
+  in_features: 528 # freq(33) * channels(16)
+  mlp_features: [384] # MLP front-end → 768 features
+  conv_channels: [512, 512] # 2-layer temporal CNN
+  conv_kernel_size: 5 # kernel size for CNN
+  conv_dropout: 0.1
+  lstm_hidden_size: 256 # BiLSTM hidden size (output = 512)
+  lstm_num_layers: 2 # 2-layer BiLSTM
+  lstm_dropout: 0.2
+  d_model: 256 # Transformer model dimension
+  num_heads: 4 # 4 attention heads
+  num_transformer_layers: 2 # Lightweight transformer on top of BiLSTM
+  d_ff: 512 # Feedforward dimension
+  transformer_dropout: 0.1
+  positional_encoding: sinusoidal # sinusoidal or alibi
+
+datamodule:
+  _target_: emg2qwerty.lightning.WindowedEMGDataModule
+  window_length: 8000 # 4-sec windows
+  padding: [1800, 200] # 900ms left + 100ms right context
+  train_window_lengths: null
+  train_window_weights: null

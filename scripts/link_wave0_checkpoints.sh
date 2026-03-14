@@ -13,6 +13,9 @@ link_best() {
 
     ckpt="$(find "${ROOT_DIR}/logs/${run_name}/checkpoints" -name 'epoch=*.ckpt' -type f | sort | tail -1)"
     if [[ -z "${ckpt}" ]]; then
+        ckpt="$(find "${ROOT_DIR}/logs/${run_name}/checkpoints" -name 'last*.ckpt' -type f | sort | tail -1)"
+    fi
+    if [[ -z "${ckpt}" ]]; then
         echo "No checkpoint found for ${run_name}"
         return 1
     fi

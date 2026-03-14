@@ -14,6 +14,7 @@ module:
   d_kv: 32                  # unused, kept for compat
   positional_encoding: sinusoidal
   use_cnn: true             # toggle temporal CNN featurizer
+  temporal_stride: 1        # 1 = no temporal downsampling
   blank_penalty_epochs: 40  # 0 = disable anti-blank penalty
   blank_alpha_max: 50.0     # peak penalty weight
 

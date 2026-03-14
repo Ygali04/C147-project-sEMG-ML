@@ -473,6 +473,7 @@ class T5CTCModule(CTCModuleBase):
         inference: DictConfig | None = None,
         positional_encoding: str = "sinusoidal",
         use_cnn: bool = True,
+        temporal_stride: int = 1,
         blank_penalty_epochs: int = 40,
         blank_alpha_max: float = 50.0,
     ) -> None:
@@ -483,6 +484,7 @@ class T5CTCModule(CTCModuleBase):
         self._use_cnn = use_cnn
         self._positional_encoding = positional_encoding
         self._num_heads = num_heads
+        self._temporal_stride = temporal_stride
         self._BLANK_PENALTY_EPOCHS = blank_penalty_epochs
         self._BLANK_ALPHA_MAX = blank_alpha_max
 
@@ -516,6 +518,19 @@ class T5CTCModule(CTCModuleBase):
                 nn.GELU(),
                 nn.Dropout(0.1),
                 nn.Conv1d(d_model, d_model, kernel_size=3, padding=1),
+                nn.BatchNorm1d(d_model),
+                nn.GELU(),
+                nn.Dropout(0.1),
+            )
+        if temporal_stride > 1:
+            self.temporal_downsample = nn.Sequential(
+                nn.Conv1d(
+                    d_model,
+                    d_model,
+                    kernel_size=2 * temporal_stride + 1,
+                    stride=temporal_stride,
+                    padding=temporal_stride,
+                ),
                 nn.BatchNorm1d(d_model),
                 nn.GELU(),
                 nn.Dropout(0.1),
@@ -622,10 +637,21 @@ class T5CTCModule(CTCModuleBase):
         if self._use_cnn:
             x = x.permute(1, 2, 0)  # (N, C, T)
             x = self.temporal_cnn(x)  # (N, C, T)
+            if self._temporal_stride > 1:
+                x = self.temporal_downsample(x)
             x = x.permute(2, 0, 1)  # (T, N, C)
+        elif self._temporal_stride > 1:
+            x = x.permute(1, 2, 0)
+            x = self.temporal_downsample(x)
+            x = x.permute(2, 0, 1)
         x = self.proj_norm(x)
 
         T_len = x.shape[0]
+        encoder_lengths = torch.div(
+            input_lengths + self._temporal_stride - 1,
+            self._temporal_stride,
+            rounding_mode="floor",
+        )
         if self._positional_encoding == "sinusoidal":
             pe = self._build_positional_encoding(T_len, x.device)
             x = self.pe_dropout(x + pe)
@@ -635,7 +661,7 @@ class T5CTCModule(CTCModuleBase):
             raise ValueError(f"Unsupported positional encoding: {self._positional_encoding}")
 
         # Build key_padding_mask: True = ignore (PyTorch convention)
-        key_padding_mask = torch.arange(T_len, device=x.device).unsqueeze(0) >= input_lengths.unsqueeze(1)  # (N, T)
+        key_padding_mask = torch.arange(T_len, device=x.device).unsqueeze(0) >= encoder_lengths.unsqueeze(1)  # (N, T)
         attn_bias = self._build_attention_bias(T_len, x.shape[1], x.device)
 
         x = self.transformer_encoder(x, mask=attn_bias, src_key_padding_mask=key_padding_mask)

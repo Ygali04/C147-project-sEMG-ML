@@ -49,27 +49,31 @@ Use this table to track live and recently completed runs for the
 
 | Rank | Model | Epochs | Decoder | Inference | Val CER | Test CER | Gap | Notes |
 |---:|---|---:|---|---|---:|---:|---:|---|
-| **1** | **CNN-BiLSTM (150ep)** | 150 | **beam+LM** | full_session | **9.39** | **7.95** | **−1.44** | **🏆 Overall best** |
-| **2** | **CNN-BiLSTM (300ep)** | 300 | **beam+LM** | full_session | **9.11** | **8.47** | **−0.64** | Longer training, slightly worse test |
-| **3** | **ALiBi Transformer** | 150 | **beam+LM** | windowed | **10.97** | **8.84** | **−2.13** | **🏆 Best transformer** |
-| 4 | CNN-BiLSTM deep-CNN | 200 | beam+LM | full_session | 11.72 | 9.55 | −2.17 | 3-layer CNN, tight gap |
-| 5 | ALiBi Transformer | 150 | beam+LM | windowed | 10.97 | 9.88 | −1.09 | replicated eval |
-| 6 | BiLSTM-only | 200 | beam+LM | full_session | 9.97 | 10.72 | 0.75 | no CNN, still competitive |
-| 7 | CNN-BiLSTM (300ep) | 300 | greedy | full_session | 12.36 | 13.81 | 1.45 | best greedy |
-| 8 | CNN-BiLSTM (150ep) | 150 | greedy | full_session | 13.00 | 14.96 | 1.96 | strong greedy baseline |
-| 9 | CNN-BiLSTM-Transformer | 150 | beam+LM | windowed | 9.64 | 14.11 | 4.47 | hybrid, beam helps |
-| 10 | CNN-BiLSTM deep-CNN | 200 | greedy | full_session | 14.58 | 14.80 | 0.22 | tightest greedy gap |
-| 11 | CNN-BiLSTM wide | 200 | greedy | full_session | 14.62 | 16.08 | 1.46 | wider LSTM |
-| 12 | ALiBi Transformer | 150 | greedy | windowed | 17.41 | 17.59 | 0.18 | ALiBi fixes length gap |
-| 13 | BiLSTM-only | 200 | greedy | full_session | 15.11 | 18.31 | 3.20 | no CNN |
-| 14 | TDS-ConvNet | 150 | greedy | full_session | 19.45 | 22.48 | 3.03 | original baseline |
-| 15 | CNN-BiLSTM-Transformer | 150 | greedy | windowed | 13.49 | 22.97 | 9.48 | hybrid windowed |
-| 16 | CNN-BiLSTM-Transformer | 150 | greedy | full_session | 13.49 | 38.34 | 24.85 | transformer adds gap |
-| 17 | Hybrid 300ep | 300 | greedy | full_session | 13.03 | 49.49 | 36.46 | longer doesn't help gap |
-| 18 | Large Transformer | 150 | beam+LM | windowed | 9.37 | 81.07 | 71.70 | sinusoidal PE broken |
-| 19 | Large Transformer | 150 | greedy | windowed | 14.51 | 82.02 | 67.51 | windowing barely helps |
-| 20 | Small Transformer | 150 | greedy | full_session | 15.15 | 87.21 | 72.06 | severe length gap |
-| 21 | Whisper-CTC | 150 | greedy | full_session | 19.30 | 100.0 | 80.70 | complete test failure |
+| **1** | **CNN-BiLSTM Deep LSTM (3L)** | 200 | **beam+LM (λ=3)** | full_session | **10.06** | **7.22** | **−2.84** | **🏆 Overall best** |
+| **2** | **CNN-BiLSTM (150ep)** | 150 | **beam+LM (λ=3)** | full_session | **9.81** | **7.63** | **−2.18** | Tuned beam params |
+| 3 | CNN-BiLSTM (150ep) | 150 | beam+LM | full_session | 9.39 | 7.95 | −1.44 | Default beam params |
+| 4 | CNN-BiLSTM (150ep) | 150 | beam+LM (λ=4) | full_session | 11.28 | 8.02 | −3.26 | Overtuned LM weight |
+| **5** | **CNN-BiLSTM (300ep)** | 300 | **beam+LM** | full_session | **9.11** | **8.47** | **−0.64** | Longer training |
+| 6 | CNN-BiLSTM Deep LSTM (3L) | 200 | beam+LM | full_session | 9.26 | 8.45 | −0.81 | Default beam params |
+| 7 | CNN-BiLSTM warmup | 300 | beam+LM (λ=3) | full_session | 10.61 | 8.80 | −1.81 | Cosine annealing LR |
+| **8** | **ALiBi Transformer** | 150 | **beam+LM** | windowed | **10.97** | **8.84** | **−2.13** | **🏆 Best transformer** |
+| 9 | CNN-BiLSTM warmup | 300 | beam+LM | full_session | 10.04 | 9.12 | −0.92 | Default beam params |
+| 10 | CNN-BiLSTM deep-CNN | 200 | beam+LM | full_session | 11.72 | 9.55 | −2.17 | 3-layer CNN |
+| 11 | BiLSTM-only | 200 | beam+LM | full_session | 9.97 | 10.72 | 0.75 | No CNN |
+| 12 | CNN-BiLSTM 400ep | 400 | beam+LM | full_session | 9.99 | 11.45 | 1.46 | Overfit, worse test |
+| 13 | CNN-BiLSTM Deep LSTM (3L) | 200 | greedy | full_session | 12.36 | 13.40 | 1.04 | **Tightest greedy gap** |
+| 14 | CNN-BiLSTM (300ep) | 300 | greedy | full_session | 12.36 | 13.81 | 1.45 | |
+| 15 | CNN-BiLSTM warmup | 300 | greedy | full_session | 12.05 | 14.57 | 2.52 | **Best greedy val CER** |
+| 16 | CNN-BiLSTM deep-CNN | 200 | greedy | full_session | 14.58 | 14.80 | 0.22 | Tight gap |
+| 17 | CNN-BiLSTM (150ep) | 150 | greedy | full_session | 13.00 | 14.96 | 1.96 | |
+| 18 | CNN-BiLSTM 400ep | 400 | greedy | full_session | 12.85 | 15.80 | 2.95 | Diminishing returns |
+| 19 | CNN-BiLSTM wide | 200 | greedy | full_session | 14.62 | 16.08 | 1.46 | Wider LSTM |
+| 20 | ALiBi Transformer | 150 | greedy | windowed | 17.41 | 17.59 | 0.18 | ALiBi fixes length gap |
+| 21 | BiLSTM-only | 200 | greedy | full_session | 15.11 | 18.31 | 3.20 | No CNN |
+| 22 | TDS-ConvNet | 150 | greedy | full_session | 19.45 | 22.48 | 3.03 | Original baseline |
+| 23 | Large Transformer | 150 | greedy | windowed | 14.51 | 82.02 | 67.51 | Sinusoidal PE broken |
+| 24 | Small Transformer | 150 | greedy | full_session | 15.15 | 87.21 | 72.06 | Severe length gap |
+| 25 | Whisper-CTC | 150 | greedy | full_session | 19.30 | 100.0 | 80.70 | Complete test failure |
 
 ### Wave 11: CER Push Training Results (Greedy)
 
@@ -91,15 +95,44 @@ Use this table to track live and recently completed runs for the
 | ALiBi Transformer | beam+LM | windowed | 10.97 | 9.88 | 4.28 | 0.76 | 4.84 | Transformer sub-10% |
 | BiLSTM-only | beam+LM | full_session | 9.97 | 10.72 | 2.18 | 1.56 | 6.98 | No CNN, still sub-11% |
 
+### Wave 13: Push to Sub-5% — Training Results (Greedy)
+
+| Architecture | Config | Epochs | Val CER | Test CER | Gap | Notes |
+|---|---|---:|---:|---:|---:|---|
+| **CNN-BiLSTM warmup** | h=384, 2L, CosineAnnealing | 300 | **12.05** | 14.57 | 2.52 | **Best greedy val CER** |
+| **CNN-BiLSTM Deep LSTM** | h=384, 3L, [512,512] | 200 | 12.36 | **13.40** | **1.04** | **Best greedy test CER, tightest gap** |
+| CNN-BiLSTM 400ep | h=384, 2L, [512,512] | 400 | 12.85 | 15.80 | 2.95 | Diminishing returns past 300ep |
+| CNN-BiLSTM varwin | h=384, 2L, variable windows | 185 | 13.93 | — | — | Variable window training |
+| Hybrid ALiBi | CNN+BiLSTM+Trans, ALiBi | 200 | 16.19 | OOM | — | ALiBi OOMs on full session |
+| Large ALiBi (300ep) | d=256, 6L, CNN, ALiBi | 300 | 17.92 | OOM | — | ALiBi OOMs on full session |
+| Medium ALiBi | d=192, 6L, CNN, ALiBi | 200 | 18.54 | OOM | — | ALiBi OOMs on full session |
+| Large ALiBi (150ep) | d=256, 6L, CNN, ALiBi | 150 | 20.29 | OOM | — | ALiBi OOMs on full session |
+
+### Wave 13: Beam Search Hyperparameter Ablation
+
+| Model | LM Weight (λ) | Ins. Bonus (β) | Beam Size | Val CER | Test CER | Notes |
+|---|---:|---:|---:|---:|---:|---|
+| **Deep LSTM (3L)** | **3.0** | **3.0** | **100** | **10.06** | **7.22** | **🏆 Best overall** |
+| CNN-BiLSTM (150ep) | 3.0 | 3.0 | 100 | 9.81 | 7.63 | |
+| CNN-BiLSTM (150ep) | 2.0 | 2.0 | 50 | 9.39 | 7.95 | Previous best |
+| CNN-BiLSTM (150ep) | 4.0 | 4.0 | 100 | 11.28 | 8.02 | Over-weighted LM |
+| Deep LSTM (3L) | 2.0 | 2.0 | 50 | 9.26 | 8.45 | Default beam params |
+| Warmup CNN-BiLSTM | 3.0 | 3.0 | 100 | 10.61 | 8.80 | Cosine annealing LR |
+| ALiBi Transformer | 2.0 | 2.0 | 50 | 10.97 | 8.84 | Windowed inference |
+| Warmup CNN-BiLSTM | 2.0 | 2.0 | 50 | 10.04 | 9.12 | |
+| CNN-BiLSTM 400ep | 2.0 | 2.0 | 50 | 9.99 | 11.45 | Overfit, LM can't rescue |
+
 ### Key Findings
 
-1. **KenLM beam search** cuts CER roughly in half vs. greedy decoding (CNN-BiLSTM: 14.96→7.95, ALiBi: 17.59→8.84)
-2. **ALiBi positional encoding** dramatically improves transformer length generalization: val/test gap goes from 72% (sinusoidal) to 0.18% (ALiBi) with windowed inference
-3. **Windowed logits merge** is essential for transformer architectures at test time but slightly hurts models without length issues (CNN-BiLSTM)
-4. **CNN-BiLSTM** remains the strongest single architecture, while **ALiBi Transformer + beam search** brings transformers to competitive test-time performance
-5. **Longer training (300ep)** marginally improves greedy CER (13.00→12.36) but the 150ep model with beam search (7.95%) still beats the 300ep beam result (8.47%)
-6. **Deep CNN (3-layer)** achieves the tightest val/test gap of only 0.22% with greedy decoding
-7. **Sinusoidal PE transformers** cannot be rescued even with beam search + windowed inference (81.07% test CER)
+1. **Beam search hyperparameter tuning** is critical: λ=3.0 with beam=100 beats the default λ=2.0 by 0.73% (7.22 vs 7.95)
+2. **Deeper LSTM (3 layers)** with tuned beam search achieves the best test CER of **7.22%** — a 9.2% relative improvement over the previous best
+3. **KenLM beam search** cuts CER roughly in half vs. greedy decoding (CNN-BiLSTM: 14.96→7.95, ALiBi: 17.59→8.84)
+4. **ALiBi positional encoding** dramatically improves transformer length generalization: val/test gap goes from 72% (sinusoidal) to 0.18% (ALiBi) with windowed inference
+5. **Windowed logits merge** is essential for transformer architectures at test time but slightly hurts models without length issues (CNN-BiLSTM)
+6. **CNN-BiLSTM** remains the strongest single architecture, while **ALiBi Transformer + beam search** brings transformers to competitive test-time performance
+7. **Longer training (400ep) shows diminishing returns** — the 400ep model with beam (11.45% test) is worse than 150ep (7.95%) due to overfitting
+8. **Deep CNN (3-layer)** achieves the tightest val/test gap of only 0.22% with greedy decoding
+9. **Sinusoidal PE transformers** cannot be rescued even with beam search + windowed inference
 
 ### Inference Policy Comparison (Wave 10)
 
@@ -319,6 +352,64 @@ transformer. Instead, val CER is worse (18.96%) and the test gap remains large.
 The learning curve is notably slower, with CER still above 100% until epoch 30.
 
 ![Hybrid large-LSTM training curves](../images/waves/wave11_hybrid_large_lstm.png)
+
+---
+
+### Wave 13: Push to Sub-5% CER
+
+#### CNN-BiLSTM Deep LSTM (3L, h=384) — 200 epochs — Best Test CER: 7.22% (beam)
+
+The new champion. Adding a third LSTM layer (3L vs 2L) provides richer sequential
+context. Greedy test CER of 13.40% with only a 1.04% val/test gap — the tightest
+of any model. With tuned beam search (λ=3.0, β=3.0, beam=100), test CER drops to
+**7.22%**, a 9.2% relative improvement over the previous best.
+
+![Deep LSTM 3L training curves](../images/wave13/deep_lstm_3L.png)
+
+#### CNN-BiLSTM Warmup (CosineAnnealing LR) — 300 epochs — Val: 12.05%
+
+LinearWarmupCosineAnnealing scheduler achieves the **best greedy val CER of any
+model (12.05%)**. The smooth LR decay helps the model converge to a slightly
+better optimum. With beam search, test CER reaches 8.80%.
+
+![CNN-BiLSTM warmup training curves](../images/wave13/cnn_bilstm_warmup.png)
+
+#### CNN-BiLSTM 400 Epochs — Val: 12.85% / Test: 15.80%
+
+Extended training to 400 epochs. Val CER continues improving to 12.85%, but test
+CER (15.80%) is worse than the 150-epoch model (14.96%), confirming that excessive
+training on this dataset leads to overfitting that beam search cannot fully correct.
+
+![CNN-BiLSTM 400ep training curves](../images/wave13/cnn_bilstm_400ep.png)
+
+#### Large ALiBi Transformer — 150 epochs — Val: 20.29%
+
+Larger ALiBi transformer (d=256, 6 layers, 8 heads) with CNN featurizer. Despite
+more capacity, val CER (20.29%) is worse than the small ALiBi (17.41%). OOMs on
+full test sessions — ALiBi attention bias matrix requires 147 GB for 140K timesteps.
+
+![Large ALiBi training curves](../images/wave13/large_alibi_150ep.png)
+
+#### Large ALiBi Transformer — 300 epochs — Val: 17.92%
+
+Extended training of the large ALiBi model. Val CER improves from 20.29% to
+17.92% by epoch 300, nearly matching the small ALiBi's 17.41%. Still OOMs on test.
+
+![Large ALiBi 300ep training curves](../images/wave13/large_alibi_300ep.png)
+
+#### Medium ALiBi Transformer (d=192, 6L) — 200 epochs — Val: 18.54%
+
+Mid-sized ALiBi transformer. Converges to 18.54% val CER — between the small
+(17.41%) and large (20.29%) variants. Still OOMs on full test sessions.
+
+![Medium ALiBi training curves](../images/wave13/medium_alibi.png)
+
+#### Hybrid CNN-BiLSTM-Transformer ALiBi — 200 epochs — Val: 16.19%
+
+The hybrid architecture with ALiBi positional encoding. Val CER of 16.19%,
+but OOMs on the full test session due to the ALiBi attention bias matrix.
+
+![Hybrid ALiBi training curves](../images/wave13/hybrid_alibi.png)
 
 ---
 

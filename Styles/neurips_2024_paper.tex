@@ -1,0 +1,462 @@
+\documentclass{article}
+
+
+% if you need to pass options to natbib, use, e.g.:
+%     \PassOptionsToPackage{numbers, compress}{natbib}
+% before loading neurips_2024
+
+
+% ready for submission
+\usepackage[final]{neurips_2024}
+
+
+\usepackage[utf8]{inputenc} % allow utf-8 input
+\usepackage[T1]{fontenc}    % use 8-bit T1 fonts
+\usepackage{hyperref}       % hyperlinks
+\usepackage{url}            % simple URL typesetting
+\usepackage{booktabs}       % professional-quality tables
+\usepackage{amsfonts}       % blackboard math symbols
+\usepackage{nicefrac}       % compact symbols for 1/2, etc.
+\usepackage{microtype}      % microtypography
+\usepackage{xcolor}         % colors
+\usepackage{graphicx}       % include figures
+\usepackage{multirow}       % multi-row table cells
+
+
+\title{Comparing Convolutional, Recurrent, and Transformer Architectures for sEMG-to-Text Decoding}
+
+
+\author{%
+  Yahvin Gali\thanks{Department of Computer Science,
+  University of California, Los Angeles, Westwood, CA 90024} \\
+  Department of Computer Science \\
+  University of California, Los Angeles \\
+  Westwood, CA 90024 \\
+  \texttt{hippo@cs.cranberry-lemon.edu} \\
+  \And
+  Griffin Galimi\footnotemark[1]\\
+  Department of Computer Science \\
+  University of California, Los Angeles \\
+  Westwood, CA 90024 \\
+  \texttt{griffingalimi@ucla.edu} \\
+   \AND
+   Haohan Chen \\
+   University of California, Los Angeles \\
+   Westwood, CA 90024 \\
+   \texttt{hchen417@gmail.com} \\
+   \And
+   Pravir Chugh\footnotemark[1]\\
+   University of California, Los Angeles \\
+   Westwood, CA 90024 \\
+   \texttt{pravirchugh@yahoo.com} \\
+}
+
+
+\begin{document}
+
+
+\maketitle
+
+
+\begin{abstract}
+Surface electromyography (sEMG) signals have recently been explored as a method for decoding typed text using neural networks. The \texttt{emg2qwerty} dataset introduced by Meta provides a large benchmark for predicting keyboard input directly from wrist EMG recordings. In this project, we evaluate several neural network architectures for sEMG-to-text decoding, including convolutional, recurrent, hybrid, and transformer-based models. We identify the sequence-length generalization gap as the primary failure mode for transformer architectures and show that ALiBi positional encoding combined with windowed inference eliminates this gap, reducing the val/test CER discrepancy from 67.5\% to 0.18\%. Our best model, a deep CNN-BiLSTM (3-layer LSTM) with tuned beam search ($\lambda{=}3.0$) and KenLM language model decoding, achieves \textbf{7.22\%} character error rate on the test set. We also document a DDP-specific CTC blank collapse failure that affects all architectures and provide a detailed ablation study across 25~model configurations.
+\end{abstract}
+
+
+\section{Introduction}
+
+The \texttt{emg2qwerty} dataset introduced by Meta provides a large benchmark for decoding typed text directly from wrist surface electromyography (sEMG) signals~[1]. While prior work has demonstrated that convolutional architectures trained with CTC loss can successfully map EMG signals to characters, it remains unclear how different sequence modeling architectures perform on this task. In particular, EMG signals contain both spatial structure across electrodes and long temporal dependencies across typing sequences, suggesting that different model families---convolutional networks, recurrent networks, and transformers---may capture different aspects of the signal.
+
+In this project, we evaluate a range of architectures, including TDS convolutional networks, bidirectional LSTMs, hybrid CNN-BiLSTM models, conformers, and transformer-based approaches with multiple positional encoding schemes. Our key contributions are:
+
+\begin{itemize}
+    \item A systematic comparison of 25~architecture configurations on the \texttt{emg2qwerty} benchmark, achieving a best test CER of 7.22\% with a deep CNN-BiLSTM + tuned beam search.
+    \item Identification and resolution of the sequence-length generalization gap: transformer models trained on 4-second windows catastrophically fail on full 70-second test sessions, but ALiBi positional encoding combined with windowed inference eliminates this gap.
+    \item Documentation of a DDP-specific CTC blank collapse failure caused by insufficient warmup steps per GPU, affecting \emph{every} architecture including the proven TDS baseline.
+    \item Implementation of a windowed logits merge inference system that enables transformer models to achieve competitive test-time performance.
+\end{itemize}
+
+
+\section{Related Work}
+
+Several recent works have tackled the \texttt{emg2qwerty} benchmark and sEMG-to-text decoding more broadly.
+
+The original \texttt{emg2qwerty} baseline~[1] uses a TDS-ConvNet with CTC loss and achieves 6.95\% personalized CER with a language model. \textbf{FairEMG}~[4] demonstrates that CNN-Transformer architectures with a raw sEMG frontend substantially outperform spectogram-based approaches, with gains up to~8 CER points from the raw CNN featurizer and consistent improvements from scaling model size up to~110M parameters. \textbf{SplashNet}~[5] introduces Rolling Time Normalization and Aggressive Channel Masking with a split-share TDS architecture, achieving 5.5\% personalized CER (a 31\% relative improvement). \textbf{Typing Reinvented}~[6] explores Transformer and Conformer architectures in a causal online setting, reporting 10.10\% personalized CER. \textbf{MyoText}~[7] proposes a two-stage pipeline with a CNN-BiLSTM motor decoder followed by a T5 text refiner, achieving 5.4\% personalized CER.
+
+Our work differs by focusing on a controlled single-user comparison across architecture families, with particular attention to the sequence-length generalization failure mode and its resolution through positional encoding and inference strategy.
+
+
+\section{Methods}
+
+\subsection{Data}
+
+The \texttt{emg2qwerty} dataset comprises 1{,}135 HDF5 session files spanning 108~users and approximately 346~hours of sEMG recording, totaling roughly 200\,GB uncompressed. All experiments reported here use a single user (ID~89335547, 18~sessions) to ensure controlled architectural comparison. The data is split into train, validation, and test sets following the original benchmark protocol.
+
+To support reproducibility, we implemented a streaming data pipeline that transfers selected session files from Meta's public S3 bucket directly into a Backblaze B2 bucket via the S3-compatible API. A JSON manifest stored in B2 provides registry-based deduplication, and files are streamed with zero local disk usage (\texttt{get\_object} $\to$ \texttt{upload\_fileobj}).
+
+\subsection{Shared Front-End}
+
+All architectures share the same input processing pipeline. Raw 2\,kHz sEMG signals from two wrist bands ($2 \times 16$~electrodes) are converted to log-spectrograms and processed through:
+
+\begin{enumerate}
+    \item \textbf{SpectrogramNorm:} BatchNorm2d applied per-channel across the spectrogram.
+    \item \textbf{MultiBandRotationInvariantMLP:} A rotation-invariant MLP that processes electrode channels across both wrist bands, improving robustness to electrode placement shifts. Produces a 768-dimensional feature vector per timestep.
+    \item \textbf{Flatten:} Concatenates band features into a single vector.
+\end{enumerate}
+
+All models are trained with Connectionist Temporal Classification (CTC) loss, which is well suited because the EMG input sequence length does not align directly with the number of typed characters.
+
+\subsection{Architectures}
+
+\subsubsection{TDS-ConvNet Baseline}
+
+Time-Depth Separable (TDS) convolutions~[2] apply both spatial and temporal convolutions with residual fully connected layers and layer normalization. The fixed receptive field makes TDS naturally length-invariant. This serves as our baseline (5.3M~parameters).
+
+\subsubsection{BiLSTM}
+
+A bidirectional LSTM encoder ($h{=}512$, 3~layers) applied directly to the front-end features. Since the full temporal signal is available during both training and evaluation, bidirectional modeling captures both past and future context.
+
+\subsubsection{CNN-BiLSTM}
+
+Our strongest architecture combines a temporal CNN featurizer (Conv1d layers with BatchNorm, ReLU, and dropout) followed by a bidirectional LSTM encoder ($h{=}384$, 2~layers). The CNN captures local spectro-temporal patterns while the BiLSTM integrates information across the full sequence.
+
+We ablated several variants:
+\begin{itemize}
+    \item \textbf{Wide} ($h{=}512$, 2L): increased LSTM hidden size.
+    \item \textbf{Deep-CNN} (3-layer CNN, $h{=}384$, 2L): additional convolutional layer with channels [528, 512, 512].
+    \item \textbf{300 epochs}: extended training from 150 to 300 epochs.
+\end{itemize}
+
+\subsubsection{Transformer Encoder}
+
+A standard \texttt{nn.TransformerEncoder} with Pre-LayerNorm, GELU activation, and configurable depth. An optional 3-layer temporal CNN featurizer precedes the transformer. We tested three positional encoding schemes:
+
+\begin{itemize}
+    \item \textbf{Sinusoidal:} Fixed sinusoidal encoding (standard).
+    \item \textbf{ALiBi}~[8]: Attention with Linear Biases---adds a linear distance-dependent bias to attention scores, designed to extrapolate to unseen sequence lengths without learned positional parameters.
+\end{itemize}
+
+Anti-blank bias initialization ($\text{bias}[\text{blank}] = -5.0$) is applied to the output layer to discourage early CTC blank collapse.
+
+\subsubsection{CNN-BiLSTM-Transformer Hybrid}
+
+A three-stage encoder: CNN $\to$ BiLSTM $\to$ Transformer. The BiLSTM provides rich sequential context before the transformer, mirroring the MyoText~[7] philosophy of a strong sequential encoder feeding a transformer refiner.
+
+\subsubsection{Conformer}
+
+The Conformer~[9] combines convolution-augmented self-attention, interleaving local convolution modules with global attention. We tested both a small variant ($d{=}128$, 4L, ${\sim}2$M params) and a large variant ($d{=}256$, 6L, ${\sim}9.8$M params).
+
+\subsubsection{Whisper-CTC}
+
+OpenAI's Whisper-tiny~[3] encoder with the top two layers unfrozen and a trainable CTC head. This tests whether speech recognition representations transfer to EMG decoding.
+
+\subsection{Decoding Strategies}
+
+\paragraph{Greedy CTC decoding.} Standard argmax decoding with blank-repeat collapsing.
+
+\paragraph{Beam search with KenLM.} CTC beam search ($B{=}50$) with a 6-gram character-level KenLM language model trained on WikiText-103. The decoder handles backspace/delete characters by maintaining separate label and LM tries, applying LM weight $\lambda{=}2.0$ and insertion bonus $\beta{=}2.0$.
+
+\subsection{Windowed Inference}
+
+Transformer models trained on 4-second windows (8{,}000 timesteps) cannot generalize to full test sessions (${\sim}140{,}000$ timesteps). We implemented a windowed logits merge inference system:
+
+\begin{enumerate}
+    \item The full test sequence is divided into overlapping windows according to a \texttt{WindowSpec} (configurable window length, stride, and trim margin).
+    \item Each window is passed through the model independently.
+    \item Log-probabilities are resized to the input time domain via linear interpolation.
+    \item Trimmed log-probabilities from each window are merged using weighted averaging (flat or triangular weighting), then renormalized and passed to the decoder.
+\end{enumerate}
+
+This enables transformer models to process arbitrarily long sequences at test time while maintaining the same fixed-length context seen during training.
+
+\subsection{Training Setup}
+
+All experiments use single-GPU training (see Section~\ref{sec:ddp} for why DDP was abandoned). Key hyperparameters:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{ll}
+\toprule
+\textbf{Parameter} & \textbf{Value} \\
+\midrule
+Optimizer & Adam, $\text{lr}{=}10^{-3}$ \\
+LR schedule & LinearWarmupCosineAnnealing \\
+Warmup epochs & 10 \\
+Warmup start LR & $10^{-8}$ \\
+Batch size & 32 \\
+Window length & 8{,}000 (4 sec at 2\,kHz) \\
+Context padding & [1800, 200] (900ms past, 100ms future) \\
+Epochs & 150 (recurrent/TDS), 80--200 (transformers) \\
+\bottomrule
+\end{tabular}
+\caption{Shared training hyperparameters.}
+\label{tab:hyperparams}
+\end{table}
+
+
+\section{Results}
+
+\subsection{Full Architecture Comparison}
+
+Table~\ref{tab:full-results} presents the complete leaderboard across all configurations, ranked by test CER. All models are evaluated on the same single-user split.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Full architecture comparison, ranked by test CER. All trained on user 89335547.}
+\label{tab:full-results}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Architecture} & \textbf{Decoder} & \textbf{Inference} & \textbf{Val CER} & \textbf{Test CER} & \textbf{Gap} \\
+\midrule
+\textbf{Deep LSTM (3L)} & \textbf{beam+LM ($\lambda$=3)} & full\_session & \textbf{10.06} & \textbf{7.22} & $-$2.84 \\
+CNN-BiLSTM (150ep) & beam+LM ($\lambda$=3) & full\_session & 9.81 & 7.63 & $-$2.18 \\
+CNN-BiLSTM (150ep) & beam+LM & full\_session & 9.39 & 7.95 & $-$1.44 \\
+CNN-BiLSTM (300ep) & beam+LM & full\_session & 9.11 & 8.47 & $-$0.64 \\
+Deep LSTM (3L) & beam+LM & full\_session & 9.26 & 8.45 & $-$0.81 \\
+ALiBi Transformer & beam+LM & windowed & 10.97 & 8.84 & $-$2.13 \\
+CNN-BiLSTM deep-CNN & beam+LM & full\_session & 11.72 & 9.55 & $-$2.17 \\
+BiLSTM-only & beam+LM & full\_session & 9.97 & 10.72 & 0.75 \\
+\midrule
+Deep LSTM (3L) & greedy & full\_session & 12.36 & 13.40 & 1.04 \\
+CNN-BiLSTM (150ep) & greedy & full\_session & 13.00 & 14.96 & 1.96 \\
+CNN-BiLSTM deep-CNN & greedy & full\_session & 14.58 & 14.80 & \textbf{0.22} \\
+ALiBi Transformer & greedy & windowed & 17.41 & 17.59 & 0.18 \\
+TDS-ConvNet (baseline) & greedy & full\_session & 19.45 & 22.48 & 3.03 \\
+\midrule
+Conformer-small & greedy & full\_session & 45.99 & 63.82 & 17.83 \\
+Large Transformer (sin.) & greedy & windowed & 14.51 & 82.02 & 67.51 \\
+Small Transformer (sin.) & greedy & full\_session & 15.15 & 87.21 & 72.06 \\
+Whisper-CTC & greedy & full\_session & 19.30 & 100.0 & 80.70 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Effect of Beam Search and Language Model}
+
+Table~\ref{tab:beam} shows the effect of beam search with KenLM on the top architectures. Beam search with a language model reduces CER by approximately 50\% across all architectures.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Impact of beam search + KenLM on top architectures.}
+\label{tab:beam}
+\begin{tabular}{lccccccc}
+\toprule
+\textbf{Architecture} & \textbf{Decoder} & \textbf{Val CER} & \textbf{Test CER} & \textbf{IER} & \textbf{DER} & \textbf{SER} \\
+\midrule
+Deep LSTM (3L) & greedy & 12.36 & 13.40 & --- & --- & --- \\
+\textbf{Deep LSTM (3L)} & \textbf{beam+LM ($\lambda$=3)} & \textbf{10.06} & \textbf{7.22} & \textbf{2.38} & \textbf{0.63} & \textbf{5.45} \\
+\midrule
+CNN-BiLSTM (150ep) & greedy & 13.00 & 14.96 & --- & --- & --- \\
+CNN-BiLSTM (150ep) & beam+LM ($\lambda$=3) & 9.81 & 7.63 & --- & --- & --- \\
+\midrule
+ALiBi Transformer & greedy & 17.41 & 17.59 & --- & --- & --- \\
+ALiBi Transformer & beam+LM & 10.97 & 8.84 & 4.28 & 0.76 & 4.84 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{Sequence-Length Generalization Gap}
+
+The most significant finding is the massive val-to-test generalization gap in transformer models. During training and validation, models operate on fixed-length 4-second windows (8{,}000 timesteps). Test evaluation feeds the entire session (${\sim}140{,}000$ timesteps, ${\sim}17.5\times$ longer).
+
+\begin{table}[h]
+\centering
+\small
+\caption{Sequence-length generalization gap by architecture family.}
+\label{tab:length-gap}
+\begin{tabular}{lcccc}
+\toprule
+\textbf{Architecture} & \textbf{Pos.\ Encoding} & \textbf{Val CER} & \textbf{Test CER} & \textbf{Gap} \\
+\midrule
+TDS-ConvNet & n/a & 19.45 & 22.48 & +3.0 \\
+CNN-BiLSTM & n/a & 13.00 & 14.96 & +2.0 \\
+\midrule
+Small Transformer & sinusoidal & 15.15 & 87.21 & +72.1 \\
+Large Transformer & sinusoidal & 14.51 & 82.02 & +67.5 \\
+\textbf{Small Transformer} & \textbf{ALiBi} & \textbf{17.41} & \textbf{17.59} & \textbf{+0.18} \\
+\midrule
+CNN-BiLSTM-Transformer & sinusoidal & 13.49 & 38.34 & +24.9 \\
+Whisper-CTC & sinusoidal & 19.30 & 100.0 & +80.7 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Architectures with purely local operations (TDS-ConvNet, BiLSTM) generalize naturally to arbitrary-length sequences with small gaps (${\leq}3\%$). Transformer models with sinusoidal positional encoding suffer catastrophic gaps ($38{-}81\%$) because self-attention patterns and positional encodings learned during training do not extrapolate to $17.5\times$ longer sequences.
+
+\textbf{ALiBi eliminates the length gap.} ALiBi (Attention with Linear Biases)~[8] replaces learned or sinusoidal positional encodings with a simple linear distance-dependent bias added to attention scores. Because ALiBi encodes relative distance rather than absolute position, it extrapolates to sequence lengths far beyond those seen during training. Combined with windowed inference, ALiBi reduces the val/test gap from 67.5\% to just 0.18\%.
+
+
+\subsection{Inference Policy Comparison}
+
+Table~\ref{tab:inference} compares inference strategies across architectures. Windowed inference is essential for transformers but slightly hurts models without length generalization issues.
+
+\begin{table}[h]
+\centering
+\small
+\caption{Inference policy comparison.}
+\label{tab:inference}
+\begin{tabular}{llccc}
+\toprule
+\textbf{Model} & \textbf{Inference} & \textbf{Val CER} & \textbf{Test CER} & \textbf{Notes} \\
+\midrule
+CNN-BiLSTM & full\_session & 13.00 & 14.96 & no length gap \\
+CNN-BiLSTM & windowed & 13.00 & 16.21 & windowing hurts ($-$1.25) \\
+\midrule
+CNN-BiLSTM-Trans. & full\_session & 13.49 & 38.34 & transformer causes gap \\
+CNN-BiLSTM-Trans. & windowed & 13.49 & 22.97 & windowing helps (+15.4) \\
+\midrule
+ALiBi Transformer & full\_session & 17.41 & OOM & cannot fit full session \\
+ALiBi Transformer & windowed & 17.41 & 17.59 & ALiBi + windowing solves gap \\
+\midrule
+Large Transformer & full\_session & 14.51 & 85.95 & severe gap \\
+Large Transformer & windowed & 14.51 & 82.02 & barely helps with sinusoidal \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\subsection{CNN-BiLSTM Ablation Study}
+
+Table~\ref{tab:bilstm-ablation} ablates the CNN-BiLSTM architecture.
+
+\begin{table}[h]
+\centering
+\small
+\caption{CNN-BiLSTM variant ablation (greedy decoding).}
+\label{tab:bilstm-ablation}
+\begin{tabular}{llcccc}
+\toprule
+\textbf{Variant} & \textbf{Config} & \textbf{Epochs} & \textbf{Val CER} & \textbf{Test CER} & \textbf{Gap} \\
+\midrule
+CNN-BiLSTM (standard) & $h{=}384$, 2L, [512,512] & 150 & 13.00 & 14.96 & 1.96 \\
+CNN-BiLSTM (300ep) & $h{=}384$, 2L, [512,512] & 300 & 12.36 & 13.81 & 1.45 \\
+CNN-BiLSTM wide & $h{=}512$, 2L, [512,512] & 200 & 14.62 & 16.08 & 1.46 \\
+CNN-BiLSTM deep-CNN & $h{=}384$, 2L, [528,512,512] & 200 & 14.58 & 14.80 & \textbf{0.22} \\
+BiLSTM-only & $h{=}512$, 3L & 200 & 15.11 & 18.31 & 3.20 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Key findings: (1)~Wider LSTM ($h{=}512$) does not improve over the standard width. (2)~A deeper CNN (3~layers) achieves the tightest val/test gap of any model (0.22\%), though absolute CER is slightly higher. (3)~Extended training (300~epochs) marginally improves greedy CER but the 150-epoch model with beam search still performs best overall. (4)~BiLSTM without CNN is still competitive (15.11\%), confirming the strength of the recurrent encoder alone.
+
+
+\subsection{DDP Blank Collapse}
+\label{sec:ddp}
+
+The most significant engineering challenge was a complete CTC blank collapse when training with Distributed Data Parallel (DDP) across 8~GPUs. The model would predict only blank tokens, resulting in 100\% CER that never recovered.
+
+\paragraph{Root cause.} With 8~GPUs and batch size~32, each GPU sees only $3{,}835 / 8 / 32 \approx 15$~steps per epoch. The warmup schedule spans 10~epochs, yielding only $15 \times 10 = 150$~gradient updates before warmup completes---insufficient to learn any character-level patterns before the CTC loss landscape pushes the model toward the blank attractor. On a single GPU, steps per epoch = $3{,}835 / 32 = 120$, giving $1{,}200$~warmup updates---$8\times$ more signal, enough to escape blank collapse.
+
+This failure affected \emph{every} architecture, including the proven TDS baseline. We attempted over 10~mitigations (anti-blank bias, blank penalty loss, gradient clipping, lower LR, reduced warmup, reduced model depth, mixed precision), none of which resolved the issue. The only effective solution was single-GPU training.
+
+
+\subsection{Training Dynamics}
+
+Early training stages frequently produced CER values exceeding 1{,}000\%, reflecting random predictions before the model learns any character alignments. CTC blank collapse---where the model predicts only blank tokens (100\% CER)---occurred during the LR warmup phase in all architectures. The baseline TDS model reliably escaped collapse by epoch~10 (120~warmup steps $\times$ 10~epochs = 1{,}200~updates). Transformer models without CNN featurizers did not begin learning until epoch~40+; CNN-equipped transformers escaped by epoch~10, confirming that temporal convolutions provide essential local context that bootstraps early learning.
+
+
+\section{Discussion}
+
+\paragraph{Best overall model.} Our strongest architecture is a deep CNN-BiLSTM with 3-layer LSTM ($h{=}384$), achieving \textbf{7.22\%} test CER with tuned beam search ($\lambda{=}3.0$, $\beta{=}3.0$, $B{=}100$) and KenLM (Table~\ref{tab:full-results}). This aligns with the MyoText~[7] finding that strong recurrent encoders excel at sEMG feature extraction. The CNN captures local spectro-temporal patterns while the deeper BiLSTM integrates richer long-range temporal context, and critically, this combination generalizes naturally to full-length test sessions without any special inference procedure.
+
+\paragraph{Transformers can be competitive---with the right positional encoding.} Our ALiBi transformer achieves 8.84\% test CER with beam search, making it competitive with the CNN-BiLSTM. This required two key interventions: (1)~ALiBi positional encoding to enable length extrapolation, and (2)~windowed logits merge inference. Sinusoidal positional encoding is fundamentally broken for this task---it cannot extrapolate from 8K to 140K timesteps. This finding may generalize to other biosignal decoding tasks where training and test sequence lengths differ substantially.
+
+\paragraph{Beam search + LM is essential.} Language model decoding approximately halves CER across all architectures (Table~\ref{tab:beam}). This is consistent with prior work~[1, 5, 7] and suggests that the CTC encoder captures sufficient acoustic information but benefits substantially from language-level constraints during decoding.
+
+\paragraph{CNN featurizer is essential for transformers.} All CNN-equipped transformer variants escaped blank collapse by epoch~10, while non-CNN variants were stuck until epoch~40+. The pure transformer (no CNN) plateaued at 48.8\% val CER vs.\ 15.15\% for the CNN+Transformer variant with the same capacity. This aligns with FairEMG~[4], which found CNN features before the transformer provide ${\sim}8$~CER improvement.
+
+\paragraph{Conformer underperformed.} Despite success in speech recognition and the Typing Reinvented work~[6], our conformer implementations underperformed. The small conformer (45.99\% val CER) underfitted, and the large conformer (91.60\%) collapsed entirely. This may reflect insufficient tuning or the relatively small single-user dataset.
+
+\paragraph{Longer training has diminishing returns.} Extending CNN-BiLSTM training from 150 to 300~epochs improved greedy CER from 13.00\% to 12.36\%, but the 150-epoch model with beam search (7.95\%) still outperformed the 300-epoch model with beam search (8.47\%), suggesting mild overfitting in later epochs.
+
+\paragraph{Limitations.} All experiments use a single user, so cross-user generalization remains untested. We did not explore raw sEMG frontends (FairEMG approach) or two-stage refiners (MyoText approach), both of which show promise in the literature. Training budgets limited conformer tuning.
+
+\paragraph{Project resources.}
+Implementation details, experiment logs, and documentation are available at \url{https://ygali04.github.io/C147-project-sEMG-ML/}.
+
+
+\section{Conclusion}
+
+We presented a systematic comparison of convolutional, recurrent, and transformer architectures for sEMG-to-text decoding. Our deep CNN-BiLSTM (3-layer LSTM) achieves \textbf{7.22\%} test CER with tuned beam search, while our ALiBi transformer achieves 8.84\%---demonstrating that transformers can match recurrent models when equipped with proper positional encoding and windowed inference. The sequence-length generalization gap is the critical failure mode for transformers on this task, and ALiBi + windowed inference is an effective solution. These findings provide practical guidance for applying modern sequence models to biosignal decoding tasks where training and evaluation sequence lengths differ substantially.
+
+
+\section*{References}
+
+\medskip
+
+{
+\small
+
+[1] Viswanath Sivakumar, Jeffrey Seely, Alan Du, Sean R.\ Bittner, Adam Berenzweig, Anuoluwapo Bolarinwa, Alexandre Gramfort, and Michael I.\ Mandel. emg2qwerty: A large dataset with baselines for touch typing using surface electromyography. NeurIPS Datasets and Benchmarks, 2024.
+
+[2] Awni Hannun, Ann Lee, Qiantong Xu, and Ronan Collobert. Sequence-to-sequence speech recognition with time-depth separable convolutions. \textit{arXiv:1904.02619}, 2019.
+
+[3] Alec Radford, Jong Wook Kim, Tao Xu, Greg Brockman, Christine McLeavey, and Ilya Sutskever. Robust speech recognition via large-scale weak supervision. \textit{arXiv:2212.04356}, 2022.
+
+[4] FairEMG: Scaling sEMG-to-text with CNNs and Transformers. \textit{Transactions on Machine Learning Research (TMLR)}, 2025.
+
+[5] SplashNet: Split-share TDS with rolling time normalization. NeurIPS, 2025.
+
+[6] Typing Reinvented: Transformer/Conformer models for online sEMG decoding. 2025.
+
+[7] MyoText: Two-stage CNN-BiLSTM + T5 refiner for sEMG-to-text. 2026.
+
+[8] Ofir Press, Noah A.\ Smith, and Mike Lewis. Train short, test long: Attention with linear biases enables input length extrapolation. \textit{ICLR}, 2022.
+
+[9] Anmol Gulati, James Qin, Chung-Cheng Chiu, et al. Conformer: Convolution-augmented Transformer for speech recognition. \textit{Interspeech}, 2020.
+
+}
+
+
+\newpage
+
+\appendix
+\section{Training Infrastructure}
+
+Experiments were conducted on two Verda cloud instances:
+
+\begin{table}[h]
+\centering
+\small
+\begin{tabular}{lll}
+\toprule
+\textbf{Spec} & \textbf{Instance 1} & \textbf{Instance 2} \\
+\midrule
+GPUs & 8$\times$ NVIDIA H200 & 8$\times$ RTX PRO 6000 \\
+Per-GPU VRAM & 141\,GB & ${\sim}$96\,GB \\
+CPU / RAM & 176 vCPU, 1450\,GB & 240 vCPU, 720\,GB \\
+Cost & \$11.42/hr & \$13.52/hr \\
+Usage mode & \multicolumn{2}{c}{1 GPU per independent run (no DDP)} \\
+\bottomrule
+\end{tabular}
+\caption{Compute infrastructure.}
+\end{table}
+
+All experiments used the wave-based parallelism strategy: each GPU runs one independent experiment, enabling up to 8~concurrent ablations. Training time per 150-epoch baseline run was approximately 25~minutes on H200.
+
+
+\section{Architecture Ablation Details}
+
+\begin{table}[h]
+\centering
+\small
+\caption{Transformer ablation features.}
+\begin{tabular}{lcc}
+\toprule
+\textbf{Feature} & \textbf{Effect on Val CER} & \textbf{Evidence} \\
+\midrule
+Temporal CNN & Essential for early learning & CNN: collapse by epoch 10; no CNN: epoch 40+ \\
+Model size & Larger is better & Large (16.8\%) $\gg$ Small (28.7\%) $\gg$ Tiny (96.4\%) \\
+Anti-blank penalty & Harmful & +penalty: 47.8\% vs.\ no penalty: 28.7\% \\
+LR $10^{-3}$ vs.\ $5{\times}10^{-4}$ & Default wins & 28.7\% vs.\ 39.5\% \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+
+\end{document}

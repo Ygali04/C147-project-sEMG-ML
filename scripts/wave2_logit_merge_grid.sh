@@ -13,7 +13,7 @@ export PATH="$HOME/.local/bin:$PATH"
 : "${LARGE_TRANSFORMER_CKPT:?Set LARGE_TRANSFORMER_CKPT to the large transformer checkpoint path}"
 : "${SMALL_TRANSFORMER_CKPT:?Set SMALL_TRANSFORMER_CKPT to the small transformer checkpoint path}"
 
-COMMON="user=single_user train=False ~cluster trainer.devices=1 inference=windowed_logits_merge"
+COMMON="user=single_user train=False ~cluster trainer.accelerator=gpu trainer.devices=1 trainer.strategy=auto inference=windowed_logits_merge"
 
 run_eval() {
     local gpu="$1"

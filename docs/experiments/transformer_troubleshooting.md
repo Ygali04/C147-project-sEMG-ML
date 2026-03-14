@@ -79,7 +79,10 @@ bash scripts/wave1_inference_sweep.sh
 
 | Policy | Window length | Stride | Trim margin | Merge mode | Model | Val CER | Test CER | IER | DER | SER | Notes |
 |---|---:|---:|---:|---|---|---:|---:|---:|---:|---:|---|
-| full_session | — | — | — | none | `t5_ctc_large` | — | — | — | — | — | baseline |
+| full_session | — | — | — | none | `t5_ctc_large` | 57.95 | 68.06 | 49.67 | 0.48 | 17.92 | clean best checkpoint from `wave0_gpu1_transformer_large_control` |
+| windowed_logits_merge | 8000 | 8000 | 0 | log-prob merge | `t5_ctc_large` | 57.95 | 66.76 | 49.36 | 0.24 | 17.16 | modest test-time improvement vs full session |
+| full_session | — | — | — | none | `t5_ctc_small` | 28.47 | 64.51 | 35.53 | 1.79 | 27.19 | best current validation transformer |
+| windowed_logits_merge | 8000 | 8000 | 0 | log-prob merge | `t5_ctc_small` | 28.47 | 59.84 | 30.65 | 2.70 | 26.50 | current best transformer test CER |
 
 ## Wave 2 Launch Template
 

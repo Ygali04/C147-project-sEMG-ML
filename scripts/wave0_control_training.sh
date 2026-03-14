@@ -9,7 +9,7 @@ set -euo pipefail
 cd /root/emg2qwerty
 export PATH="$HOME/.local/bin:$PATH"
 
-COMMON="user=single_user ~cluster trainer.devices=1"
+COMMON="user=single_user ~cluster trainer.accelerator=gpu trainer.devices=1 trainer.strategy=auto"
 
 run_train() {
     local gpu="$1"

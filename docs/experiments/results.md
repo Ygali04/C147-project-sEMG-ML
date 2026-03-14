@@ -36,10 +36,10 @@ Use this table to track live and recently completed runs for the
 | Wave | GPU slot | Model | Commit SHA | Inference mode | Train windows | Positional encoding | Frontend | Decoder | Status | Checkpoint | Train CER | Val CER | Test CER | Notes |
 |---|---:|---|---|---|---|---|---|---|---|---|---:|---:|---:|---|
 | wave-0-docs | 0 | docs foundation | pending | n/a | n/a | n/a | n/a | n/a | completed | — | — | — | — | initial ledger scaffold |
-| wave-1-inference | 0 | Large CNN + Transformer | pending | `full_session` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | control |
+| wave-1-inference | 0 | Large CNN + Transformer | pending | `full_session` | `4s` | sinusoidal | spectrogram | greedy | completed | `wave0_gpu1_transformer_large_control` | — | 57.95 | 68.06 | clean best checkpoint |
 | wave-1-inference | 1 | Large CNN + Transformer | pending | `windowed_chunk_decode` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | chunk decode |
-| wave-1-inference | 2 | Large CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | main candidate |
-| wave-1-inference | 3 | Small CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | small control |
+| wave-1-inference | 2 | Large CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | completed | `wave0_gpu1_transformer_large_control` | — | 57.95 | 66.76 | improves test CER over full session |
+| wave-1-inference | 3 | Small CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | completed | `wave0_gpu2_transformer_small_control` | — | 28.47 | 59.84 | current best transformer |
 | wave-1-inference | 4 | Whisper-CTC | pending | `windowed_logits_merge` | `4s` | n/a | spectrogram | greedy | planned | — | — | — | — | transfer control |
 | wave-1-inference | 5 | TDS-ConvNet | pending | `windowed_logits_merge` | `4s` | n/a | spectrogram | greedy | planned | — | — | — | — | local control |
 | wave-1-inference | 6 | Large CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | alt stride |
@@ -51,7 +51,8 @@ Use this table to track live and recently completed runs for the
 |---|---:|---:|---:|---|---|---:|---:|---:|---:|---:|---|
 | `full_session` | — | — | — | none | Large CNN + Transformer | 16.79 | 78.52 | 61.16 | 0.13 | 17.22 | current failure baseline |
 | `windowed_chunk_decode` | 8000 | 8000 | 0 | transcript concat/alignment | pending | — | — | — | — | — | to be filled |
-| `windowed_logits_merge` | 8000 | 8000 | 0 | log-prob merge | pending | — | — | — | — | — | to be filled |
+| `windowed_logits_merge` | 8000 | 8000 | 0 | log-prob merge | Large CNN + Transformer | 57.95 | 66.76 | 49.36 | 0.24 | 17.16 | slight gain over full session |
+| `windowed_logits_merge` | 8000 | 8000 | 0 | log-prob merge | Small CNN + Transformer | 28.47 | 59.84 | 30.65 | 2.70 | 26.50 | best transformer result so far |
 
 ### Position Encoding Comparison
 

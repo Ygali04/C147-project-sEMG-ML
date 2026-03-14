@@ -660,8 +660,14 @@ class T5CTCModule(CTCModuleBase):
         else:
             raise ValueError(f"Unsupported positional encoding: {self._positional_encoding}")
 
-        # Build key_padding_mask: True = ignore (PyTorch convention)
-        key_padding_mask = torch.arange(T_len, device=x.device).unsqueeze(0) >= encoder_lengths.unsqueeze(1)  # (N, T)
+        # Use an additive padding mask so it matches the float ALiBi mask type.
+        padding_mask = torch.arange(T_len, device=x.device).unsqueeze(0) >= encoder_lengths.unsqueeze(1)
+        key_padding_mask = torch.zeros(
+            (x.shape[1], T_len),
+            dtype=x.dtype,
+            device=x.device,
+        )
+        key_padding_mask = key_padding_mask.masked_fill(padding_mask, float("-inf"))
         attn_bias = self._build_attention_bias(T_len, x.shape[1], x.device)
 
         x = self.transformer_encoder(x, mask=attn_bias, src_key_padding_mask=key_padding_mask)

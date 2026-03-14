@@ -25,7 +25,7 @@ mkdir -p "${PHASE_DIR}"
 cd "${ROOT_DIR}"
 export PATH="$HOME/.local/bin:$PATH"
 
-COMMON=("$@" "user=single_user" "~cluster" "trainer.devices=1")
+COMMON=("$@" "user=single_user" "~cluster" "trainer.accelerator=gpu" "trainer.devices=1" "trainer.strategy=auto")
 
 run_phase() {
     local phase_name="$1"

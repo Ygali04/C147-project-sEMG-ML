@@ -20,7 +20,7 @@ export PATH="$HOME/.local/bin:$PATH"
 : "${SMALL_TRANSFORMER_CKPT:?Set SMALL_TRANSFORMER_CKPT to the small transformer checkpoint path}"
 : "${WHISPER_CKPT:?Set WHISPER_CKPT to the Whisper checkpoint path}"
 
-COMMON="user=single_user train=False ~cluster trainer.devices=1"
+COMMON="user=single_user train=False ~cluster trainer.accelerator=gpu trainer.devices=1 trainer.strategy=auto"
 
 run_eval() {
     local gpu="$1"

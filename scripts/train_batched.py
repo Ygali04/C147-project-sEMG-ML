@@ -42,6 +42,43 @@ logging.basicConfig(
 log = logging.getLogger(__name__)
 
 
+# Allowed model configuration names (canonical spellings only)
+ALLOWED_MODELS = (
+    "tds_conv_ctc",
+    "bilstm_ctc",
+    "cnn_bilstm_ctc",
+    "whisper_ctc",
+)
+
+
+def _normalize_model_option(
+    ctx: click.Context | None, param: click.Parameter | None, value: str | None
+) -> str | None:
+    """Normalize and validate the --model option.
+
+    - Accepts the legacy misspelling "whipser_ctc" as an alias for "whisper_ctc"
+      without advertising it in the CLI help.
+    - Ensures the final value is one of ALLOWED_MODELS.
+    """
+    if value is None:
+        return None
+
+    value = value.strip()
+
+    if value == "whipser_ctc":
+        log.warning(
+            "Model name 'whipser_ctc' is deprecated; using 'whisper_ctc' instead."
+        )
+        return "whisper_ctc"
+
+    if value not in ALLOWED_MODELS:
+        raise click.BadParameter(
+            f"Invalid model '{value}'. Valid choices are: {', '.join(ALLOWED_MODELS)}"
+        )
+
+    return value
+
+
 @click.command(context_settings={"help_option_names": ["-h", "--help"]})
 @click.option(
     "--baseline",
@@ -67,6 +104,14 @@ log = logging.getLogger(__name__)
     type=str,
     default=None,
     help="Optional checkpoint path to resume from.",
+)
+@click.option(
+    "--model",
+    type=str,
+    callback=_normalize_model_option,
+    default="tds_conv_ctc",
+    show_default=True,
+    help="Hydra model config to use from config/model/.",
 )
 @click.option(
     "--batch-size-profiles",

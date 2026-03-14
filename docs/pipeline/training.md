@@ -44,17 +44,16 @@ to discover which user profiles and sessions are available.
 
 Based on the `--mode` flag:
 
-| Mode | Strategy |
-|---|---|
-| `--baseline` | Only user `89335547` |
-| `--test` | First `n_test_users` users from the registry |
-| `--all` | Every user in the registry |
+| Mode         | Strategy                                     |
+| ------------ | -------------------------------------------- |
+| `--baseline` | Only user `89335547`                         |
+| `--test`     | First `n_test_users` users from the registry |
+| `--all`      | Every user in the registry                   |
 
 ### 3. Data Sync
 
 For each profile, HDF5 files are downloaded from B2 to the local `data/`
-directory using the B2 S3-compatible API (`boto3`) or using `rclone sync`. 
-Files already present locally are skipped.
+directory using `rclone sync`. Files already present locally are skipped.
 
 ### 4. Training
 
@@ -66,25 +65,26 @@ and `OmegaConf.from_dotlist` to compose the final config.
 
 Training hyperparameters are controlled by the existing Hydra config system:
 
-| Config | Purpose |
-|---|---|
-| `config/base.yaml` | Batch size, epochs, seed, logging |
-| `config/model/tds_conv_ctc.yaml` | TDS-CNN architecture |
-| `config/model/bilstm_ctc.yaml` | Bidirectional LSTM encoder |
-| `config/model/cnn_bilstm_ctc.yaml` | Temporal CNN front-end + BiLSTM encoder |
-| `config/model/whisper_ctc.yaml` | Whisper encoder transfer model with CTC head |
-| `config/optimizer/adam.yaml` | Adam optimizer (lr=1e-3) |
-| `config/lr_scheduler/*.yaml` | LR schedule options |
-| `config/decoder/*.yaml` | Greedy vs beam decoder |
-| `config/user/*.yaml` | Single-user vs generic splits |
+| Config                             | Purpose                                      |
+| ---------------------------------- | -------------------------------------------- |
+| `config/base.yaml`                 | Batch size, epochs, seed, logging            |
+| `config/model/tds_conv_ctc.yaml`   | TDS-CNN architecture                         |
+| `config/model/bilstm_ctc.yaml`     | Bidirectional LSTM encoder                   |
+| `config/model/cnn_bilstm_ctc.yaml` | Temporal CNN front-end + BiLSTM encoder      |
+| `config/model/whisper_ctc.yaml`    | Whisper encoder transfer model with CTC head |
+| `config/optimizer/adam.yaml`       | Adam optimizer (lr=1e-3)                     |
+| `config/lr_scheduler/*.yaml`       | LR schedule options                          |
+| `config/decoder/*.yaml`            | Greedy vs beam decoder                       |
+| `config/user/*.yaml`               | Single-user vs generic splits                |
 
 The batched trainer passes user-specific overrides to Hydra automatically:
 
 ```yaml
 # These are injected per-profile:
-user: <user_id>
+dataset.root: data/<user_id>
+user: single_user # or the appropriate user config, <user_id>
 model: <model_name>
-checkpoint: <checkpoint_path>   # optional
+checkpoint: <checkpoint_path> # optional
 ```
 
 You can select the model from CLI:
@@ -101,8 +101,8 @@ uv run python scripts/train_batched.py --baseline --model whisper_ctc
 - Checkpoints are saved to `logs/<date>/<time>/checkpoints/`
 - Use `--checkpoint` to resume training from a saved checkpoint
 - The `ModelCheckpoint` callback saves:
-    - Best model by validation CER
-    - Last epoch checkpoint
+  - Best model by validation CER
+  - Last epoch checkpoint
 
 ## Output Structure
 

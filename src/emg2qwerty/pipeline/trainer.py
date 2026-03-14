@@ -251,8 +251,8 @@ class BatchTrainer:
     def _build_hydra_overrides(
         user_id: str,
         session_paths: list[Path],
+        model: str,
         checkpoint: str | None = None,
-        model: str = "tds_conv_ctc",
     ) -> list[str]:
         """Build Hydra CLI override strings for a single user."""
         # Resolve the Hydra config-group name for this user.
@@ -284,8 +284,8 @@ class BatchTrainer:
         overrides = self._build_hydra_overrides(
             user_id=user_id,
             session_paths=session_paths,
-            checkpoint=self.config.checkpoint,
             model=self.config.model,
+            checkpoint=self.config.checkpoint,
         )
 
         cmd = [

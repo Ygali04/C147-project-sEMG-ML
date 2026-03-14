@@ -49,6 +49,19 @@ HDF5 session files (308 GB tar.gz from Meta S3)
 | **Transformer** | 🔬 In progress | Generic self-attention encoder over EMG frames |
 | **Hybrid** | 🔬 Planned | CNN front-end + Transformer/RNN encoder |
 
+## Active Troubleshooting Campaign
+
+The current development focus is the `yahvin/transformer-troubleshoot` branch,
+which is using an `8x RTX PRO 6000` Verda instance as an 8-lane experiment
+cluster. The central problem is not transformer optimization in isolation, but
+the large jump from windowed training to full-session test inference.
+
+Current campaign pages:
+
+- [`experiments/results.md`](experiments/results.md) for the global leaderboard
+- [`models/transformer.md`](models/transformer.md) for transformer-family findings
+- [`experiments/transformer_troubleshooting.md`](experiments/transformer_troubleshooting.md) for the active wave ledger and branch roadmap
+
 ## Current Best Documented Result
 
 The strongest documented run so far is the CNN + BiLSTM model on the

@@ -20,6 +20,52 @@ on an 8×H200 Verda instance with one experiment per GPU.
 | Trans + blank penalty (no CNN) | ~1.3M | 94.84 | 98.92 | 50.25 | 52.87 | 74/80 | Blank penalty + no CNN: collapsed |
 | Tiny Transformer (d=64) | ~300K | 96.37 | 100.0 | 77.73 | 66.26 | 1/80 | Undertrained / too small |
 
+## RTX PRO 6000 Campaign
+
+The active troubleshooting campaign runs on an on-demand Verda instance with
+`8x RTX PRO 6000` GPUs and treats the machine as an 8-lane experiment cluster.
+The governing rule is `1 GPU = 1 independent run`; the campaign does not use
+standard DDP for core CTC training because earlier 8-GPU DDP experiments caused
+blank-collapse by reducing each GPU to too few warmup steps.
+
+### Active Wave Ledger
+
+Use this table to track live and recently completed runs for the
+`yahvin/transformer-troubleshoot` branch.
+
+| Wave | GPU slot | Model | Commit SHA | Inference mode | Train windows | Positional encoding | Frontend | Decoder | Status | Checkpoint | Train CER | Val CER | Test CER | Notes |
+|---|---:|---|---|---|---|---|---|---|---|---|---:|---:|---:|---|
+| wave-0-docs | 0 | docs foundation | pending | n/a | n/a | n/a | n/a | n/a | completed | — | — | — | — | initial ledger scaffold |
+| wave-1-inference | 0 | Large CNN + Transformer | pending | `full_session` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | control |
+| wave-1-inference | 1 | Large CNN + Transformer | pending | `windowed_chunk_decode` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | chunk decode |
+| wave-1-inference | 2 | Large CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | main candidate |
+| wave-1-inference | 3 | Small CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | small control |
+| wave-1-inference | 4 | Whisper-CTC | pending | `windowed_logits_merge` | `4s` | n/a | spectrogram | greedy | planned | — | — | — | — | transfer control |
+| wave-1-inference | 5 | TDS-ConvNet | pending | `windowed_logits_merge` | `4s` | n/a | spectrogram | greedy | planned | — | — | — | — | local control |
+| wave-1-inference | 6 | Large CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | alt stride |
+| wave-1-inference | 7 | Large CNN + Transformer | pending | `windowed_logits_merge` | `4s` | sinusoidal | spectrogram | greedy | planned | — | — | — | — | alt trim |
+
+### Inference Policy Comparison
+
+| Policy | Window length | Stride | Trim margin | Merge strategy | Model | Val CER | Test CER | IER | DER | SER | Notes |
+|---|---:|---:|---:|---|---|---:|---:|---:|---:|---:|---|
+| `full_session` | — | — | — | none | Large CNN + Transformer | 16.79 | 78.52 | 61.16 | 0.13 | 17.22 | current failure baseline |
+| `windowed_chunk_decode` | 8000 | 8000 | 0 | transcript concat/alignment | pending | — | — | — | — | — | to be filled |
+| `windowed_logits_merge` | 8000 | 8000 | 0 | log-prob merge | pending | — | — | — | — | — | to be filled |
+
+### Position Encoding Comparison
+
+| Model | Train windows | Inference mode | Sinusoidal Val/Test | ALiBi Val/Test | RoPE Val/Test | Winner | Notes |
+|---|---|---|---|---|---|---|---|
+| Large CNN + Transformer | pending | pending | pending | pending | pending | pending | wave not yet run |
+
+### Architecture Sweep Template
+
+| Family | Frontend | Encoder | Downsample | Positional encoding | Decoder | Train CER | Val CER | Test CER | Status | Notes |
+|---|---|---|---:|---|---|---:|---:|---:|---|---|
+| transformer | spectrogram | transformer | 1x | sinusoidal | greedy | — | 16.79 | 78.52 | completed | current control |
+| recurrent | spectrogram | CNN + BiLSTM | 1x | n/a | greedy | — | 13.76 | 14.89 | completed | strongest current control |
+
 ### Detailed Metrics (Val / Test)
 Each training run now auto-saves a curve plot at:
 

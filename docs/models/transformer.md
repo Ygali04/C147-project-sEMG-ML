@@ -4,6 +4,10 @@
 > **Module:** `emg2qwerty.lightning.T5CTCModule`
 > **Config:** `config/model/t5_ctc.yaml`
 
+> The active remediation campaign now targets the `yahvin/transformer-troubleshoot`
+> branch on an `8x RTX PRO 6000` Verda instance and tracks every transformer-family
+> wave in [`docs/experiments/transformer_troubleshooting.md`](../experiments/transformer_troubleshooting.md).
+
 ## Architecture
 
 The Transformer-CTC model reuses the same EMG front-end as the TDS-ConvNet baseline
@@ -54,6 +58,9 @@ Linear → log_softmax → CTC Loss
 | Whisper-CTC (`model=whisper_ctc`) | Project EMG features into a pretrained Whisper encoder and train a CTC head |
 | Encoder-only Transformer | Self-attention over EMG spectrogram frames |
 | CNN + Transformer | TDS/Conv front-end → Transformer encoder |
+| Conformer-CTC (planned) | Convolution-augmented attention encoder for better local/global balance |
+| Raw-CNN + Transformer (planned) | FairEMG-style raw sEMG frontend before attention |
+| MyoText-style Refiner (planned) | Stage-A motor model plus transformer text correction |
 
 ## Documented Whisper-CTC result
 
@@ -125,6 +132,38 @@ module:
 > because test feeds the entire session (~140K timesteps) without windowing, while
 > training/val use 4-sec windows (8K timesteps). See
 > [Sequence-Length Generalization Gap](../experiments/results.md#critical-finding-sequence-length-generalization-gap).
+
+## RTX PRO 6000 Troubleshooting Campaign
+
+The active campaign treats the new Verda machine as an 8-lane experiment cluster.
+Each GPU runs one independent job rather than participating in standard DDP.
+
+| Resource | Value |
+|---|---|
+| GPUs | 8x RTX PRO 6000 |
+| Per-GPU VRAM | ~96 GB |
+| CPU | 240 vCPU |
+| RAM | 720 GB |
+| Planning mode | one GPU per run, rolling 8-lane waves |
+
+### Wave 1 Objective
+
+The first RTX PRO 6000 wave focuses exclusively on inference policy:
+
+| GPU | Planned run |
+|---:|---|
+| 0 | Large CNN + Transformer, `full_session` control |
+| 1 | Large CNN + Transformer, `windowed_chunk_decode` |
+| 2 | Large CNN + Transformer, `windowed_logits_merge` |
+| 3 | Small CNN + Transformer, `windowed_logits_merge` |
+| 4 | Whisper-CTC, `windowed_logits_merge` |
+| 5 | TDS-ConvNet, `windowed_logits_merge` control |
+| 6 | Large CNN + Transformer, alternate stride |
+| 7 | Large CNN + Transformer, alternate trim |
+
+This wave is designed to answer one question before any retraining starts:
+how much of the transformer test collapse is caused by full-session inference
+rather than by the encoder itself?
 
 ### Key findings
 

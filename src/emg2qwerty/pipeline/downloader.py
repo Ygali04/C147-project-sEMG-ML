@@ -145,7 +145,7 @@ class EMGDownloader:
                 aws_access_key_id=self.config.b2.key_id,
                 aws_secret_access_key=self.config.b2.application_key,
             )
-        return self._b2_client
+        return _thread_local.b2_client
 
     def _get_registry(self) -> FileRegistry:
         """Return the file registry, loading it from B2 on first call."""

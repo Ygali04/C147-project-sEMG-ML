@@ -5,3 +5,4 @@ inference:
   window_length: 8000
   stride: 8000
   trim_margin: 0
+  merge_mode: flat

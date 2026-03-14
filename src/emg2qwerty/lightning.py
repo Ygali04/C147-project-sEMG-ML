@@ -148,6 +148,7 @@ class CTCModuleBase(pl.LightningModule):
         self._inference_window_length = inference.get("window_length")
         self._inference_stride = inference.get("stride")
         self._inference_trim_margin = int(inference.get("trim_margin", 0))
+        self._inference_merge_mode = str(inference.get("merge_mode", "flat"))
         self._inference_apply_on = str(inference.get("apply_on", "test"))
 
     def _setup_ctc(self, decoder: DictConfig) -> None:
@@ -232,7 +233,12 @@ class CTCModuleBase(pl.LightningModule):
             chunk_emissions = self._forward_for_ctc(chunk_inputs, chunk_input_lengths)
             chunk_log_probs.append(chunk_emissions)
 
-        merged = merge_log_prob_chunks(chunk_log_probs, window_specs, full_length)
+        merged = merge_log_prob_chunks(
+            chunk_log_probs,
+            window_specs,
+            full_length,
+            merge_mode=self._inference_merge_mode,
+        )
         merged_lengths = torch.tensor([merged.shape[0]], dtype=input_lengths.dtype, device=input_lengths.device)
         return merged, merged_lengths
 

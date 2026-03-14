@@ -32,3 +32,14 @@ def test_merge_log_prob_chunks_returns_normalized_log_probs() -> None:
     assert merged.shape == (16, 1, 6)
     probs = merged.exp()
     assert torch.allclose(probs.sum(dim=-1), torch.ones(16, 1), atol=1e-5)
+
+
+def test_merge_log_prob_chunks_supports_triangular_weights() -> None:
+    specs = build_window_specs(total_length=24, window_length=10, stride=5, trim_margin=1)
+    chunks = [torch.log_softmax(torch.randn(10, 1, 3), dim=-1) for _ in specs]
+
+    merged = merge_log_prob_chunks(chunks, specs, full_length=24, merge_mode="triangular")
+
+    assert merged.shape == (24, 1, 3)
+    probs = merged.exp()
+    assert torch.allclose(probs.sum(dim=-1), torch.ones(24, 1), atol=1e-5)

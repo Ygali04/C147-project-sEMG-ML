@@ -73,9 +73,18 @@ bash scripts/wave1_inference_sweep.sh
 
 ## Inference Policy Comparison Template
 
-| Policy | Window length | Stride | Trim margin | Merge strategy | Model | Val CER | Test CER | IER | DER | SER | Notes |
+| Policy | Window length | Stride | Trim margin | Merge mode | Model | Val CER | Test CER | IER | DER | SER | Notes |
 |---|---:|---:|---:|---|---|---:|---:|---:|---:|---:|---|
 | full_session | — | — | — | none | `t5_ctc_large` | — | — | — | — | — | baseline |
+
+## Wave 2 Launch Template
+
+```bash
+export LARGE_TRANSFORMER_CKPT=/root/checkpoints/transformer_large_best.ckpt
+export SMALL_TRANSFORMER_CKPT=/root/checkpoints/transformer_small_best.ckpt
+
+bash scripts/wave2_logit_merge_grid.sh
+```
 
 ## Length Generalization Comparison Template
 

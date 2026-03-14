@@ -86,6 +86,7 @@ def merge_log_prob_chunks(
     chunk_log_probs: list[torch.Tensor],
     window_specs: list[WindowSpec],
     full_length: int,
+    merge_mode: str = "flat",
 ) -> torch.Tensor:
     if len(chunk_log_probs) != len(window_specs):
         raise ValueError("chunk_log_probs and window_specs must have equal length")
@@ -104,8 +105,17 @@ def merge_log_prob_chunks(
         kept = resized[spec.keep_start : spec.keep_end].exp()
         global_start = spec.start + spec.keep_start
         global_end = spec.start + spec.keep_end
-        merged_probs[global_start:global_end] += kept
-        coverage[global_start:global_end] += 1.0
+        if merge_mode == "flat":
+            weights = torch.ones(kept.shape[0], 1, 1, device=device)
+        elif merge_mode == "triangular":
+            weights = torch.linspace(0.25, 1.0, kept.shape[0], device=device)
+            mirror = torch.minimum(weights, weights.flip(0))
+            weights = (mirror / mirror.max()).view(-1, 1, 1)
+        else:
+            raise ValueError(f"Unsupported merge_mode: {merge_mode}")
+
+        merged_probs[global_start:global_end] += kept * weights
+        coverage[global_start:global_end] += weights
 
     merged_probs = merged_probs / coverage.clamp_min(1.0)
     merged_probs = merged_probs / merged_probs.sum(dim=-1, keepdim=True).clamp_min(1e-8)

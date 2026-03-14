@@ -20,3 +20,5 @@ datamodule:
   _target_: emg2qwerty.lightning.WindowedEMGDataModule
   window_length: 8000       # 4-sec windows
   padding: [1800, 200]      # 900ms left + 100ms right context
+  train_window_lengths: null
+  train_window_weights: null

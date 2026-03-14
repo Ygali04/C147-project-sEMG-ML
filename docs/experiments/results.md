@@ -59,6 +59,15 @@ Use this table to track live and recently completed runs for the
 |---|---|---|---|---|---|---|---|
 | Large CNN + Transformer | pending | pending | pending | pending | pending | pending | wave not yet run |
 
+### Variable-Length Window Sweep
+
+| Model | Train window lengths | Sampling weights | Inference mode | Val CER | Test CER | Gap | Status | Notes |
+|---|---|---|---|---:|---:|---:|---|---|
+| Large CNN + Transformer | `[8000]` | `[1.0]` | pending | — | — | — | planned | fixed-length control |
+| Large CNN + Transformer | `[8000,16000]` | `[1.0,1.0]` | pending | — | — | — | planned | first multi-length regime |
+| Large CNN + Transformer | `[8000,16000,24000]` | `[1.0,1.0,1.0]` | pending | — | — | — | planned | broader range |
+| Large CNN + Transformer | `[8000,16000,24000,32000]` | `[1.0,1.0,1.0,1.0]` | pending | — | — | — | planned | max planned regime |
+
 ### Architecture Sweep Template
 
 | Family | Frontend | Encoder | Downsample | Positional encoding | Decoder | Train CER | Val CER | Test CER | Status | Notes |

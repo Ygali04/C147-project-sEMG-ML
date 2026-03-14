@@ -17,7 +17,7 @@ import torch.nn.functional as F
 from hydra.utils import instantiate
 from omegaconf import DictConfig
 from torch import nn
-from torch.utils.data import ConcatDataset, DataLoader
+from torch.utils.data import ConcatDataset, DataLoader, WeightedRandomSampler
 from torchmetrics import MetricCollection
 
 from emg2qwerty import utils
@@ -38,6 +38,8 @@ class WindowedEMGDataModule(pl.LightningDataModule):
         self,
         window_length: int,
         padding: tuple[int, int],
+        train_window_lengths: Sequence[int] | None,
+        train_window_weights: Sequence[float] | None,
         batch_size: int,
         num_workers: int,
         train_sessions: Sequence[Path],
@@ -51,6 +53,8 @@ class WindowedEMGDataModule(pl.LightningDataModule):
 
         self.window_length = window_length
         self.padding = padding
+        self.train_window_lengths = list(train_window_lengths) if train_window_lengths is not None else None
+        self.train_window_weights = list(train_window_weights) if train_window_weights is not None else None
 
         self.batch_size = batch_size
         self.num_workers = num_workers
@@ -63,19 +67,45 @@ class WindowedEMGDataModule(pl.LightningDataModule):
         self.val_transform = val_transform
         self.test_transform = test_transform
 
-    def setup(self, stage: str | None = None) -> None:
-        self.train_dataset = ConcatDataset(
-            [
-                WindowedEMGDataset(
-                    hdf5_path,
-                    transform=self.train_transform,
-                    window_length=self.window_length,
-                    padding=self.padding,
-                    jitter=True,
-                )
-                for hdf5_path in self.train_sessions
-            ]
+        if self.train_window_weights is not None:
+            if self.train_window_lengths is None:
+                raise ValueError("train_window_weights requires train_window_lengths to be set.")
+            if len(self.train_window_lengths) != len(self.train_window_weights):
+                raise ValueError("train_window_lengths and train_window_weights must have the same length.")
+
+    @staticmethod
+    def _build_weighted_sampler(
+        datasets: Sequence[WindowedEMGDataset],
+        weights: Sequence[float],
+    ) -> WeightedRandomSampler:
+        sample_weights: list[float] = []
+        for dataset, weight in zip(datasets, weights):
+            sample_weights.extend([float(weight)] * len(dataset))
+        return WeightedRandomSampler(
+            weights=torch.as_tensor(sample_weights, dtype=torch.double),
+            num_samples=len(sample_weights),
+            replacement=True,
         )
+
+    def setup(self, stage: str | None = None) -> None:
+        train_window_lengths = self.train_window_lengths or [self.window_length]
+        train_datasets = [
+            WindowedEMGDataset(
+                hdf5_path,
+                transform=self.train_transform,
+                window_length=window_length,
+                padding=self.padding,
+                jitter=True,
+            )
+            for window_length in train_window_lengths
+            for hdf5_path in self.train_sessions
+        ]
+        self.train_dataset = ConcatDataset(train_datasets)
+        self._train_sampler = None
+        if self.train_window_weights is not None:
+            repeated_weights = [weight for weight in self.train_window_weights for _ in self.train_sessions]
+            self._train_sampler = self._build_weighted_sampler(train_datasets, repeated_weights)
+
         self.val_dataset = ConcatDataset(
             [
                 WindowedEMGDataset(
@@ -107,7 +137,8 @@ class WindowedEMGDataModule(pl.LightningDataModule):
         return DataLoader(
             self.train_dataset,
             batch_size=self.batch_size,
-            shuffle=True,
+            shuffle=self._train_sampler is None,
+            sampler=self._train_sampler,
             num_workers=self.num_workers,
             collate_fn=WindowedEMGDataset.collate,
             pin_memory=True,

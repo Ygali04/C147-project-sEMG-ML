@@ -63,6 +63,9 @@ in the result columns when runs complete.
 ## Wave 1 Launch Template
 
 ```bash
+uv run python scripts/sync_baseline_from_b2.py
+bash scripts/wave0_control_training.sh
+
 export TDS_CKPT=/root/checkpoints/tds_best.ckpt
 export LARGE_TRANSFORMER_CKPT=/root/checkpoints/transformer_large_best.ckpt
 export SMALL_TRANSFORMER_CKPT=/root/checkpoints/transformer_small_best.ckpt
@@ -91,6 +94,12 @@ bash scripts/wave2_logit_merge_grid.sh
 | Model | Train windows | Curriculum | Positional encoding | Test inference | Val CER | Test CER | Gap | Notes |
 |---|---|---|---|---|---:|---:|---:|---|
 | `t5_ctc_large` | `4s` | none | sinusoidal | full_session | — | — | — | control |
+
+## Wave 3 Launch Template
+
+```bash
+bash scripts/wave3_variable_window_sweep.sh
+```
 
 ## Architecture Comparison Template
 
